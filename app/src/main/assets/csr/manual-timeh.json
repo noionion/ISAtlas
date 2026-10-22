@@ -1,0 +1,50 @@
+{
+  "id": "riscv/manual/csr/timeh",
+  "namespace": "manual",
+  "name": "timeh",
+  "title": "Upper 32 bits of time, RV32 only",
+  "summary": "实时时间计数的 RV32 高半部。",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 3201
+  },
+  "privilege": "U",
+  "access": "RO",
+  "xlens": [
+    32
+  ],
+  "condition": "",
+  "extensions": [
+    "U",
+    "Zicntr"
+  ],
+  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
+  "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "TIMEH",
+      "summary": "读取逻辑 64 位计数值的高 32 位。",
+      "access": "RO",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 0
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/counters.adoc",
+      "summaryEn": "Report real-time counter state through its RV32 high-half CSR.",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "读取逻辑 64 位计数值的高 32 位。实时时间计数值，是平台时间源的只读视图，速率与周期计数器可以不同。"
+    }
+  ],
+  "regions": [],
+  "summaryEn": "Upper 32 bits of time, RV32 only"
+}

@@ -97,7 +97,10 @@ fun FilterPanel(state: AtlasState, model: AppViewModel) {
     val sources: @Composable ColumnScope.() -> Unit = {
             Text("数据来源", style = MaterialTheme.typography.labelLarge)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(0.dp)) {
-                listOf(null to "全部", "standard" to "标准", "andes" to "Andes", "thead" to "玄铁").forEach { (value, label) ->
+                val namespaces = state.pack?.registers.orEmpty().map { it.namespace.ifBlank { state.pack!!.namespace } }.distinct().sorted()
+                (listOf<Pair<String?, String>>(null to "全部") + namespaces.map { value ->
+                    value to when (value) { "manual" -> "ISA 手册"; "thead" -> "玄铁"; else -> value }
+                }).forEach { (value, label) ->
                     FilterChip(selected = state.namespace == value, onClick = { model.namespace(value) },
                         label = { Text(label, style = MaterialTheme.typography.labelMedium) },
                         modifier = Modifier.testTag("source-${value ?: "all"}"))

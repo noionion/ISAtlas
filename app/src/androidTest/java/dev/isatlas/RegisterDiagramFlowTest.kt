@@ -26,14 +26,15 @@ class RegisterDiagramFlowTest {
         compose.onNodeWithContentDescription("筛选").performClick()
         compose.onNodeWithText("RV64").performClick()
         compose.onNodeWithTag("filter-permission-all").performClick()
-        compose.onNodeWithText("完成").performScrollTo().performClick()
+        val panel = compose.onNodeWithTag("filter-panel").fetchSemanticsNode().boundsInRoot
+        compose.onRoot().performTouchInput { click(Offset(panel.left / 2f, centerY)) }
         compose.onNodeWithTag("search-input").performTextReplacement("mstatus")
         compose.onNode(hasText("mstatus") and hasText("M · CSR")).performClick()
         compose.onNodeWithTag("register-detail-list").performScrollToIndex(1)
         compose.onNodeWithTag("diagram-MPP-12-11").assertIsDisplayed().performClick()
         compose.onNodeWithTag("diagram-MPP-12-11").assertIsSelected()
         saveDiagram("register-16.png")
-        compose.onNodeWithText("MPP [12:11] · WARL · RW-H").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("MPP [12:11] · WARL").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("32 位/行").performScrollTo().performClick()
         compose.onNodeWithTag("diagram-MPP-12-11").assertIsSelected()
         compose.onNodeWithTag("register-detail-list").performScrollToIndex(1)
@@ -55,7 +56,7 @@ class RegisterDiagramFlowTest {
             up()
         }
         compose.onNodeWithTag("diagram-SIE-1-1").assertIsSelected()
-        compose.onNodeWithText("已选：SIE [1] · RO / RW-H（依配置）").assertIsDisplayed()
+        compose.onNodeWithText("已选：SIE [1]", substring = true).assertIsDisplayed()
         saveDiagram("register-drag.png")
         compose.onNodeWithText("32 位/行").performScrollTo().performClick()
         compose.onNodeWithTag("register-detail-list").performScrollToIndex(1)
@@ -77,7 +78,8 @@ class RegisterDiagramFlowTest {
         compose.onNodeWithContentDescription("筛选").performClick()
         compose.onNodeWithText("RV64").performClick()
         compose.onNodeWithTag("filter-permission-all").performClick()
-        compose.onNodeWithText("完成").performScrollTo().performClick()
+        val panel = compose.onNodeWithTag("filter-panel").fetchSemanticsNode().boundsInRoot
+        compose.onRoot().performTouchInput { click(Offset(panel.left / 2f, centerY)) }
         compose.onNodeWithTag("search-input").performTextReplacement(name)
         compose.onNode(hasText(name) and hasText("$privilege · CSR")).performClick()
         compose.onNodeWithTag("register-detail-list").performScrollToIndex(1)
@@ -87,7 +89,7 @@ class RegisterDiagramFlowTest {
         open("mcause")
         compose.onNodeWithTag("register-detail-list").performScrollToIndex(0)
         compose.onNodeWithText("0x342 | MRW").assertIsDisplayed()
-        compose.onNodeWithText("desc: trap cause").assertIsDisplayed()
+        compose.onNodeWithText("desc: 机器模式陷阱原因").assertIsDisplayed()
         compose.onNodeWithText("16 位/行").assertIsSelected()
         compose.onNodeWithTag("diagram-CODE-15-0").assertIsDisplayed()
         saveScreen("register-detail-portrait.png")

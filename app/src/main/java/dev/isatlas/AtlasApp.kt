@@ -276,7 +276,7 @@ private fun RegisterDetail(state: AtlasState, reg: RegisterDefinition, onWidthCh
     }
     val address = (reg.locator as RegisterLocator.Csr).address
     val access = reg.privilege + if ((address shr 10) == 3) "RO" else "RW"
-    val description = reg.title.removePrefix("Machine ").removePrefix("Supervisor ").replaceFirstChar { it.lowercase() }
+    val description = reg.summary.ifBlank { reg.title }.removeSuffix("。")
     LazyColumn(state = list, modifier = Modifier.testTag("register-detail-list"), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -336,7 +336,10 @@ private fun RegisterDetail(state: AtlasState, reg: RegisterDefinition, onWidthCh
                             TextButton(onClick = { expanded = !expanded }) { Text(if (expanded) "收起访问规则" else "访问规则（依配置）") }
                             if (expanded) Text(field.typeRule, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
                         }
-                        field.values.forEach { (value, description) -> Text("$value  →  $description", style = MaterialTheme.typography.bodySmall) }
+                        (field.valuesByXlen[state.xlen] ?: field.values).forEach { (value, description) -> Text("$value  →  $description", style = MaterialTheme.typography.bodySmall) }
+                        if (field.sourceUrl.isNotBlank()) TextButton(onClick = { runCatching { uriHandler.openUri(field.sourceUrl) }.onFailure { sourceError = true } }) {
+                            Text("字段规范原文")
+                        }
                     }
                 }
             }

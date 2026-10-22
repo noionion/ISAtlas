@@ -1,0 +1,84 @@
+{
+  "id": "riscv/manual/csr/hgeie",
+  "namespace": "manual",
+  "name": "hgeie",
+  "title": "Hypervisor guest external interrupt-enable register",
+  "summary": "访客外部中断使能位图。",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 1543
+  },
+  "privilege": "H",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "",
+  "extensions": [
+    "H"
+  ],
+  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
+  "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "GEIE",
+      "summary": "选择参与 HS 级 guest external interrupt 汇总的中断源。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 1
+        },
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 1
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+      "summaryEn": "Select guest external interrupts contributing to the HS-level summary.",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "编号从 1 开始；实现数量为 GEILEN，未实现的位为只读零，bit 0 固定为零。每位 0 表示未挂起/未使能，1 表示挂起/使能；这是独立位掩码而非单值枚举。"
+    }
+  ],
+  "regions": [
+    {
+      "label": "0",
+      "access": "RO",
+      "summary": "只读零区域。",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 0,
+          "lsb": 0
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+      "summaryEn": "This region reads as zero."
+    },
+    {
+      "label": "0",
+      "access": "RO",
+      "summary": "只读零区域。",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 0,
+          "lsb": 0
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+      "summaryEn": "This region reads as zero."
+    }
+  ],
+  "summaryEn": "Hypervisor guest external interrupt-enable register"
+}

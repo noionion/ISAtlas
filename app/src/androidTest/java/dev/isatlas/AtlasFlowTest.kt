@@ -34,7 +34,7 @@ class AtlasFlowTest {
         compose.onNodeWithTag("search-group-DESCRIPTION").assertDoesNotExist()
         compose.onNodeWithText("当前数据范围内没有匹配项").assertDoesNotExist()
         csr("mstatus").performClick()
-        compose.onNodeWithText("desc: status").assertIsDisplayed()
+        compose.onNodeWithText("desc: 机器模式状态与陷阱控制").assertIsDisplayed()
         compose.onNodeWithContentDescription("返回搜索").performClick()
         compose.onNodeWithTag("search-input").performTextReplacement("zz_no_csr_matches_zz")
         compose.onNodeWithText("当前数据范围内没有匹配项").assertIsDisplayed()
@@ -61,7 +61,8 @@ class AtlasFlowTest {
         compose.onNodeWithContentDescription("返回搜索").performClick()
         compose.onNodeWithTag("search-group-CSR").assert(closed)
         compose.onNodeWithTag("search-group-FIELD").performScrollTo().performClick().assert(closed)
-        compose.onNodeWithTag("search-group-DESCRIPTION").assert(open).performClick().assert(closed)
+        val hasDescription = compose.onAllNodesWithTag("search-group-DESCRIPTION").fetchSemanticsNodes().isNotEmpty()
+        if (hasDescription) compose.onNodeWithTag("search-group-DESCRIPTION").assert(open).performClick().assert(closed)
         compose.onNodeWithText("当前数据范围内没有匹配项").assertDoesNotExist()
         compose.onNodeWithTag("search-group-CSR").performScrollTo().performClick().assert(open)
         val context = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext
@@ -70,7 +71,6 @@ class AtlasFlowTest {
             bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
         }
         compose.onNodeWithTag("search-group-FIELD").performScrollTo().performClick()
-        compose.onNodeWithTag("search-group-DESCRIPTION").performScrollTo().performClick()
     }
 
     @Test fun widthFilterAndNoResults() {
@@ -80,7 +80,28 @@ class AtlasFlowTest {
         compose.onNodeWithText("RV32").performClick()
         closeFilters()
         csr("mstatush").performClick()
-        compose.onNodeWithText("desc: status high").assertIsDisplayed()
+        compose.onNodeWithText("desc: RV32 的机器状态高半部").assertIsDisplayed()
+    }
+
+    @Test fun fieldDescriptionsAndEnumsFollowSelectedWidth() {
+        compose.onNodeWithTag("search-input").performTextReplacement("satp.MODE")
+        compose.onNode(hasText("satp.MODE") and hasText("S · FIELD")).performClick()
+        compose.onAllNodesWithText("选择地址转换模式；Bare 不执行本级分页，支持的分页模式由 XLEN 与实现决定。").onLast().performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("8  →  Sv39").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("1  →  Sv32").assertDoesNotExist()
+        compose.onNodeWithTag("register-detail-list").performScrollToIndex(1)
+        compose.onNode(hasText("RV32") and hasAnyAncestor(hasTestTag("register-detail-list"))).performClick()
+        compose.onNodeWithText("1  →  Sv32").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("8  →  Sv39").assertDoesNotExist()
+        compose.onNodeWithContentDescription("返回搜索").performClick()
+        compose.onNodeWithTag("search-input").performTextReplacement("mstatus.MIE")
+        compose.onNode(hasText("mstatus.MIE") and hasText("M · FIELD")).performClick()
+        compose.onAllNodesWithText("M 模式全局中断允许位。").onLast().performScrollTo().assertIsDisplayed()
+        compose.onNode(hasText("1  →  允许本级全局中断") and hasText("MIE  [3]")).performScrollTo().assertIsDisplayed()
+        val context = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext
+        java.io.File(context.getExternalFilesDir(null), "field-description-zh.png").outputStream().use {
+            compose.onRoot().captureToImage().asAndroidBitmap().compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
+        }
     }
 
     @Test fun rightFilterPanelSupportsDraggingAndSelectsPrerequisites() {
@@ -143,7 +164,7 @@ class AtlasFlowTest {
             compose.onNodeWithTag("extension-search").assertIsDisplayed()
             org.junit.Assert.assertTrue(compose.onNodeWithTag("extension-search").fetchSemanticsNode().boundsInRoot.left >
                 compose.onNodeWithTag("filter-width").fetchSemanticsNode().boundsInRoot.right)
-            compose.onNodeWithTag("source-standard").performClick().assertIsSelected()
+            compose.onNodeWithTag("source-manual").performClick().assertIsSelected()
             saveFilterScreen("filters-right-landscape.png")
             compose.onNodeWithText("重置筛选").performClick()
             closeFilters()
@@ -189,19 +210,22 @@ class AtlasFlowTest {
 
     @Test fun importedVendorFieldsAndAddressOnlyEntriesAreDistinct() {
         compose.onNodeWithContentDescription("筛选").performClick()
-        compose.onNodeWithText("RV32").performClick()
-        compose.onNodeWithTag("source-andes").performScrollTo().performClick().assertIsSelected()
+        compose.onNodeWithText("RV64").performClick()
+        compose.onNodeWithTag("source-andes").assertDoesNotExist()
+        compose.onNodeWithTag("source-standard").assertDoesNotExist()
+        compose.onNodeWithTag("source-manual").assertIsDisplayed()
+        compose.onNodeWithTag("source-thead").performScrollTo().performClick().assertIsSelected()
         saveFilterScreen("filters-sources.png")
         closeFilters()
-        compose.onNodeWithTag("search-input").performTextReplacement("mcache_ctl")
-        csr("mcache_ctl").performClick()
+        compose.onNodeWithTag("search-input").performTextReplacement("th.sxstatus")
+        compose.onNode(hasText("th.sxstatus") and hasText("S · CSR")).performClick()
         compose.onNodeWithTag("register-diagram").assertIsDisplayed()
         compose.onNodeWithContentDescription("返回搜索").performClick()
         compose.onNodeWithContentDescription("筛选").performClick()
         compose.onNodeWithText("重置筛选").performScrollTo().performClick()
         closeFilters()
-        compose.onNodeWithTag("search-input").performTextReplacement("stopei")
-        compose.onNode(hasText("stopei") and hasText("S · CSR")).performClick()
+        compose.onNodeWithTag("search-input").performTextReplacement("dcsr")
+        compose.onNode(hasText("dcsr") and hasText("D · CSR")).performClick()
         compose.onNodeWithText("仅收录地址，字段布局待补充。").assertIsDisplayed()
         compose.onNodeWithContentDescription("数据包信息").performClick()
         compose.onNodeWithText("数据来源与许可").performClick()

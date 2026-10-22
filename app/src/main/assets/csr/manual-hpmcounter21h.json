@@ -1,0 +1,50 @@
+{
+  "id": "riscv/manual/csr/hpmcounter21h",
+  "namespace": "manual",
+  "name": "hpmcounter21h",
+  "title": "Upper 32 bits of hpmcounter4, RV32 only",
+  "summary": "性能事件计数的 RV32 高半部。",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 3221
+  },
+  "privilege": "U",
+  "access": "RO",
+  "xlens": [
+    32
+  ],
+  "condition": "",
+  "extensions": [
+    "U",
+    "Zihpm"
+  ],
+  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
+  "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "HPMCOUNTER21H",
+      "summary": "读取逻辑 64 位计数值的高 32 位。",
+      "access": "RO",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 0
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/counters.adoc",
+      "summaryEn": "Count the selected performance events through its RV32 high-half CSR.",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "读取逻辑 64 位计数值的高 32 位。性能事件计数值，由相应 mhpmevent 选择事件；计数精度与可实现值受硬件能力约束。"
+    }
+  ],
+  "regions": [],
+  "summaryEn": "Upper 32 bits of hpmcounter4, RV32 only"
+}

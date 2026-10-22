@@ -1,0 +1,149 @@
+{
+  "id": "riscv/manual/csr/satp",
+  "namespace": "manual",
+  "name": "satp",
+  "title": "Supervisor address translation and protection",
+  "summary": "监管模式地址转换根配置。",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 384
+  },
+  "privilege": "S",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "",
+  "extensions": [
+    "S"
+  ],
+  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
+  "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "MODE",
+      "summary": "选择地址转换模式；Bare 不执行本级分页，支持的分页模式由 XLEN 与实现决定。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 31
+        },
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 60
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/supervisor.adoc",
+      "summaryEn": "Select the page-table translation mode.",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {
+        "32": {
+          "0": "Bare：关闭本级分页",
+          "1": "Sv32"
+        },
+        "64": {
+          "0": "Bare",
+          "1": "保留",
+          "2": "保留",
+          "3": "保留",
+          "4": "保留",
+          "5": "保留",
+          "6": "保留",
+          "7": "保留",
+          "8": "Sv39",
+          "9": "Sv48",
+          "10": "Sv57",
+          "11": "保留",
+          "12": "保留",
+          "13": "保留",
+          "14": "保留",
+          "15": "保留"
+        }
+      },
+      "valuesEnByXlen": {
+        "32": {
+          "0": "Bare: no translation",
+          "1": "Sv32"
+        },
+        "64": {
+          "0": "Bare",
+          "1": "Reserved",
+          "2": "Reserved",
+          "3": "Reserved",
+          "4": "Reserved",
+          "5": "Reserved",
+          "6": "Reserved",
+          "7": "Reserved",
+          "8": "Sv39",
+          "9": "Sv48",
+          "10": "Sv57",
+          "11": "Reserved",
+          "12": "Reserved",
+          "13": "Reserved",
+          "14": "Reserved",
+          "15": "Reserved"
+        }
+      },
+      "typeRule": "RV32 MODE：0=Bare，1=Sv32（hgatp 为 Sv32x4）。RV64 MODE：0=Bare，8=Sv39，9=Sv48，10=Sv57；hgatp 对应 Sv39x4/Sv48x4/Sv57x4。并非所有编码都必须实现。"
+    },
+    {
+      "name": "ASID",
+      "summary": "地址空间标识符，用于区分不同地址空间的地址转换缓存；实际可写位数由实现决定。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 30,
+          "lsb": 22
+        },
+        {
+          "xlen": 64,
+          "msb": 59,
+          "lsb": 44
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/supervisor.adoc",
+      "summaryEn": "Tag the address space for address-translation caching.",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "PPN",
+      "summary": "根页表物理页号；须按本级转换模式的地址宽度与根页表对齐规则解释。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 21,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 43,
+          "lsb": 0
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/supervisor.adoc",
+      "summaryEn": "Encode the root page-table physical page number.",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    }
+  ],
+  "regions": [],
+  "summaryEn": "Supervisor address translation and protection"
+}

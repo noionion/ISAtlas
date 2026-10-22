@@ -1,0 +1,55 @@
+{
+  "id": "riscv/thead/csr/th.sxstatus",
+  "namespace": "thead",
+  "name": "th.sxstatus",
+  "title": "XuanTie extension status",
+  "summary": "XuanTie extension status register for S-mode",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 1472
+  },
+  "privilege": "S",
+  "access": "RW",
+  "xlens": [
+    64
+  ],
+  "condition": "XTheadSxStatus 1.0 · mvendorid=0x5B7",
+  "notes": "原文同时将低 8 位列为 0、低 22 位列为 WPRI，存在歧义；低 22 位不作推断。THEADISAEE 不应清零，清零行为未定义。",
+  "sourceUrl": "https://github.com/T-head-Semi/thead-extension-spec/blob/5a75db2696881a812a04e6e00347d3920dae03f2/xtheadsxstatus.adoc",
+  "sourceRevision": "5a75db2696881a812a04e6e00347d3920dae03f2",
+  "license": "Apache-2.0",
+  "coverage": "fields",
+  "extensions": [
+    "XTheadSxStatus"
+  ],
+  "fields": [
+    {
+      "name": "THEADISAEE",
+      "summary": "Controls availability of XThead extensions. Do not clear; clearing behavior is undefined.",
+      "access": "RW（不应清零）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 22,
+          "lsb": 22
+        }
+      ],
+      "values": {},
+      "condition": ""
+    }
+  ],
+  "regions": [
+    {
+      "label": "WPRI",
+      "access": "WPRI",
+      "summary": "Reserved by XTheadSxStatus 1.0; other extensions may define these bits.",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 23
+        }
+      ]
+    }
+  ]
+}

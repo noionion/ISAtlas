@@ -8,7 +8,7 @@ from csr_storage import write_catalog, read_catalog, catalog_sha256
 
 class CsrStorageTests(unittest.TestCase):
     def setUp(self):
-        self.pack = json.loads((Path(__file__).resolve().parents[1] / "core/src/test/resources/riscv-standard-sample.json").read_text(encoding="utf-8"))
+        self.pack = json.loads((Path(__file__).resolve().parents[1] / "core/src/test/resources/riscv-manual-sample.json").read_text(encoding="utf-8"))
 
     def test_roundtrip_dedup_and_deterministic_output(self):
         original = copy.deepcopy(self.pack)

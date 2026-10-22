@@ -17,12 +17,13 @@ __pycache__/
 *.keystore
 keystore.properties
 
-# Local review material and unverified architecture data.
-/docs/
-/app/src/main/assets/
-/core/src/test/resources/*.json
+# Generated reports, screenshots and local design material.
+/docs/*
+!/docs/data-import.md
+!/docs/data-format.md
+!/docs/field-review.md
 
-# Keep source-specific import work local until its provenance is reviewed.
-/tools/*
-!/tools/csr_storage.py
-!/tools/test_csr_storage.py
+# Retired local discovery material, unused by the official manual importer.
+/tools/discover_github_sources.py
+/tools/csr-corrections.json
+/tools/New-SamplePack.ps1

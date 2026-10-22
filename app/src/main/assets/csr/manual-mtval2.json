@@ -1,0 +1,52 @@
+{
+  "id": "riscv/manual/csr/mtval2",
+  "namespace": "manual",
+  "name": "mtval2",
+  "title": "Machine second trap value",
+  "summary": "机器模式的补充地址陷阱信息。",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 843
+  },
+  "privilege": "M",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "",
+  "extensions": [],
+  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
+  "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "MTVAL2",
+      "summary": "保存两阶段地址转换陷阱的补充信息；适用时记录右移两位的访客物理地址。",
+      "access": "WARL / RO=0（依实现）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 0
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+      "summaryEn": "Hold supplementary guest-physical-address trap information.",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    }
+  ],
+  "regions": [],
+  "summaryEn": "Machine second trap value"
+}

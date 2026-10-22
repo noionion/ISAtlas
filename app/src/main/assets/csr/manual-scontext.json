@@ -1,0 +1,29 @@
+{
+  "id": "riscv/manual/csr/scontext",
+  "namespace": "manual",
+  "name": "scontext",
+  "title": "Supervisor-mode context register",
+  "summary": "监管模式调试上下文。",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 1448
+  },
+  "privilege": "S",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "",
+  "extensions": [
+    "S"
+  ],
+  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
+  "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "coverage": "address-only",
+  "fields": [],
+  "regions": [],
+  "summaryEn": "Supervisor-mode context register"
+}

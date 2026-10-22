@@ -1,0 +1,54 @@
+{
+  "id": "riscv/manual/csr/vstval",
+  "namespace": "manual",
+  "name": "vstval",
+  "title": "Virtual supervisor trap value",
+  "summary": "虚拟监管模式的地址或指令陷阱信息。",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 579
+  },
+  "privilege": "VS",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "",
+  "extensions": [
+    "H"
+  ],
+  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
+  "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "VSTVAL",
+      "summary": "保存陷阱附加信息，例如出错地址或指令信息；不提供该类信息时为零。",
+      "access": "WARL / RO=0（依实现）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 0
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+      "summaryEn": "Hold trap-specific address or instruction information, or zero.",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    }
+  ],
+  "regions": [],
+  "summaryEn": "Virtual supervisor trap value"
+}

@@ -1,0 +1,88 @@
+{
+  "id": "riscv/manual/csr/vstvec",
+  "namespace": "manual",
+  "name": "vstvec",
+  "title": "Virtual supervisor trap handler base address",
+  "summary": "虚拟监管模式陷阱入口地址与模式。",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 517
+  },
+  "privilege": "VS",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "",
+  "extensions": [
+    "H"
+  ],
+  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
+  "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "BASE",
+      "summary": "陷阱入口基地址，存放地址的高 XLEN-2 位；最低两位由 MODE 占用，向量模式可能要求更严格对齐。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 2
+        },
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 2
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+      "summaryEn": "Encode the aligned trap-handler base address.",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "MODE",
+      "summary": "选择陷阱入口方式：Direct 使用 BASE；Vectored 对异步中断使用 BASE+4×cause，同步异常仍进入 BASE。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 1,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 1,
+          "lsb": 0
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+      "summaryEn": "Select direct or vectored trap entry.",
+      "values": {
+        "0": "Direct",
+        "1": "Vectored",
+        "2": "保留",
+        "3": "保留"
+      },
+      "valuesEn": {
+        "0": "Direct",
+        "1": "Vectored",
+        "2": "Reserved",
+        "3": "Reserved"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    }
+  ],
+  "regions": [],
+  "summaryEn": "Virtual supervisor trap handler base address"
+}

@@ -39,6 +39,11 @@ data class FieldDefinition(
     val condition: String = "",
     val aliases: List<String> = emptyList(),
     val typeRule: String = "",
+    val sourceUrl: String = "",
+    val summaryEn: String = "",
+    val valuesEn: Map<String, String> = emptyMap(),
+    val valuesByXlen: Map<Int, Map<String, String>> = emptyMap(),
+    val valuesEnByXlen: Map<Int, Map<String, String>> = emptyMap(),
 ) {
     fun layout(xlen: Int) = layouts.singleOrNull { it.xlen == xlen }
 }
@@ -49,6 +54,8 @@ data class BitRegion(
     val access: String,
     val summary: String,
     val layouts: List<BitLayout>,
+    val sourceUrl: String = "",
+    val summaryEn: String = "",
 ) {
     fun layout(xlen: Int) = layouts.singleOrNull { it.xlen == xlen }
 }
@@ -73,6 +80,7 @@ data class RegisterDefinition(
     val license: String = "",
     val coverage: String = "fields",
     val extensions: List<String> = emptyList(),
+    val summaryEn: String = "",
 )
 
 @Serializable
@@ -124,7 +132,10 @@ object Catalog {
                     require(bits.xlen in reg.xlens && bits.lsb >= 0 && bits.msb >= bits.lsb && bits.msb < bits.xlen) {
                         "${reg.name}.${field.name}: 无效位范围"
                     }
-                    field.values.keys.forEach { raw ->
+                    require(field.valuesByXlen.keys.all { width -> field.layouts.any { it.xlen == width } })
+                    require(field.valuesEn.isEmpty() || field.valuesEn.keys == field.values.keys)
+                    require(field.valuesEnByXlen.all { (width, values) -> field.valuesByXlen[width]?.keys == values.keys })
+                    (field.valuesByXlen[bits.xlen] ?: field.values).keys.forEach { raw ->
                         val value = raw.toULongOrNull() ?: error("无效枚举编码")
                         val width = bits.msb - bits.lsb + 1
                         require(width == 64 || value < (1uL shl width)) { "枚举编码溢出" }

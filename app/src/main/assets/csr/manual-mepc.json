@@ -1,0 +1,53 @@
+{
+  "id": "riscv/manual/csr/mepc",
+  "namespace": "manual",
+  "name": "mepc",
+  "title": "Machine exception program counter",
+  "summary": "机器模式陷阱返回地址。",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 833
+  },
+  "privilege": "M",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "",
+  "extensions": [],
+  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
+  "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "MEPC",
+      "summary": "保存陷阱发生时的返回指令地址；对应的特权返回指令从这里恢复执行。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 0
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Hold the trap return program counter subject to address and alignment constraints.",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "保存陷阱发生时的返回指令地址；对应的特权返回指令从这里恢复执行。可实现地址及低位对齐规则受架构和 IALIGN 约束。"
+    }
+  ],
+  "regions": [],
+  "summaryEn": "Machine exception program counter"
+}

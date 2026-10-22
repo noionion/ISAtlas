@@ -4,12 +4,12 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class CatalogTest {
-    private val pack = Catalog.decode(javaClass.getResource("/riscv-standard-sample.json")!!.readText())
+    private val pack = Catalog.decode(javaClass.getResource("/riscv-manual-sample.json")!!.readText())
 
     @Test fun `bundled pack passes validation with explicit coverage`() {
         assertEquals(15, pack.registers.size)
         assertTrue(pack.coverage.isNotBlank())
-        assertEquals("ISA 20240411 / Machine & Supervisor 1.13", pack.source.revision)
+        assertEquals("584390d9d872835b1bc45ab9ea946b56db3ad485", pack.source.revision)
     }
 
     @Test fun `hex decimal and case-insensitive names find same register`() {
@@ -42,13 +42,13 @@ class CatalogTest {
     }
 
     @Test fun `text tokens and privilege filters apply together`() {
-        assertEquals("satp", Search.query(pack, "地址 转换", 64, "S").first().register.name)
-        assertTrue(Search.query(pack, "satp", 64, "M").isEmpty())
-        assertEquals("mtvec", Search.query(pack, "trap vector", 32).first().register.name)
+        assertEquals("satp", Search.query(pack, "address translation", 64, "S").first().register.name)
+        assertTrue(Search.query(pack, "satp", 64, "M").all { it.register.privilege == "M" && it.category != SearchCategory.CSR })
+        assertEquals("mtvec", Search.query(pack, "trap handler", 32).first().register.name)
     }
 
     @Test fun `vendor id bank stays 32 bit wide even on RV64 and misa MXL is read only`() {
-        val bank = pack.registers.first { it.name == "mvendorid" }.fields.first { it.name == "Bank" }
+        val bank = pack.registers.first { it.name == "mvendorid" }.fields.first { it.name == "BANK" }
         assertEquals(BitLayout(64, 31, 7), bank.layout(64))
         assertEquals("RO", pack.registers.first { it.name == "misa" }.fields.first { it.name == "MXL" }.access)
     }

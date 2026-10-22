@@ -1,0 +1,55 @@
+{
+  "id": "riscv/manual/csr/vstart",
+  "namespace": "manual",
+  "name": "vstart",
+  "title": "Vector start position",
+  "summary": "向量指令起始元素索引。",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 8
+  },
+  "privilege": "U",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "",
+  "extensions": [
+    "U",
+    "V"
+  ],
+  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
+  "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "VSTART",
+      "summary": "指定向量指令开始或重新开始执行的元素索引。",
+      "access": "RW",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 0
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc",
+      "summaryEn": "Select the first vector element to execute or restart.",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    }
+  ],
+  "regions": [],
+  "summaryEn": "Vector start position"
+}

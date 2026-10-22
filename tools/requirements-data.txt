@@ -1,0 +1,1 @@
+# The current ISA manual importer uses only the Python 3.10+ standard library.

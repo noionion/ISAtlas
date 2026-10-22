@@ -1,0 +1,67 @@
+{
+  "id": "riscv/manual/csr/pmpaddr62",
+  "namespace": "manual",
+  "name": "pmpaddr62",
+  "title": "Physical memory protection address register",
+  "summary": "PMP 区域地址编码。",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 1006
+  },
+  "privilege": "M",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "",
+  "extensions": [],
+  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
+  "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "ADDRESS",
+      "summary": "PMP 地址编码，保存物理地址移除低两位后的值；其匹配范围由关联 A 字段决定，NAPOT 还使用低位编码区域大小。",
+      "access": "WARL（受粒度和锁定约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 53,
+          "lsb": 0
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Encode the PMP address and, for NAPOT, the matched region size.",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    }
+  ],
+  "regions": [
+    {
+      "label": "0",
+      "access": "WARL",
+      "summary": "手册位图明确标注的区域。",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 54
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/pmpaddr-rv64.edn",
+      "summaryEn": "Writes may be constrained to architecturally legal values."
+    }
+  ],
+  "summaryEn": "Physical memory protection address register"
+}

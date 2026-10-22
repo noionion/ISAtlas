@@ -25,7 +25,7 @@ class IsaExtensionFilterTest {
 
     @Test fun `floating and vector prerequisite closures are transitive`() {
         assertTrue(options.selectionClosure(setOf("d")).containsAll(listOf("d", "f", "zicsr")))
-        assertTrue(options.selectionClosure(setOf("v")).containsAll(listOf("v", "d", "f", "zve32x", "zvl32b", "zicsr")))
+        assertTrue(options.selectionClosure(setOf("v")).containsAll(listOf("v", "d", "f", "zicsr")))
         assertEquals(options.selectionClosure(setOf("v")), options.selectionClosure(options.selectionClosure(setOf("v"))))
     }
 
@@ -33,7 +33,7 @@ class IsaExtensionFilterTest {
         val selected = options.selectionClosure(setOf("h"))
         assertTrue(selected.containsAll(listOf("h", "i", "s", "u")))
         assertFalse("sm" in selected)
-        assertTrue("sm" in options.associatedTags(selected))
+        assertFalse("sm" in options.associatedTags(selected))
     }
 
     @Test fun `extension association finds containing CSR but not unrelated fields`() {

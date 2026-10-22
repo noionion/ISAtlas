@@ -31,7 +31,7 @@ object Search {
                 val name = reg.name.lowercase(Locale.ROOT)
                 val namespaced = "${reg.namespace.ifBlank { pack.namespace }}.$name".lowercase(Locale.ROOT)
                 val identifiers = "$name $namespaced"
-                val regText = "$identifiers ${reg.title} ${reg.summary} ${reg.condition} ${reg.extensions.joinToString(" ")}".lowercase(Locale.ROOT)
+                val regText = "$identifiers ${reg.title} ${reg.summary} ${reg.summaryEn} ${reg.condition} ${reg.extensions.joinToString(" ")}".lowercase(Locale.ROOT)
                 val addressMatch = (reg.locator as RegisterLocator.Csr).address == address
                 val nameMatch = !numeric && tokens.all { token -> token in name || ('.' in token && token in namespaced) }
                 if (query.isEmpty() || addressMatch || nameMatch) {
@@ -53,7 +53,7 @@ object Search {
                         val qualified = names.flatMap { listOf("$name.$it", "$namespaced.$it") }
                         val fieldIdentifiers = (names + qualified).joinToString(" ")
                         val allIdentifiers = "$identifiers $fieldIdentifiers"
-                        val fieldText = "${field.summary} ${field.condition}".lowercase(Locale.ROOT)
+                        val fieldText = "${field.summary} ${field.summaryEn} ${field.condition}".lowercase(Locale.ROOT)
                         val fieldSpecific = tokens.any { token -> names.any { token in it } || qualified.any { token in it && '.' in token } }
                         val identityMatch = tokens.all { token -> token in name || names.any { token in it } || qualified.any { '.' in token && token in it } }
                         if (identityMatch && fieldSpecific) {

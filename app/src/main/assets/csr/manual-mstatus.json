@@ -1,0 +1,939 @@
+{
+  "id": "riscv/manual/csr/mstatus",
+  "namespace": "manual",
+  "name": "mstatus",
+  "title": "Machine status register",
+  "summary": "机器模式状态与陷阱控制。",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 768
+  },
+  "privilege": "M",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "",
+  "extensions": [],
+  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
+  "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "SIE",
+      "summary": "S 模式全局中断允许位。",
+      "access": "RW / RO=0（依实现）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 1,
+          "lsb": 1
+        },
+        {
+          "xlen": 64,
+          "msb": 1,
+          "lsb": 1
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Control global interrupt enable in S-mode.",
+      "values": {
+        "0": "关闭本级全局中断",
+        "1": "允许本级全局中断"
+      },
+      "valuesEn": {
+        "0": "Disable interrupts at this level",
+        "1": "Enable interrupts at this level"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "S 模式全局中断允许位。在 S 模式下控制可屏蔽中断；未实现 S 模式时可为只读零。"
+    },
+    {
+      "name": "MIE",
+      "summary": "M 模式全局中断允许位。",
+      "access": "RW",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 3,
+          "lsb": 3
+        },
+        {
+          "xlen": 64,
+          "msb": 3,
+          "lsb": 3
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Control global interrupt enable in M-mode.",
+      "values": {
+        "0": "关闭本级全局中断",
+        "1": "允许本级全局中断"
+      },
+      "valuesEn": {
+        "0": "Disable interrupts at this level",
+        "1": "Enable interrupts at this level"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "M 模式全局中断允许位。在 M 模式下，1 允许、0 禁止可屏蔽中断；还需满足对应中断源的使能条件。"
+    },
+    {
+      "name": "SPIE",
+      "summary": "记录进入 S 模式陷阱前的全局中断允许状态；SRET 用它恢复 SIE，随后将该位置 1。",
+      "access": "RW / RO=0（依实现）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 5,
+          "lsb": 5
+        },
+        {
+          "xlen": 64,
+          "msb": 5,
+          "lsb": 5
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Save the pre-trap S-mode interrupt-enable state.",
+      "values": {
+        "0": "先前中断关闭",
+        "1": "先前中断开启"
+      },
+      "valuesEn": {
+        "0": "Previous interrupts disabled",
+        "1": "Previous interrupts enabled"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "UBE",
+      "summary": "控制 U 模式显式数据访问的字节序；不改变指令取指的字节序。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 6,
+          "lsb": 6
+        },
+        {
+          "xlen": 64,
+          "msb": 6,
+          "lsb": 6
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Select endianness for explicit U-mode data accesses.",
+      "values": {
+        "0": "小端",
+        "1": "大端"
+      },
+      "valuesEn": {
+        "0": "Little-endian",
+        "1": "Big-endian"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "MPIE",
+      "summary": "记录进入 M 模式陷阱前的全局中断允许状态；MRET 用它恢复 MIE，随后将该位置 1。",
+      "access": "RW",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 7,
+          "lsb": 7
+        },
+        {
+          "xlen": 64,
+          "msb": 7,
+          "lsb": 7
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Save the pre-trap M-mode interrupt-enable state.",
+      "values": {
+        "0": "先前中断关闭",
+        "1": "先前中断开启"
+      },
+      "valuesEn": {
+        "0": "Previous interrupts disabled",
+        "1": "Previous interrupts enabled"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "SPP",
+      "summary": "记录进入 S 模式陷阱前的特权级：0 为 U，1 为 S；SRET 据此返回并将该位置 0。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 8,
+          "lsb": 8
+        },
+        {
+          "xlen": 64,
+          "msb": 8,
+          "lsb": 8
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Save the privilege mode before an S-mode trap.",
+      "values": {
+        "0": "U 模式",
+        "1": "S 模式"
+      },
+      "valuesEn": {
+        "0": "U-mode",
+        "1": "S-mode"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "VS",
+      "summary": "跟踪向量寄存器与向量 CSR 的上下文状态；缺少向量状态时可为只读零。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 10,
+          "lsb": 9
+        },
+        {
+          "xlen": 64,
+          "msb": 10,
+          "lsb": 9
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "condition": "V（适用关联，完整条件见手册）",
+      "summaryEn": "Track vector context state.",
+      "values": {
+        "0": "Off：关闭扩展状态",
+        "1": "Initial：初始状态",
+        "2": "Clean：状态未修改",
+        "3": "Dirty：状态已修改"
+      },
+      "valuesEn": {
+        "0": "Off",
+        "1": "Initial",
+        "2": "Clean",
+        "3": "Dirty"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "MPP",
+      "summary": "记录进入 M 模式陷阱前的特权级；MRET 据此恢复特权级，仅能保存实现支持的模式。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 12,
+          "lsb": 11
+        },
+        {
+          "xlen": 64,
+          "msb": 12,
+          "lsb": 11
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Save the privilege mode before an M-mode trap.",
+      "values": {
+        "0": "U 模式",
+        "1": "S 模式",
+        "2": "保留",
+        "3": "M 模式"
+      },
+      "valuesEn": {
+        "0": "U-mode",
+        "1": "S-mode",
+        "2": "Reserved",
+        "3": "M-mode"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "FS",
+      "summary": "跟踪浮点寄存器与浮点控制状态，供软件决定是否保存/恢复上下文；缺少相关状态时可为只读零。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 14,
+          "lsb": 13
+        },
+        {
+          "xlen": 64,
+          "msb": 14,
+          "lsb": 13
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "condition": "F D Q（适用关联，完整条件见手册）",
+      "summaryEn": "Track floating-point context state.",
+      "values": {
+        "0": "Off：关闭扩展状态",
+        "1": "Initial：初始状态",
+        "2": "Clean：状态未修改",
+        "3": "Dirty：状态已修改"
+      },
+      "valuesEn": {
+        "0": "Off",
+        "1": "Initial",
+        "2": "Clean",
+        "3": "Dirty"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "XS",
+      "summary": "汇总其他扩展所维护的上下文状态，反映这些扩展中最脏的状态；软件不能直接写入。",
+      "access": "RO",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 16,
+          "lsb": 15
+        },
+        {
+          "xlen": 64,
+          "msb": 16,
+          "lsb": 15
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Summarize context state maintained by other extensions.",
+      "values": {
+        "0": "Off：关闭扩展状态",
+        "1": "Initial：初始状态",
+        "2": "Clean：状态未修改",
+        "3": "Dirty：状态已修改"
+      },
+      "valuesEn": {
+        "0": "Off",
+        "1": "Initial",
+        "2": "Clean",
+        "3": "Dirty"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "MPRV",
+      "summary": "修改 M 模式显式数据访存的有效特权级；置 1 时按 MPP 指定的模式进行权限检查，不影响取指。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 17,
+          "lsb": 17
+        },
+        {
+          "xlen": 64,
+          "msb": 17,
+          "lsb": 17
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Select MPP-based privilege for explicit data accesses.",
+      "values": {
+        "0": "按当前特权级访存",
+        "1": "数据访存按 MPP 特权级"
+      },
+      "valuesEn": {
+        "0": "Use current privilege",
+        "1": "Use MPP privilege for data accesses"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "SUM",
+      "summary": "控制 S 模式是否可访问 U=1 的用户页；不允许 S 模式从用户页取指，且不改变 U 模式的权限。",
+      "access": "RW / RO=0（依实现）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 18,
+          "lsb": 18
+        },
+        {
+          "xlen": 64,
+          "msb": 18,
+          "lsb": 18
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Permit S-mode data access to user pages.",
+      "values": {
+        "0": "S 模式不能访问用户页数据",
+        "1": "允许 S 模式访问用户页数据"
+      },
+      "valuesEn": {
+        "0": "Disallow S-mode access to user-page data",
+        "1": "Allow S-mode access to user-page data"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "MXR",
+      "summary": "允许把可执行页作为可读页，用于加载权限检查；不影响写权限，也不绕过物理内存保护。",
+      "access": "RW / RO=0（依实现）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 19,
+          "lsb": 19
+        },
+        {
+          "xlen": 64,
+          "msb": 19,
+          "lsb": 19
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Allow loads from executable pages.",
+      "values": {
+        "0": "加载要求页可读",
+        "1": "可执行页也可用于加载"
+      },
+      "valuesEn": {
+        "0": "Loads require readable pages",
+        "1": "Executable pages also satisfy loads"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "TVM",
+      "summary": "置 1 时，S 模式访问 satp 或执行 SFENCE.VMA 等受控地址转换操作会陷入，便于虚拟化内存管理。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 20,
+          "lsb": 20
+        },
+        {
+          "xlen": 64,
+          "msb": 20,
+          "lsb": 20
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Intercept S-mode virtual-memory management operations.",
+      "values": {
+        "0": "不强制该陷入",
+        "1": "按本字段规则拦截"
+      },
+      "valuesEn": {
+        "0": "No interception by this control",
+        "1": "Intercept as specified"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "TW",
+      "summary": "控制低特权级 WFI 的陷入；受控的 WFI 若未在实现规定的有限时间内完成，将触发异常。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 21,
+          "lsb": 21
+        },
+        {
+          "xlen": 64,
+          "msb": 21,
+          "lsb": 21
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Control trapping of lower-privilege WFI instructions.",
+      "values": {
+        "0": "不强制该陷入",
+        "1": "按本字段规则拦截"
+      },
+      "valuesEn": {
+        "0": "No interception by this control",
+        "1": "Intercept as specified"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "TSR",
+      "summary": "置 1 时使 S 模式执行 SRET 触发非法指令异常。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 22,
+          "lsb": 22
+        },
+        {
+          "xlen": 64,
+          "msb": 22,
+          "lsb": 22
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Trap S-mode SRET instructions.",
+      "values": {
+        "0": "不强制该陷入",
+        "1": "按本字段规则拦截"
+      },
+      "valuesEn": {
+        "0": "No interception by this control",
+        "1": "Intercept as specified"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "SPELP",
+      "summary": "保存进入 S 模式陷阱前的预期 landing-pad 状态；SRET 按 Zicfilp 规则恢复。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 23,
+          "lsb": 23
+        },
+        {
+          "xlen": 64,
+          "msb": 23,
+          "lsb": 23
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-cfi.adoc",
+      "condition": "Zicfilp（适用关联，完整条件见手册）",
+      "summaryEn": "Save the pre-trap expected landing-pad state for S-mode.",
+      "values": {
+        "0": "不期待 landing pad",
+        "1": "期待 landing pad"
+      },
+      "valuesEn": {
+        "0": "No landing pad expected",
+        "1": "Landing pad expected"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "SDT",
+      "summary": "S 模式双重陷阱控制；再次陷阱发生于尚未准备好可重入的处理阶段时，按 Ssdbltrp 规则处理。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 24,
+          "lsb": 24
+        },
+        {
+          "xlen": 64,
+          "msb": 24,
+          "lsb": 24
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/supervisor.adoc",
+      "condition": "Ssdbltrp（适用关联，完整条件见手册）",
+      "summaryEn": "Control detection of unexpected S-mode traps.",
+      "values": {
+        "0": "可接受正常陷阱",
+        "1": "标记不可重入阶段"
+      },
+      "valuesEn": {
+        "0": "Normal trap entry permitted",
+        "1": "Non-reentrant trap phase"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "SD",
+      "summary": "Dirty 状态汇总；当 FS、VS 或 XS 中存在 Dirty 状态时置 1，便于快速判断是否需要保存扩展上下文。",
+      "access": "RO",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 31
+        },
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 63
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "condition": "F V（适用关联，完整条件见手册）",
+      "summaryEn": "Summarize dirty floating-point, vector, or other extension state.",
+      "values": {
+        "0": "无 Dirty 扩展状态",
+        "1": "存在 Dirty 扩展状态"
+      },
+      "valuesEn": {
+        "0": "No dirty extension state",
+        "1": "Dirty extension state present"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "UXL",
+      "summary": "选择 U 模式有效 XLEN；编码与 misa.MXL 相同，取值受实现和更高特权级的宽度限制。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 33,
+          "lsb": 32
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Select the effective XLEN for U-mode.",
+      "values": {
+        "0": "保留",
+        "1": "RV32",
+        "2": "RV64",
+        "3": "保留"
+      },
+      "valuesEn": {
+        "0": "Reserved",
+        "1": "RV32",
+        "2": "RV64",
+        "3": "Reserved"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "SXL",
+      "summary": "选择 S 模式有效 XLEN；编码与 misa.MXL 相同，取值不得超过 M 模式有效 XLEN。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 35,
+          "lsb": 34
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Select the effective XLEN for S-mode.",
+      "values": {
+        "0": "保留",
+        "1": "RV32",
+        "2": "RV64",
+        "3": "保留"
+      },
+      "valuesEn": {
+        "0": "Reserved",
+        "1": "RV32",
+        "2": "RV64",
+        "3": "Reserved"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "SBE",
+      "summary": "控制 S 模式显式数据访问以及适用页表访问的字节序；仅支持一种字节序的实现可将其固定。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 36,
+          "lsb": 36
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Select endianness for S-mode data and applicable page-table accesses.",
+      "values": {
+        "0": "小端",
+        "1": "大端"
+      },
+      "valuesEn": {
+        "0": "Little-endian",
+        "1": "Big-endian"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "MBE",
+      "summary": "控制 M 模式显式数据访问的字节序；不改变指令取指的字节序。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 37,
+          "lsb": 37
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "Select endianness for explicit M-mode data accesses.",
+      "values": {
+        "0": "小端",
+        "1": "大端"
+      },
+      "valuesEn": {
+        "0": "Little-endian",
+        "1": "Big-endian"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "GVA",
+      "summary": "指示当前陷阱提供的地址信息是否为 guest virtual address，帮助区分访客虚拟地址与其他地址。",
+      "access": "RW（由陷阱更新）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 38,
+          "lsb": 38
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+      "condition": "H（适用关联，完整条件见手册）",
+      "summaryEn": "Indicate that trap information contains a guest virtual address.",
+      "values": {
+        "0": "未标为访客虚拟地址",
+        "1": "访客虚拟地址"
+      },
+      "valuesEn": {
+        "0": "Not marked as a guest virtual address",
+        "1": "Guest virtual address"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "MPV",
+      "summary": "保存进入 M 模式陷阱前的虚拟化状态，并参与 MRET 与 MPRV 的有效访存模式选择。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 39,
+          "lsb": 39
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+      "condition": "H（适用关联，完整条件见手册）",
+      "summaryEn": "Save or select the virtualized privilege state.",
+      "values": {
+        "0": "非虚拟化状态",
+        "1": "虚拟化状态"
+      },
+      "valuesEn": {
+        "0": "Non-virtualized",
+        "1": "Virtualized"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "MPELP",
+      "summary": "保存进入 M 模式陷阱前的预期 landing-pad 状态；MRET 按 Zicfilp 规则恢复。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 41,
+          "lsb": 41
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-cfi.adoc",
+      "condition": "Zicfilp（适用关联，完整条件见手册）",
+      "summaryEn": "Save the pre-trap expected landing-pad state for M-mode.",
+      "values": {
+        "0": "不期待 landing pad",
+        "1": "期待 landing pad"
+      },
+      "valuesEn": {
+        "0": "No landing pad expected",
+        "1": "Landing pad expected"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "MDT",
+      "summary": "M 模式双重陷阱控制。",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 42,
+          "lsb": 42
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "condition": "Smdbltrp（适用关联，完整条件见手册）",
+      "summaryEn": "Control detection of unexpected M-mode traps.",
+      "values": {
+        "0": "可接受正常陷阱",
+        "1": "标记不可重入阶段"
+      },
+      "valuesEn": {
+        "0": "Normal trap entry permitted",
+        "1": "Non-reentrant trap phase"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "M 模式双重陷阱控制。用于标识关键陷阱处理阶段；再次发生意外陷阱时按 Smdbltrp/Smrnmi 规则处理。"
+    }
+  ],
+  "regions": [
+    {
+      "label": "WPRI",
+      "access": "WPRI",
+      "summary": "写入其他字段时保留该区域，读取值应忽略。",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 0,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 0,
+          "lsb": 0
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/wavedrom/mstatusreg-rv321.edn",
+      "summaryEn": "Preserve this region when updating other fields and ignore its read value."
+    },
+    {
+      "label": "WPRI",
+      "access": "WPRI",
+      "summary": "写入其他字段时保留该区域，读取值应忽略。",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 2,
+          "lsb": 2
+        },
+        {
+          "xlen": 64,
+          "msb": 2,
+          "lsb": 2
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/wavedrom/mstatusreg-rv321.edn",
+      "summaryEn": "Preserve this region when updating other fields and ignore its read value."
+    },
+    {
+      "label": "WPRI",
+      "access": "WPRI",
+      "summary": "写入其他字段时保留该区域，读取值应忽略。",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 4,
+          "lsb": 4
+        },
+        {
+          "xlen": 64,
+          "msb": 4,
+          "lsb": 4
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/wavedrom/mstatusreg-rv321.edn",
+      "summaryEn": "Preserve this region when updating other fields and ignore its read value."
+    },
+    {
+      "label": "WPRI",
+      "access": "WPRI",
+      "summary": "写入其他字段时保留该区域，读取值应忽略。",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 30,
+          "lsb": 25
+        },
+        {
+          "xlen": 64,
+          "msb": 31,
+          "lsb": 25
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/wavedrom/mstatusreg-rv321.edn",
+      "summaryEn": "Preserve this region when updating other fields and ignore its read value."
+    },
+    {
+      "label": "WPRI",
+      "access": "WPRI",
+      "summary": "写入其他字段时保留该区域，读取值应忽略。",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 40,
+          "lsb": 40
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/wavedrom/mstatusreg.edn",
+      "summaryEn": "Preserve this region when updating other fields and ignore its read value."
+    },
+    {
+      "label": "WPRI",
+      "access": "WPRI",
+      "summary": "写入其他字段时保留该区域，读取值应忽略。",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 62,
+          "lsb": 43
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/wavedrom/mstatusreg.edn",
+      "summaryEn": "Preserve this region when updating other fields and ignore its read value."
+    }
+  ],
+  "summaryEn": "Machine status register"
+}

@@ -4,10 +4,10 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class SearchPriorityTest {
-    private val sample = Catalog.decode(javaClass.getResource("/riscv-standard-sample.json")!!.readText())
+    private val sample = Catalog.decode(javaClass.getResource("/riscv-manual-sample.json")!!.readText())
     private val template = sample.registers.first()
     private fun reg(name: String, privilege: String, summary: String = "", fields: List<FieldDefinition> = emptyList()) =
-        template.copy(id = "riscv/standard/csr/$name", name = name, title = "", summary = summary,
+        template.copy(id = "riscv/manual/csr/$name", name = name, title = "", summary = summary,
             condition = "", privilege = privilege, fields = fields)
     private fun pack(vararg registers: RegisterDefinition) = sample.copy(registers = registers.toList())
 
@@ -58,7 +58,7 @@ class SearchPriorityTest {
 
     @Test fun `namespace text cannot promote unrelated CSR names`() {
         val data = pack(reg("cycle", "M"))
-        assertEquals(SearchCategory.DESCRIPTION, Search.query(data, "standard", 64).single().category)
-        assertEquals(SearchCategory.CSR, Search.query(data, "standard.cycle", 64).single().category)
+        assertEquals(SearchCategory.DESCRIPTION, Search.query(data, "manual", 64).single().category)
+        assertEquals(SearchCategory.CSR, Search.query(data, "manual.cycle", 64).single().category)
     }
 }

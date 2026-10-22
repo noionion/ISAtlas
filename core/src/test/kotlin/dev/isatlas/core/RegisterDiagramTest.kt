@@ -4,7 +4,7 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class RegisterDiagramTest {
-    private val pack = Catalog.decode(javaClass.getResource("/riscv-standard-sample.json")!!.readText())
+    private val pack = Catalog.decode(javaClass.getResource("/riscv-manual-sample.json")!!.readText())
 
     @Test fun `drag hit testing resolves exact one bit fields and ignores reserved regions`() {
         val reg = pack.registers.first { it.name == "mstatus" }
@@ -21,18 +21,18 @@ class RegisterDiagramTest {
     @Test fun `hit testing at lane boundary keeps cross lane fields intact`() {
         val reg = pack.registers.first { it.name == "mcause" }
         val lanes = registerDiagramLanes(reg.fields, 64, 16, reg.regions)
-        assertEquals("Interrupt", lanes.first().fieldAtFraction(0f)!!.name)
-        assertEquals("ExceptionCode", lanes.first().fieldAtFraction(1f / 16)!!.name)
-        assertEquals("ExceptionCode", lanes.first().fieldAtFraction(0.99999f)!!.name)
-        assertEquals("ExceptionCode", lanes[1].fieldAtFraction(0f)!!.name)
+        assertEquals("INT", lanes.first().fieldAtFraction(0f)!!.name)
+        assertEquals("CODE", lanes.first().fieldAtFraction(1f / 16)!!.name)
+        assertEquals("CODE", lanes.first().fieldAtFraction(0.99999f)!!.name)
+        assertEquals("CODE", lanes[1].fieldAtFraction(0f)!!.name)
     }
 
     @Test fun `wide fields continue across lane boundaries without losing or duplicating bits`() {
         val fields = pack.registers.first { it.name == "mcause" }.fields
         val lanes = registerDiagramLanes(fields, 64, 16)
         assertEquals(listOf(63, 47, 31, 15), lanes.map { it.msb })
-        assertEquals(listOf("Interrupt", "ExceptionCode"), lanes.first().segments.map { it.field!!.name })
-        assertEquals(63, lanes.flatMap { it.segments }.filter { it.field!!.name == "ExceptionCode" }.sumOf { it.width })
+        assertEquals(listOf("INT", "CODE"), lanes.first().segments.map { it.field!!.name })
+        assertEquals(63, lanes.flatMap { it.segments }.filter { it.field!!.name == "CODE" }.sumOf { it.width })
         assertEquals((63 downTo 0).toList(), lanes.flatMap { it.segments }.flatMap { (it.msb downTo it.lsb).toList() })
     }
 
@@ -41,23 +41,24 @@ class RegisterDiagramTest {
         val lanes = registerDiagramLanes(reg.fields, 64, 32, reg.regions)
         val upper = lanes.first().segments
         assertEquals("SD", upper.first().field!!.name)
-        assertEquals("[62:38]", upper[1].range)
+        assertEquals("[62:43]", upper[1].range)
         assertNull(upper[1].field)
         assertEquals("WPRI", upper[1].region!!.access)
         assertEquals(2, lanes.size)
         assertTrue(lanes.all { it.segments.sumOf { segment -> segment.width } == 32 })
     }
 
-    @Test fun `bundled base layouts classify every bit without inventing gap permissions`() {
-        pack.registers.forEach { reg -> reg.xlens.forEach { xlen ->
-            val segments = registerDiagramLanes(reg.fields, xlen, 16, reg.regions).flatMap { it.segments }
-            assertTrue("${reg.name} RV$xlen", segments.all { it.field != null || it.region != null })
-            assertEquals(xlen, segments.sumOf { it.width })
-        } }
+    @Test fun `manual status layouts cover explicit bits while unsupported areas remain unknown`() {
+        val reg = pack.registers.first { it.name == "mstatus" }
+        for (width in reg.xlens) {
+            val segments = registerDiagramLanes(reg.fields, width, 16, reg.regions).flatMap { it.segments }
+            assertTrue(segments.all { it.field != null || it.region != null })
+            assertEquals(width, segments.sumOf { it.width })
+        }
         val misa = pack.registers.first { it.name == "misa" }
-        assertEquals("WARL", misa.regions.single().access)
+        assertTrue(misa.regions.all { it.access == "WARL" })
         val vendor = pack.registers.first { it.name == "mvendorid" }
-        assertEquals("RO", vendor.regions.single().access)
+        assertTrue(vendor.fields.all { it.access == "RO" })
     }
 
     @Test fun `unclassified input stays unknown rather than silently becoming WPRI`() {

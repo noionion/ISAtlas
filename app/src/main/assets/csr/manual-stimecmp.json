@@ -1,0 +1,55 @@
+{
+  "id": "riscv/manual/csr/stimecmp",
+  "namespace": "manual",
+  "name": "stimecmp",
+  "title": "Supervisor timer compare",
+  "summary": "监管模式定时比较值。",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 333
+  },
+  "privilege": "S",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "",
+  "extensions": [
+    "S",
+    "Sstc"
+  ],
+  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
+  "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/sstc.adoc",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "STIMECMP",
+      "summary": "保存定时比较值；时间计数值达到或超过完整比较值时产生相应 S/VS 定时器中断。",
+      "access": "RW",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 0
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/sstc.adoc",
+      "summaryEn": "Hold the timer-comparison value.",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    }
+  ],
+  "regions": [],
+  "summaryEn": "Supervisor timer compare"
+}
