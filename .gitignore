@@ -1,0 +1,28 @@
+.gradle/
+.tools/
+**/build/
+local.properties
+.idea/
+*.iml
+*.hprof
+captures/
+.kotlin/
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+keystore.properties
+
+# Local review material and unverified architecture data.
+/docs/
+/app/src/main/assets/
+/core/src/test/resources/*.json
+
+# Keep source-specific import work local until its provenance is reviewed.
+/tools/*
+!/tools/csr_storage.py
+!/tools/test_csr_storage.py
