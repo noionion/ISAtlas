@@ -29,7 +29,8 @@ data class AtlasState(
     val compilerIsa: CompilerIsaOptions? = null,
     val selectedId: String? = null,
     val selectedField: String? = null,
-    val showPack: Boolean = false,
+    val showAbout: Boolean = false,
+    val showSources: Boolean = false,
 ) {
     val selected get() = pack?.registers?.find { it.id == selectedId }
     val results get() = pack?.let { Search.query(it, query, xlen, privilege, namespace,
@@ -43,6 +44,8 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
         xlen = saved["xlen"] ?: prefs.getInt("xlen", 64),
         selectedId = saved["selectedId"],
         selectedField = saved["selectedField"],
+        showAbout = saved["showAbout"] ?: false,
+        showSources = saved["showSources"] ?: false,
     ))
     val state = mutable.asStateFlow()
     init { load() }
@@ -102,5 +105,14 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
         saved["selectedField"] = null
         mutable.update { it.copy(selectedId = null, selectedField = null) }
     }
-    fun showPack(value: Boolean) { mutable.update { it.copy(showPack = value) } }
+    fun showAbout(value: Boolean) {
+        saved["showAbout"] = value
+        if (!value) saved["showSources"] = false
+        mutable.update { it.copy(showAbout = value, showSources = if (value) it.showSources else false) }
+    }
+    fun showSources(value: Boolean) {
+        saved["showSources"] = value
+        if (value) saved["showAbout"] = true
+        mutable.update { it.copy(showSources = value, showAbout = it.showAbout || value) }
+    }
 }

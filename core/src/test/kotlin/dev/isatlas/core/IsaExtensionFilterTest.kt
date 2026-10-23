@@ -10,16 +10,16 @@ class IsaExtensionFilterTest {
     @Test fun `catalog options omit extensions without CSR associations but preserve dependency metadata`() {
         val visible = options.catalogOptions(pack)
         assertTrue(visible.containsAll(listOf("zicfiss", "zicfilp", "sstc", "f", "d", "h")))
-        assertFalse(visible.any { it in setOf("zba", "zbb", "za128rs", "xtheadba") })
+        assertFalse(visible.any { it in setOf("s", "u", "zba", "zbb", "za128rs", "xtheadba") })
         assertTrue(visible.all { token -> pack.registers.any { token in IsaExtensionTags.associated(it) } })
         assertEquals(emptyList<String>(), options.catalogOptions(pack.copy(registers = emptyList())))
         assertTrue("zicsr" in options.selectionClosure(setOf("d")))
     }
 
-    @Test fun `mode capabilities remain selectable separately from compiler tokens`() {
+    @Test fun `mode capabilities remain internal prerequisites without selectable filters`() {
         assertTrue("f" in options.tokens && "sstc" in options.tokens && "smstateen" in options.tokens)
         assertFalse("s" in options.tokens || "u" in options.tokens || "sm" in options.tokens)
-        assertTrue(options.selectable.containsAll(listOf("s", "u")))
+        assertFalse("s" in options.selectable || "u" in options.selectable)
         assertFalse("sm" in options.selectable)
     }
 

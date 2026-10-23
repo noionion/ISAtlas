@@ -2,7 +2,6 @@ package dev.isatlas
 
 import androidx.activity.compose.BackHandler
 import android.content.res.Configuration
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -32,13 +31,14 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontFamily
@@ -59,7 +59,7 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
     val drawer = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val keyboard = LocalSoftwareKeyboardController.current
-    var showNotices by rememberSaveable { mutableStateOf(false) }
+    val screenStates = rememberSaveableStateHolder()
     // Keep the grid alive while its screen is replaced by a register detail.
     val searchGrid = rememberLazyGridState()
     var csrExpanded by rememberSaveable { mutableStateOf(true) }
@@ -82,75 +82,68 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
     }
     BackHandler(enabled = state.selectedId != null) { model.close() }
     BackHandler(enabled = drawer.isOpen) { scope.launch { drawer.close() } }
-    RightFilterDrawer(state = drawer, enabled = selected == null,
+    BackHandler(enabled = state.showAbout) { model.showAbout(false) }
+    BackHandler(enabled = state.showSources) { model.showSources(false) }
+    RightFilterDrawer(state = drawer, enabled = selected == null && !state.showAbout,
         panel = { FilterPanel(state, model) }) {
-        Scaffold(
-            contentWindowInsets = WindowInsets.safeDrawing,
-            topBar = {
-                TopAppBar(
-                    expandedHeight = if (landscapeHome || selected != null) 48.dp else 64.dp,
-                    windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
-                    title = {
-                        Row(Modifier.fillMaxWidth().testTag("home-app-bar"), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                            Text(selected?.name ?: "ISAtlas", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold,
-                                modifier = Modifier.testTag("app-title"), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            if (landscapeHome) SearchInput(state.query, model::query, Modifier.weight(1f, fill = false).widthIn(max = 480.dp), compact = true)
+        Box(Modifier.fillMaxSize()) {
+            Scaffold(
+                modifier = if (state.showAbout) Modifier.clearAndSetSemantics {} else Modifier,
+                contentWindowInsets = WindowInsets.safeDrawing,
+                topBar = {
+                    TopAppBar(
+                        expandedHeight = if (landscapeHome || selected != null) 48.dp else 64.dp,
+                        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
+                        title = {
+                            Row(Modifier.fillMaxWidth().testTag("home-app-bar"), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                                Text(selected?.name ?: "ISAtlas", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.testTag("app-title"), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                if (landscapeHome) SearchInput(state.query, model::query, Modifier.weight(1f, fill = false).widthIn(max = 480.dp), compact = true)
+                            }
+                        },
+                        navigationIcon = {
+                            if (selected != null) IconButton(onClick = model::close) {
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, "返回搜索")
+                            }
+                        },
+                        actions = {
+                            IconButton(onClick = { keyboard?.hide(); model.showAbout(true) }) { Icon(Icons.Default.Info, "关于 ISAtlas") }
+                            if (selected == null) IconButton(onClick = { keyboard?.hide(); scope.launch { drawer.open() } }) { Icon(Icons.Default.Menu, "筛选") }
+                        },
+                    )
+                },
+            ) { insets ->
+                Box(Modifier.fillMaxSize().padding(insets)) {
+                    screenStates.SaveableStateProvider(selected?.id ?: "search") {
+                        when {
+                            state.loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
+                            state.error != null -> Column(Modifier.align(Alignment.Center).padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(state.error!!)
+                                Button(onClick = model::load) { Text("重试") }
+                            }
+                            selected != null -> key(selected.id) { RegisterDetail(state, selected, model::xlen) }
+                            else -> SearchScreen(state, model, searchGrid, showSearch = !landscapeHome,
+                                expanded = mapOf(SearchCategory.CSR to csrExpanded, SearchCategory.FIELD to fieldsExpanded, SearchCategory.DESCRIPTION to descriptionsExpanded),
+                                onToggle = { category -> when (category) {
+                                    SearchCategory.CSR -> csrExpanded = !csrExpanded
+                                    SearchCategory.FIELD -> fieldsExpanded = !fieldsExpanded
+                                    SearchCategory.DESCRIPTION -> descriptionsExpanded = !descriptionsExpanded
+                                } }, onOpen = { hit ->
+                                keyboard?.hide()
+                                model.open(hit.register.id, hit.field?.name)
+                            })
                         }
-                    },
-                    navigationIcon = {
-                        if (selected != null) IconButton(onClick = model::close) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "返回搜索")
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { model.showPack(true) }) { Icon(Icons.Default.Info, "数据包信息") }
-                        if (selected == null) IconButton(onClick = { keyboard?.hide(); scope.launch { drawer.open() } }) { Icon(Icons.Default.Menu, "筛选") }
-                    },
-                )
-            },
-        ) { insets ->
-            Box(Modifier.fillMaxSize().padding(insets)) {
-                when {
-                    state.loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
-                    state.error != null -> Column(Modifier.align(Alignment.Center).padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(state.error!!)
-                        Button(onClick = model::load) { Text("重试") }
                     }
-                    selected != null -> key(selected.id) { RegisterDetail(state, selected, model::xlen) }
-                    else -> SearchScreen(state, model, searchGrid, showSearch = !landscapeHome,
-                        expanded = mapOf(SearchCategory.CSR to csrExpanded, SearchCategory.FIELD to fieldsExpanded, SearchCategory.DESCRIPTION to descriptionsExpanded),
-                        onToggle = { category -> when (category) {
-                            SearchCategory.CSR -> csrExpanded = !csrExpanded
-                            SearchCategory.FIELD -> fieldsExpanded = !fieldsExpanded
-                            SearchCategory.DESCRIPTION -> descriptionsExpanded = !descriptionsExpanded
-                        } }, onOpen = { hit ->
-                        keyboard?.hide()
-                        model.open(hit.register.id, hit.field?.name)
-                    })
                 }
             }
+            RaisedPage(state.showAbout, "关于 ISAtlas", "收起关于", { model.showAbout(false) },
+                modifier = if (state.showSources) Modifier.clearAndSetSemantics {} else Modifier) {
+                AboutScreen(state.pack, onShowSources = { model.showSources(true) })
+            }
+            RaisedPage(state.showSources, "数据源与许可", "返回关于", { model.showSources(false) }) {
+                DataSourcesScreen(state.pack)
+            }
         }
-    }
-    if (state.showPack && state.pack != null) {
-        val pack = state.pack!!
-        AlertDialog(onDismissRequest = { model.showPack(false) },
-            title = { Text(pack.title) },
-            text = { Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("离线内置 · v${pack.version}")
-                Text(pack.coverage)
-                Text(pack.source.revision)
-                Text("新增字段保留上游英文，原有中文说明为简要译述。条件字段按扩展目录展示，未模拟具体芯片配置；仅地址索引不代表扩展已批准。")
-            } },
-            confirmButton = { TextButton(onClick = { model.showPack(false) }) { Text("知道了") } },
-            dismissButton = { TextButton(onClick = { model.showPack(false); showNotices = true }) { Text("数据来源与许可") } },
-        )
-    }
-    if (showNotices) {
-        val context = LocalContext.current
-        val notices = remember { context.assets.open("THIRD_PARTY_NOTICES.txt").bufferedReader().use { it.readText() } }
-        AlertDialog(onDismissRequest = { showNotices = false }, title = { Text("数据来源与许可") },
-            text = { SelectionContainer { Text(notices, Modifier.verticalScroll(rememberScrollState()), style = MaterialTheme.typography.bodySmall) } },
-            confirmButton = { TextButton(onClick = { showNotices = false }) { Text("关闭") } })
     }
 }
 
@@ -265,12 +258,16 @@ private fun RegisterDetail(state: AtlasState, reg: RegisterDefinition, onWidthCh
     val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val fields = reg.fields.filter { it.layout(state.xlen) != null }.sortedByDescending { it.layout(state.xlen)!!.msb }
     val available = state.xlen in reg.xlens
-    var selectedField by rememberSaveable(reg.id) { mutableStateOf(state.selectedField) }
+    var selectedField by rememberSaveable(reg.id, state.selectedField) { mutableStateOf(state.selectedField) }
     val list = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val uriHandler = LocalUriHandler.current
     var sourceError by remember { mutableStateOf(false) }
+    var lastTarget by rememberSaveable { mutableStateOf("") }
     LaunchedEffect(state.selectedField, state.xlen) {
+        val target = "${state.selectedField}:${state.xlen}"
+        if (lastTarget == target) return@LaunchedEffect
+        lastTarget = target
         val index = fields.indexOfFirst { it.name == state.selectedField }
         if (available && index >= 0) list.scrollToItem(index + 2)
     }

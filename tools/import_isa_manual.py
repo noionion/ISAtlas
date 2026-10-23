@@ -567,6 +567,11 @@ def run():
         notices += ["\nRetained T-head data: https://github.com/T-head-Semi/thead-extension-spec\nRevision: 5a75db2696881a812a04e6e00347d3920dae03f2\n",
                     (ROOT / "tools/licenses/thead-Apache-2.0.txt").read_text(encoding="utf-8")]
     (ASSETS / "THIRD_PARTY_NOTICES.txt").write_text("\n".join(notices), encoding="utf-8")
+    licenses = ASSETS / "licenses"
+    licenses.mkdir(exist_ok=True)
+    (licenses / "CC-BY-4.0.txt").write_text((UPSTREAM / "LICENSE").read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
+    if retained:
+        (licenses / "Apache-2.0.txt").write_text((ROOT / "tools/licenses/thead-Apache-2.0.txt").read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
     options_path = ASSETS / "march-extensions.json"
     options = json.loads(options_path.read_text(encoding="utf-8"))
     # Keep the compiler vocabulary; replace old UDB-derived relationships with

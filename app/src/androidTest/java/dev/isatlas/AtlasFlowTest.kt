@@ -142,9 +142,9 @@ class AtlasFlowTest {
         compose.onNodeWithTag("extension-search").performTextReplacement("h")
         compose.onNodeWithTag("extension-h").performClick()
         compose.onNodeWithTag("extension-search").performTextReplacement("s")
-        compose.onNodeWithTag("extension-s").assertIsSelected()
+        compose.onNodeWithTag("extension-s").assertDoesNotExist()
         compose.onNodeWithTag("extension-search").performTextReplacement("u")
-        compose.onNodeWithTag("extension-u").assertIsSelected()
+        compose.onNodeWithTag("extension-u").assertDoesNotExist()
         compose.onNodeWithText("全部扩展").performScrollTo().performClick()
         compose.onNodeWithTag("extension-search").performScrollTo().performTextReplacement("Zba")
         compose.onNodeWithTag("extension-zba").assertDoesNotExist()
@@ -174,9 +174,9 @@ class AtlasFlowTest {
         }
     }
 
-    private fun saveFilterScreen(name: String) {
+    private fun saveFilterScreen(name: String, tag: String? = null) {
         val context = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext
-        val bitmap = compose.onRoot().captureToImage().asAndroidBitmap()
+        val bitmap = (if (tag == null) compose.onRoot() else compose.onNodeWithTag(tag)).captureToImage().asAndroidBitmap()
         java.io.File(context.getExternalFilesDir(null), name).outputStream().use {
             bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
         }
@@ -227,10 +227,86 @@ class AtlasFlowTest {
         compose.onNodeWithTag("search-input").performTextReplacement("dcsr")
         compose.onNode(hasText("dcsr") and hasText("D · CSR")).performClick()
         compose.onNodeWithText("仅收录地址，字段布局待补充。").assertIsDisplayed()
-        compose.onNodeWithContentDescription("数据包信息").performClick()
-        compose.onNodeWithText("数据来源与许可").performClick()
-        compose.onNodeWithText("数据来源与许可").assertIsDisplayed()
-        compose.onNodeWithText("关闭").performClick()
+        compose.onNodeWithContentDescription("关于 ISAtlas").performClick()
+        compose.onNodeWithTag("about-sources").performScrollTo().performClick()
+        compose.onNodeWithTag("sources-screen").assertIsDisplayed()
+        compose.onNodeWithTag("source-license-manual-CC-BY-4.0").performScrollTo().performClick()
+        compose.onNodeWithTag("source-license-text-manual-CC-BY-4.0").assertTextContains("Attribution 4.0 International", substring = true)
+        compose.onNodeWithContentDescription("返回关于").performClick()
+        compose.onNodeWithContentDescription("收起关于").performClick()
+    }
+
+    @Test fun aboutShowsIndependentVersionsSourcesAndLinksInBothOrientations() {
+        val context = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext
+        val appVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName!!
+        compose.onNodeWithContentDescription("关于 ISAtlas").performClick()
+        compose.onNodeWithTag("about-app-version").assertTextEquals(appVersion)
+        compose.onNodeWithTag("about-database-version").assertTextEquals("0.5.0")
+        compose.onNodeWithTag("about-csr-count").assertDoesNotExist()
+        compose.onNodeWithTag("about-field-count").assertDoesNotExist()
+        compose.onNodeWithText("存储方式").assertDoesNotExist()
+        saveFilterScreen("about-portrait.png", "about-screen")
+        compose.onNodeWithTag("about-sources").performScrollTo().performClick()
+        compose.onNodeWithTag("sources-screen").assertIsDisplayed()
+        compose.onNodeWithTag("about-screen").assertDoesNotExist()
+        compose.onNodeWithTag("source-revision-manual").performScrollTo().assertTextEquals("584390d9d872835b1bc45ab9ea946b56db3ad485")
+        compose.onNodeWithTag("source-license-manual-CC-BY-4.0").performScrollTo().performClick()
+        compose.onNodeWithTag("source-license-text-manual-CC-BY-4.0").assertTextContains("Attribution 4.0 International", substring = true)
+        compose.onNodeWithTag("source-license-manual-CC-BY-4.0").performScrollTo().performClick()
+        compose.onNodeWithTag("source-revision-thead").performScrollTo().assertTextEquals("5a75db2696881a812a04e6e00347d3920dae03f2")
+        compose.onNodeWithTag("source-license-thead-Apache-2.0").performScrollTo().performClick()
+        compose.onNodeWithTag("source-license-text-thead-Apache-2.0").assertTextContains("Apache License", substring = true)
+        compose.onNodeWithTag("source-license-thead-Apache-2.0").performScrollTo().performClick()
+        try {
+            compose.runOnUiThread { compose.activity.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE }
+            compose.waitUntil(10_000) { compose.activity.resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE }
+            compose.onNodeWithTag("source-revision-manual").performScrollTo().assertIsDisplayed()
+            saveFilterScreen("sources-landscape.png", "sources-screen")
+            compose.runOnUiThread { compose.activity.onBackPressedDispatcher.onBackPressed() }
+            compose.onNodeWithTag("sources-screen").assertDoesNotExist()
+            compose.onNodeWithTag("about-app-version").performScrollTo().assertTextEquals(appVersion)
+            compose.onNodeWithTag("about-github").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithTag("about-feedback").performScrollTo().assertIsDisplayed()
+        } finally {
+            compose.runOnUiThread { compose.activity.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
+        }
+        compose.waitUntil(10_000) { compose.activity.resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT }
+        compose.onNodeWithContentDescription("收起关于").performClick()
+        compose.onNodeWithTag("search-input").performTextReplacement("mstatus.MIE")
+        compose.onNode(hasText("mstatus.MIE") and hasText("M · FIELD")).performClick()
+        val detail = compose.onNodeWithTag("register-detail-list")
+        compose.onNodeWithText("MIE  [3]").assertIsDisplayed()
+        val position = detail.fetchSemanticsNode().config[androidx.compose.ui.semantics.SemanticsProperties.VerticalScrollAxisRange].value()
+        compose.onNodeWithContentDescription("关于 ISAtlas").performClick()
+        compose.onNodeWithTag("about-sources").performScrollTo().performClick()
+        compose.onNodeWithTag("sources-screen").assertIsDisplayed()
+        compose.onNodeWithContentDescription("返回关于").performClick()
+        compose.onNodeWithTag("about-screen").assertIsDisplayed()
+        compose.runOnUiThread { compose.activity.onBackPressedDispatcher.onBackPressed() }
+        compose.onNodeWithTag("about-screen").assertDoesNotExist()
+        val restored = detail.fetchSemanticsNode().config[androidx.compose.ui.semantics.SemanticsProperties.VerticalScrollAxisRange].value()
+        org.junit.Assert.assertEquals("Detail position after returning from About", position, restored, 0.01f)
+        compose.onNodeWithText("MIE  [3]").assertIsDisplayed()
+    }
+
+    @Test fun aboutRisesFromBelowAndDismissesDownward() {
+        compose.mainClock.autoAdvance = false
+        try {
+            compose.onNodeWithContentDescription("关于 ISAtlas").performClick()
+            compose.mainClock.advanceTimeBy(80)
+            val entering = compose.onNodeWithTag("about-screen").fetchSemanticsNode().positionInRoot.y
+            compose.mainClock.advanceTimeBy(400)
+            val settled = compose.onNodeWithTag("about-screen").fetchSemanticsNode().positionInRoot.y
+            org.junit.Assert.assertTrue("About should enter upward from below", entering > settled + 1f)
+            compose.onNodeWithContentDescription("收起关于").performClick()
+            compose.mainClock.advanceTimeBy(80)
+            val leaving = compose.onNodeWithTag("about-screen").fetchSemanticsNode().positionInRoot.y
+            org.junit.Assert.assertTrue("About should dismiss downward", leaving > settled + 1f)
+            compose.mainClock.advanceTimeBy(400)
+            compose.onNodeWithTag("about-screen").assertDoesNotExist()
+        } finally {
+            compose.mainClock.autoAdvance = true
+        }
     }
 
     @Test fun compactHomeAndDrawerFilters() {

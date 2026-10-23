@@ -76,10 +76,11 @@ fun FilterPanel(state: AtlasState, model: AppViewModel) {
                 Text("扩展", Modifier.weight(1f), style = MaterialTheme.typography.labelLarge)
                 TextButton(onClick = { model.clearExtensions(); extensionQuery = "" }) { Text("全部扩展") }
             }
-            Text(if (state.extensions.isEmpty()) "-march 扩展；多选时匹配任一扩展" else "已选：${state.extensions.sorted().joinToString(" · ")}",
+            val selectedExtensions = state.extensions.filter { it in state.compilerIsa?.selectable.orEmpty() }.sorted()
+            Text(if (selectedExtensions.isEmpty()) "-march 扩展；多选时匹配任一扩展" else "已选：${selectedExtensions.joinToString(" · ")}",
                 maxLines = if (landscape) 2 else Int.MAX_VALUE, overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text("S / U 为模式能力；勾选时自动选中前置项。", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("选择扩展时自动关联必需的前置项。", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (state.extensionMessage != null) Text(state.extensionMessage, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
             OutlinedTextField(extensionQuery, { extensionQuery = it }, Modifier.fillMaxWidth().testTag("extension-search"),
                 placeholder = { Text("搜索细分扩展，如 Zicfiss", style = MaterialTheme.typography.bodySmall) }, singleLine = true,

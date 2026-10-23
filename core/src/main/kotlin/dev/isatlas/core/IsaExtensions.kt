@@ -15,13 +15,14 @@ data class CompilerIsaOptions(
     val dependencySource: String = "",
     val modes: List<String> = listOf("s", "u"),
 ) {
-    val selectable get() = (tokens + modes).distinct()
+    val selectable get() = tokens
     /** Only offer extensions explicitly associated with the installed CSR catalog. */
     fun catalogOptions(pack: DataPack): List<String> {
         val tags = pack.registers.flatMap { IsaExtensionTags.associated(it) }.toSet()
         return selectable.filter { it in tags }
     }
-    fun selectionClosure(selected: Set<String>): Set<String> = associatedTags(selected).intersect(selectable.toSet())
+    // Mode prerequisites are resolved internally, without becoming filter options.
+    fun selectionClosure(selected: Set<String>): Set<String> = associatedTags(selected).intersect((tokens + modes).toSet())
 
     fun associatedTags(selected: Set<String>): Set<String> {
         val result = mutableSetOf<String>()
