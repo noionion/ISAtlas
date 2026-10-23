@@ -10,9 +10,25 @@ android {
         applicationId = "dev.isatlas"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2.0"
+        versionCode = 3
+        versionName = "0.3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+    val releaseStore = providers.environmentVariable("ISATLAS_KEYSTORE")
+    signingConfigs {
+        if (releaseStore.isPresent) {
+            create("release") {
+                storeFile = file(releaseStore.get())
+                storePassword = providers.environmentVariable("ISATLAS_STORE_PASSWORD").get()
+                keyAlias = providers.environmentVariable("ISATLAS_KEY_ALIAS").get()
+                keyPassword = providers.environmentVariable("ISATLAS_KEY_PASSWORD").get()
+            }
+        }
+    }
+    buildTypes {
+        release {
+            if (releaseStore.isPresent) signingConfig = signingConfigs.getByName("release")
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
