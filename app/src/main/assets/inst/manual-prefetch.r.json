@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/prefetch.r",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "prefetch.r",
+  "summary": "提示为后续读取预取目标数据。",
+  "summaryEn": "Hint data prefetch for a subsequent read.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "cmo.adoc",
+      "lineStart": 1075,
+      "lineEnd": 1096,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/cmo.adoc#L1075-L1096",
+      "sha256": "c1f90966b53737a8bfffbd01493298eda2290c8cc4d2a199f06ca0b59022ccef",
+      "method": "cache-instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zicbop"
+        ]
+      ],
+      "mask": "0x01f07fff",
+      "match": "0x00106013",
+      "fields": [
+        {
+          "name": "fixed[6:0]",
+          "msb": 6,
+          "lsb": 0,
+          "value": 19,
+          "sourceLabels": [
+            "OP-IMM"
+          ]
+        },
+        {
+          "name": "fixed[11:7]",
+          "msb": 11,
+          "lsb": 7,
+          "value": 0,
+          "sourceLabels": [
+            "offset[4:0]"
+          ]
+        },
+        {
+          "name": "fixed[14:12]",
+          "msb": 14,
+          "lsb": 12,
+          "value": 6,
+          "sourceLabels": [
+            "ORI"
+          ]
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "sourceLabels": [
+            "base"
+          ],
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[24:20]",
+          "msb": 24,
+          "lsb": 20,
+          "value": 1,
+          "sourceLabels": [
+            "PREFETCH.R"
+          ]
+        },
+        {
+          "name": "imm[11:5]",
+          "msb": 31,
+          "lsb": 25,
+          "operand": "imm",
+          "operandBits": [
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5
+          ],
+          "sourceLabels": [
+            "offset[11:5]"
+          ],
+          "operandSigned": true
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "cmo.adoc",
+          "lineStart": 1085,
+          "lineEnd": 1096,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/cmo.adoc#L1085-L1096",
+          "sha256": "e7a3384606bb266433fe2385f1441fd3102d0b116764d21c039ceb02d2fef262",
+          "method": "literal-cache-encoding"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "memory.environment",
+          "category": "memory",
+          "summary": "有效地址、对齐、页表/PMP/PMA 权限及实现支持可能导致访问异常，不能由指令字独立确定。",
+          "summaryEn": "Effective address, alignment, translation/PMP/PMA permissions and implementation support may cause access faults.",
+          "check": "external",
+          "source": {
+            "path": "rv32.adoc",
+            "lineStart": 669,
+            "lineEnd": 677,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L669-L677",
+            "sha256": "d466fcca6ebbf4640e35d7f98f4c86b9d172bbc761fbb0321d39fa9687cc3c62",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

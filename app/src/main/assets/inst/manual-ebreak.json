@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/ebreak",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "ebreak",
+  "summary": "触发断点异常，交由调试环境或异常处理程序处理。",
+  "summaryEn": "Raise a breakpoint exception for the debugger or trap handler.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "rv32.adoc",
+      "lineStart": 12,
+      "lineEnd": 16,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L12-L16",
+      "sha256": "723c5843121cfd81b246e9251f2fd3386684e4f6574f8b69667f366f64bc2b1c",
+      "method": "manual-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "E"
+        ],
+        [
+          "I"
+        ]
+      ],
+      "mask": "0xffffffff",
+      "match": "0x00100073",
+      "fields": [
+        {
+          "name": "000000000001",
+          "msb": 31,
+          "lsb": 20,
+          "value": 1
+        },
+        {
+          "name": "00000",
+          "msb": 19,
+          "lsb": 15,
+          "value": 0
+        },
+        {
+          "name": "000",
+          "msb": 14,
+          "lsb": 12,
+          "value": 0
+        },
+        {
+          "name": "00000",
+          "msb": 11,
+          "lsb": 7,
+          "value": 0
+        },
+        {
+          "name": "1110011",
+          "msb": 6,
+          "lsb": 0,
+          "value": 115
+        }
+      ],
+      "constraints": [
+        "With an E base, integer register operands x16..x31 are reserved"
+      ],
+      "sources": [
+        {
+          "path": "rv-32-64g.adoc",
+          "lineStart": 105,
+          "lineEnd": 105,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv-32-64g.adoc#L105-L105",
+          "sha256": "d0d83638405bf288c2febd38c332ca58a2d53909c980cf3323f5c9774ae446ec",
+          "method": "printed-bit-table"
+        },
+        {
+          "path": "rv32e.adoc",
+          "lineStart": 33,
+          "lineEnd": 37,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L33-L37",
+          "sha256": "017cfd65c36fef775beb35f57fbcf97c6c1dfcb780dba2fc050753825194e13e",
+          "method": "reduced-register-base"
+        }
+      ],
+      "contextRules": []
+    }
+  ]
+}

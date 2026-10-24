@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/c.lh",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "c.lh",
+  "summary": "从 X(rs1′) + uimm 地址加载 16 位数据。",
+  "summaryEn": "Load 16-bit data at X(rs1′) + uimm.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "zc.adoc",
+      "lineStart": 487,
+      "lineEnd": 514,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zc.adoc#L487-L514",
+      "sha256": "ac1a7fc4dbb403427a73b990aa64f0e262d7a680ce6e796ca97d148ee9c9486c",
+      "method": "instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 16,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zcb"
+        ]
+      ],
+      "mask": "0xfc43",
+      "match": "0x8440",
+      "fields": [
+        {
+          "name": "fixed[1:0]",
+          "msb": 1,
+          "lsb": 0,
+          "value": 0,
+          "sourceLabels": [
+            "C0"
+          ]
+        },
+        {
+          "name": "rd'",
+          "msb": 4,
+          "lsb": 2,
+          "operand": "rd'",
+          "registerOffset": 8,
+          "registerClass": "integer"
+        },
+        {
+          "name": "uimm[1]",
+          "msb": 5,
+          "lsb": 5,
+          "operand": "imm",
+          "operandBits": [
+            1
+          ],
+          "operandSigned": false
+        },
+        {
+          "name": "fixed[6:6]",
+          "msb": 6,
+          "lsb": 6,
+          "value": 1
+        },
+        {
+          "name": "rs1'",
+          "msb": 9,
+          "lsb": 7,
+          "operand": "rs1'",
+          "registerOffset": 8,
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[12:10]",
+          "msb": 12,
+          "lsb": 10,
+          "value": 1
+        },
+        {
+          "name": "fixed[15:13]",
+          "msb": 15,
+          "lsb": 13,
+          "value": 4,
+          "sourceLabels": [
+            "FUNCT3"
+          ]
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "zc.adoc",
+          "lineStart": 465,
+          "lineEnd": 477,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zc.adoc#L465-L477",
+          "sha256": "d5825478412dd1134f8ce182de891a60fa021c0045f4a8d2f7a4e5be854d800e",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "Load signed halfword, 16-bit encoding",
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "memory.environment",
+          "category": "memory",
+          "summary": "有效地址、对齐、页表/PMP/PMA 权限及实现支持可能导致访问异常，不能由指令字独立确定。",
+          "summaryEn": "Effective address, alignment, translation/PMP/PMA permissions and implementation support may cause access faults.",
+          "check": "external",
+          "source": {
+            "path": "rv32.adoc",
+            "lineStart": 669,
+            "lineEnd": 677,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L669-L677",
+            "sha256": "d466fcca6ebbf4640e35d7f98f4c86b9d172bbc761fbb0321d39fa9687cc3c62",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

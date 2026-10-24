@@ -1,0 +1,210 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/vl4re64.v",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "vl4re64.v",
+  "summary": "加载指定宽度的向量元素。",
+  "summaryEn": "Load vector elements at the encoded width.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "v-st-ext.adoc",
+      "lineStart": 2087,
+      "lineEnd": 2087,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L2087-L2087",
+      "sha256": "d8d784f1412b7ffdbe0c2ea1b35b8b35e677fb3cf102a67a052ce04a4efd0782",
+      "method": "vector-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "V"
+        ],
+        [
+          "Zve64x"
+        ]
+      ],
+      "mask": "0xfff0707f",
+      "match": "0x62807007",
+      "fields": [
+        {
+          "name": "fixed[6:0]",
+          "msb": 6,
+          "lsb": 0,
+          "value": 7,
+          "sourceLabels": [
+            "VL* unit-stride"
+          ]
+        },
+        {
+          "name": "vd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "vd",
+          "sourceLabels": [
+            "destination of load"
+          ],
+          "registerClass": "vector"
+        },
+        {
+          "name": "width",
+          "msb": 14,
+          "lsb": 12,
+          "value": 7
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "sourceLabels": [
+            "base address"
+          ],
+          "registerClass": "integer"
+        },
+        {
+          "name": "lumop",
+          "msb": 24,
+          "lsb": 20,
+          "value": 8
+        },
+        {
+          "name": "vm",
+          "msb": 25,
+          "lsb": 25,
+          "value": 1
+        },
+        {
+          "name": "mop",
+          "msb": 27,
+          "lsb": 26,
+          "value": 0
+        },
+        {
+          "name": "mew",
+          "msb": 28,
+          "lsb": 28,
+          "value": 0
+        },
+        {
+          "name": "nf",
+          "msb": 31,
+          "lsb": 29,
+          "value": 3
+        }
+      ],
+      "constraints": [
+        "Base register must align to the whole-register group size",
+        "Embedded vector profiles support only their specified EEWs/ELEN; FP64 and widening FP32-to-FP64 require V or Zve64d; FP16 requires Zvfh/Zvfhmin as applicable"
+      ],
+      "sources": [
+        {
+          "path": "images/wavedrom/vmem-format.edn",
+          "lineStart": 11,
+          "lineEnd": 25,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/wavedrom/vmem-format.edn#L11-L25",
+          "sha256": "acc6308de9dc784d716da1b5430e1df5f1d064531d329e581d16c5cc1384d54c",
+          "method": "vector-mask-memory"
+        },
+        {
+          "path": "images/wavedrom/valu-format.edn",
+          "lineStart": 17,
+          "lineEnd": 26,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/wavedrom/valu-format.edn#L17-L26",
+          "sha256": "414d9e01c1b10847ec301312988758364315b8e62334eed5ad0880edc406a04a",
+          "method": "vector-arithmetic-format"
+        },
+        {
+          "path": "v-st-ext.adoc",
+          "lineStart": 5037,
+          "lineEnd": 5039,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L5037-L5039",
+          "sha256": "3647efa44aa132b7391d7acf54afc1e5ddca999f4555981611c24fb8ad51a617",
+          "method": "embedded-vector-subsets"
+        }
+      ],
+      "encodingConstraints": [
+        {
+          "mask": "0x180",
+          "operator": "in",
+          "values": [
+            0
+          ],
+          "reason": "Whole-register group base must align to its size"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "vector.state",
+          "category": "vector",
+          "summary": "向量指令需要可用的 VS 状态和实现支持，虚拟化状态也可能触发异常。",
+          "summaryEn": "Vector instructions require available VS state and implementation support, including virtualization controls.",
+          "check": "vector-state",
+          "source": {
+            "path": "v-st-ext.adoc",
+            "lineStart": 87,
+            "lineEnd": 87,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L87-L87",
+            "sha256": "37db67ef4aaf7ba9cca37be1932b120d8a597972366f57098e992d18ccd24980",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "vector.whole-memory",
+          "category": "vector",
+          "summary": "整寄存器访存不依赖 vtype/vill；仍需满足寄存器组对齐、EEW 支持和地址要求。",
+          "summaryEn": "Whole-register memory transfers ignore vtype/vill but require group alignment, EEW support and valid memory access.",
+          "check": "external",
+          "source": {
+            "path": "v-st-ext.adoc",
+            "lineStart": 467,
+            "lineEnd": 468,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L467-L468",
+            "sha256": "bb569e26790e4f57879836e6b9f19ae9c5b01e3ee5bdc9b746689d34bc62c9db",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "memory.environment",
+          "category": "memory",
+          "summary": "有效地址、对齐、页表/PMP/PMA 权限及实现支持可能导致访问异常，不能由指令字独立确定。",
+          "summaryEn": "Effective address, alignment, translation/PMP/PMA permissions and implementation support may cause access faults.",
+          "check": "external",
+          "source": {
+            "path": "rv32.adoc",
+            "lineStart": 669,
+            "lineEnd": 677,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L669-L677",
+            "sha256": "d466fcca6ebbf4640e35d7f98f4c86b9d172bbc761fbb0321d39fa9687cc3c62",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/vsetvl",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "vsetvl",
+  "summary": "按 rs2 中的 vtype 与 AVL 设置向量配置，并将 vl 写入 rd。",
+  "summaryEn": "Set vector configuration from vtype in rs2 and AVL, returning vl in rd.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "v-st-ext.adoc",
+      "lineStart": 306,
+      "lineEnd": 306,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L306-L306",
+      "sha256": "f58b2bbf80962051dcad6947a8da5e92955a90faa9b9de3d172e0b2a1a282d3c",
+      "method": "vector-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "V"
+        ],
+        [
+          "Zve32x"
+        ]
+      ],
+      "mask": "0xfe00707f",
+      "match": "0x80007057",
+      "fields": [
+        {
+          "name": "fixed[6:0]",
+          "msb": 6,
+          "lsb": 0,
+          "value": 87,
+          "sourceLabels": [
+            "vsetvl"
+          ]
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[14:12]",
+          "msb": 14,
+          "lsb": 12,
+          "value": 7
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "rs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "rs2",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[30:25]",
+          "msb": 30,
+          "lsb": 25,
+          "value": 0
+        },
+        {
+          "name": "fixed[31:31]",
+          "msb": 31,
+          "lsb": 31,
+          "value": 1
+        }
+      ],
+      "constraints": [
+        "Embedded vector profiles support only their specified EEWs/ELEN; FP64 and widening FP32-to-FP64 require V or Zve64d; FP16 requires Zvfh/Zvfhmin as applicable"
+      ],
+      "sources": [
+        {
+          "path": "images/wavedrom/vcfg-format.edn",
+          "lineStart": 36,
+          "lineEnd": 47,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/wavedrom/vcfg-format.edn#L36-L47",
+          "sha256": "6e5fe61ec31d380f4feef220e4e080ec756baf53808d1c91ce9ff4a6ac062ce3",
+          "method": "literal-vector-config"
+        },
+        {
+          "path": "images/wavedrom/valu-format.edn",
+          "lineStart": 17,
+          "lineEnd": 26,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/wavedrom/valu-format.edn#L17-L26",
+          "sha256": "414d9e01c1b10847ec301312988758364315b8e62334eed5ad0880edc406a04a",
+          "method": "vector-arithmetic-format"
+        },
+        {
+          "path": "v-st-ext.adoc",
+          "lineStart": 5037,
+          "lineEnd": 5039,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L5037-L5039",
+          "sha256": "3647efa44aa132b7391d7acf54afc1e5ddca999f4555981611c24fb8ad51a617",
+          "method": "embedded-vector-subsets"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "vector.state",
+          "category": "vector",
+          "summary": "向量指令需要可用的 VS 状态和实现支持，虚拟化状态也可能触发异常。",
+          "summaryEn": "Vector instructions require available VS state and implementation support, including virtualization controls.",
+          "check": "vector-state",
+          "source": {
+            "path": "v-st-ext.adoc",
+            "lineStart": 87,
+            "lineEnd": 87,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L87-L87",
+            "sha256": "37db67ef4aaf7ba9cca37be1932b120d8a597972366f57098e992d18ccd24980",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "vector.config",
+          "category": "vector",
+          "summary": "不支持的 vtype 通常设置 vill；不能把请求的保留配置一概当成该指令编码非法。",
+          "summaryEn": "An unsupported requested vtype normally sets vill rather than necessarily making the instruction encoding illegal.",
+          "check": "external",
+          "source": {
+            "path": "v-st-ext.adoc",
+            "lineStart": 1183,
+            "lineEnd": 1185,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L1183-L1185",
+            "sha256": "e07b83fec399e7f79cb046dd4b3f32dddf028598be53a7a028bf7fb0716388bd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/aes64ks2",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "aes64ks2",
+  "summary": "执行 AES 密钥扩展异或步骤，用于 RV64。",
+  "summaryEn": "Perform the AES key-schedule XOR step for RV64.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "scalar-crypto.adoc",
+      "lineStart": 1141,
+      "lineEnd": 1182,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/scalar-crypto.adoc#L1141-L1182",
+      "sha256": "7a2c9af1debba97d9b47e1cc9072aed0ec4825a78c52cc3c501686c536924ca3",
+      "method": "instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        64
+      ],
+      "requires": [
+        [
+          "Zk"
+        ],
+        [
+          "Zkn"
+        ],
+        [
+          "Zknd"
+        ],
+        [
+          "Zkne"
+        ]
+      ],
+      "mask": "0xfe00707f",
+      "match": "0x7e000033",
+      "fields": [
+        {
+          "name": "fixed[6:0]",
+          "msb": 6,
+          "lsb": 0,
+          "value": 51
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[14:12]",
+          "msb": 14,
+          "lsb": 12,
+          "value": 0
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "rs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "rs2",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[29:25]",
+          "msb": 29,
+          "lsb": 25,
+          "value": 31
+        },
+        {
+          "name": "fixed[31:30]",
+          "msb": 31,
+          "lsb": 30,
+          "value": 1
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "scalar-crypto.adoc",
+          "lineStart": 1128,
+          "lineEnd": 1140,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/scalar-crypto.adoc#L1128-L1140",
+          "sha256": "70f41e9f677cc495274033d583a0d97a72285dc093a63d61d201e6889b427b45",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "This instruction implements part of the KeySchedule operation for the AES Block cipher.",
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

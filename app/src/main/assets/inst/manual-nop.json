@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/nop",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "nop",
+  "summary": "空操作，不改变架构状态（除正常推进 PC 和计数器）。",
+  "summaryEn": "No operation, apart from normal PC and counter advancement.",
+  "kind": "alias",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "rv32.adoc",
+      "lineStart": 14,
+      "lineEnd": 16,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L14-L16",
+      "sha256": "6e76ee1ae7a9dafa4f10b56fa89ad223d95db439607f441597d1a5c6ab00dee5",
+      "method": "manual-pseudoinstruction"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "E"
+        ],
+        [
+          "I"
+        ]
+      ],
+      "mask": "0xffffffff",
+      "match": "0x00000013",
+      "fields": [
+        {
+          "name": "imm[11:0]",
+          "msb": 31,
+          "lsb": 20,
+          "operandBits": [
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0
+          ],
+          "value": 0
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "value": 0
+        },
+        {
+          "name": "000",
+          "msb": 14,
+          "lsb": 12,
+          "value": 0
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "value": 0
+        },
+        {
+          "name": "0010011",
+          "msb": 6,
+          "lsb": 0,
+          "value": 19
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "rv32.adoc",
+          "lineStart": 14,
+          "lineEnd": 16,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L14-L16",
+          "sha256": "6e76ee1ae7a9dafa4f10b56fa89ad223d95db439607f441597d1a5c6ab00dee5",
+          "method": "manual-pseudoinstruction"
+        }
+      ],
+      "contextRules": []
+    }
+  ],
+  "aliasOf": "addi"
+}

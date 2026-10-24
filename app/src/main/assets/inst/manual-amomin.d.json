@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/amomin.d",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "amomin.d",
+  "summary": "原子执行有符号最小值并将内存旧值写入 rd，窄结果符号扩展。",
+  "summaryEn": "Atomically perform signed minimum and return the old memory value in rd, sign-extending narrow results.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "a-st-ext.adoc",
+      "lineStart": 1,
+      "lineEnd": 485,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/a-st-ext.adoc#L1-L485",
+      "sha256": "0558f4d25a494b18575e5f474fc173f650966724d6e303487413300a5b30468e",
+      "method": "manual-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        64
+      ],
+      "requires": [
+        [
+          "Zaamo"
+        ]
+      ],
+      "mask": "0xf800707f",
+      "match": "0x8000302f",
+      "fields": [
+        {
+          "name": "10000",
+          "msb": 31,
+          "lsb": 27,
+          "value": 16
+        },
+        {
+          "name": "aq",
+          "msb": 26,
+          "lsb": 26,
+          "operand": "aq"
+        },
+        {
+          "name": "rl",
+          "msb": 25,
+          "lsb": 25,
+          "operand": "rl"
+        },
+        {
+          "name": "rs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "rs2",
+          "registerClass": "integer"
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "011",
+          "msb": 14,
+          "lsb": 12,
+          "value": 3
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "0101111",
+          "msb": 6,
+          "lsb": 0,
+          "value": 47
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "rv-32-64g.adoc",
+          "lineStart": 213,
+          "lineEnd": 213,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv-32-64g.adoc#L213-L213",
+          "sha256": "5a76edfa8366f42b9c0a7c05afb371d0882cba53798f2ae15d3356f4b64f42f9",
+          "method": "printed-bit-table"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "memory.environment",
+          "category": "memory",
+          "summary": "有效地址、对齐、页表/PMP/PMA 权限及实现支持可能导致访问异常，不能由指令字独立确定。",
+          "summaryEn": "Effective address, alignment, translation/PMP/PMA permissions and implementation support may cause access faults.",
+          "check": "external",
+          "source": {
+            "path": "rv32.adoc",
+            "lineStart": 669,
+            "lineEnd": 677,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L669-L677",
+            "sha256": "d466fcca6ebbf4640e35d7f98f4c86b9d172bbc761fbb0321d39fa9687cc3c62",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

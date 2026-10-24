@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/wrs.sto",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "wrs.sto",
+  "summary": "等待保留集变化或中断，受实现定义的短超时限制。",
+  "summaryEn": "Wait for reservation-set change or interrupt, bounded by an implementation-defined short timeout.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "zawrs.adoc",
+      "lineStart": 30,
+      "lineEnd": 35,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zawrs.adoc#L30-L35",
+      "sha256": "55cabde814f88025bb046568eb222a97eb6fadb2aae050cf81a85ed13f0cf4aa",
+      "method": "manual-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zawrs"
+        ]
+      ],
+      "mask": "0xffffffff",
+      "match": "0x01d00073",
+      "fields": [
+        {
+          "name": "000000011101",
+          "msb": 31,
+          "lsb": 20,
+          "value": 29
+        },
+        {
+          "name": "00000",
+          "msb": 19,
+          "lsb": 15,
+          "value": 0
+        },
+        {
+          "name": "000",
+          "msb": 14,
+          "lsb": 12,
+          "value": 0
+        },
+        {
+          "name": "00000",
+          "msb": 11,
+          "lsb": 7,
+          "value": 0
+        },
+        {
+          "name": "1110011",
+          "msb": 6,
+          "lsb": 0,
+          "value": 115
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "rv-32-64g.adoc",
+          "lineStart": 446,
+          "lineEnd": 446,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv-32-64g.adoc#L446-L446",
+          "sha256": "d4c9227552b52fd66353172a2f328bc2026da0c4dc35a4d17588abf1f88b213f",
+          "method": "printed-bit-table"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "wait.controls",
+          "category": "state",
+          "summary": "等待操作受特权/虚拟化超时控制约束，并允许按规范提前恢复。",
+          "summaryEn": "Wait operations depend on privileged/virtualized timeout controls and may resume early.",
+          "check": "external",
+          "source": {
+            "path": "zawrs.adoc",
+            "lineStart": 76,
+            "lineEnd": 79,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zawrs.adoc#L76-L79",
+            "sha256": "798738c081939eb18d20874023e021145b9dc37b68a10fe96664ecebb1160c3c",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

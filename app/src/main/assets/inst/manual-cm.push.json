@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/cm.push",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "cm.push",
+  "summary": "分配栈帧并保存 ra 和选定的 s 寄存器。",
+  "summaryEn": "Allocate a stack frame and save ra and the selected saved registers.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "zc.adoc",
+      "lineStart": 1524,
+      "lineEnd": 1589,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zc.adoc#L1524-L1589",
+      "sha256": "724b2194f77345be50a834f11caff49db314de89448ee447e88d063b934037e8",
+      "method": "instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 16,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zcmp"
+        ]
+      ],
+      "mask": "0xff03",
+      "match": "0xb802",
+      "fields": [
+        {
+          "name": "fixed[1:0]",
+          "msb": 1,
+          "lsb": 0,
+          "value": 2,
+          "sourceLabels": [
+            "C2"
+          ]
+        },
+        {
+          "name": "spimm",
+          "msb": 3,
+          "lsb": 2,
+          "operand": "spimm",
+          "operandSigned": false
+        },
+        {
+          "name": "rlist",
+          "msb": 7,
+          "lsb": 4,
+          "operand": "rlist"
+        },
+        {
+          "name": "fixed[12:8]",
+          "msb": 12,
+          "lsb": 8,
+          "value": 24
+        },
+        {
+          "name": "fixed[15:13]",
+          "msb": 15,
+          "lsb": 13,
+          "value": 5,
+          "sourceLabels": [
+            "FUNCT3"
+          ]
+        }
+      ],
+      "constraints": [
+        "Register-list/index/stack-adjustment restrictions follow the per-instruction manual section",
+        "On RV32E rlist must be 4..6"
+      ],
+      "sources": [
+        {
+          "path": "zc.adoc",
+          "lineStart": 1406,
+          "lineEnd": 1416,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zc.adoc#L1406-L1416",
+          "sha256": "7844cbb261317e86dec833d031e1d486459b4f9eca92c7f8d8c3f84c4d93b46c",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "Create stack frame: store ra and 0 to 12 saved registers to the stack frame, optionally allocate additional stack space.",
+      "encodingConstraints": [
+        {
+          "mask": "0xf0",
+          "operator": "notIn",
+          "values": [
+            0,
+            16,
+            32,
+            48
+          ],
+          "reason": "rlist=0..3 is reserved"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "zcmp.rlist",
+          "category": "registers",
+          "summary": "rlist=0..3 保留；RV32E 仅支持 rlist=4..6，栈调整按寄存器列表计算。",
+          "summaryEn": "rlist=0..3 is reserved; RV32E permits 4..6, with list-dependent stack adjustment.",
+          "check": "rlist",
+          "source": {
+            "path": "zc.adoc",
+            "lineStart": 1434,
+            "lineEnd": 1434,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zc.adoc#L1434-L1434",
+            "sha256": "c36730459b2eae488b4f672be2097740c5e3491c278fade07adba648ac2979f8",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

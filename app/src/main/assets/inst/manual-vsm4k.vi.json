@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/vsm4k.vi",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "vsm4k.vi",
+  "summary": "按轮立即数生成四个 SM4 轮密钥。",
+  "summaryEn": "Generate four SM4 round keys selected by the round immediate.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "vector-crypto.adoc",
+      "lineStart": 3911,
+      "lineEnd": 4087,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/vector-crypto.adoc#L3911-L4087",
+      "sha256": "f73f208b87a685c35cd91d6ff0f56232a37058b277e9e49972340ff7a3930b5f",
+      "method": "instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zvks"
+        ],
+        [
+          "Zvksc"
+        ],
+        [
+          "Zvksed"
+        ],
+        [
+          "Zvksg"
+        ]
+      ],
+      "mask": "0xfe00707f",
+      "match": "0x86002077",
+      "fields": [
+        {
+          "name": "OP-VE",
+          "msb": 6,
+          "lsb": 0,
+          "value": 119
+        },
+        {
+          "name": "vd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "vd",
+          "registerClass": "vector"
+        },
+        {
+          "name": "OPMVV",
+          "msb": 14,
+          "lsb": 12,
+          "value": 2
+        },
+        {
+          "name": "uimm",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "imm",
+          "operandSigned": false
+        },
+        {
+          "name": "vs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "vs2",
+          "registerClass": "vector"
+        },
+        {
+          "name": "fixed[25:25]",
+          "msb": 25,
+          "lsb": 25,
+          "value": 1
+        },
+        {
+          "name": "fixed[31:26]",
+          "msb": 31,
+          "lsb": 26,
+          "value": 33
+        }
+      ],
+      "constraints": [
+        "* SEW is any value other than 32"
+      ],
+      "sources": [
+        {
+          "path": "vector-crypto.adoc",
+          "lineStart": 3879,
+          "lineEnd": 3890,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/vector-crypto.adoc#L3879-L3890",
+          "sha256": "4743329d2961ca89185f1e6a88f892a540a703d59d41b7b346b810b89ceabe2d",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "Vector SM4 KeyExpansion",
+      "contextRules": [
+        {
+          "id": "vector.state",
+          "category": "vector",
+          "summary": "向量指令需要可用的 VS 状态和实现支持，虚拟化状态也可能触发异常。",
+          "summaryEn": "Vector instructions require available VS state and implementation support, including virtualization controls.",
+          "check": "vector-state",
+          "source": {
+            "path": "v-st-ext.adoc",
+            "lineStart": 87,
+            "lineEnd": 87,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L87-L87",
+            "sha256": "37db67ef4aaf7ba9cca37be1932b120d8a597972366f57098e992d18ccd24980",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "vector.vtype",
+          "category": "vector",
+          "summary": "依赖 vtype 的指令在 vill=1 时非法；还需检查 SEW、LMUL、寄存器组及掩码条件。",
+          "summaryEn": "vtype-dependent instructions are illegal when vill=1; SEW, LMUL, groups and masks also constrain execution.",
+          "check": "vtype",
+          "source": {
+            "path": "v-st-ext.adoc",
+            "lineStart": 464,
+            "lineEnd": 465,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L464-L465",
+            "sha256": "50518ffd3b0b3cfbc7d60165e3be3cf3316e4b5867b602db6164570b10fac34e",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "crypto.element-groups",
+          "category": "vector",
+          "summary": "需满足该算法的 SEW、EGW/EGS、vl/vstart 倍数、LMUL×VLEN 和寄存器组重叠约束。",
+          "summaryEn": "Algorithm-specific SEW, EGW/EGS, vl/vstart multiples, LMUL×VLEN and group overlap constraints apply.",
+          "check": "crypto-groups",
+          "source": {
+            "path": "vector-crypto.adoc",
+            "lineStart": 274,
+            "lineEnd": 276,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/vector-crypto.adoc#L274-L276",
+            "sha256": "1fe473c450a39e9e262f722641b96c15ab6c551e2a63c513161fbafc00ddf03b",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

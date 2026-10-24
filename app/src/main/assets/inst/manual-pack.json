@@ -1,0 +1,224 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/pack",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "pack",
+  "summary": "将 rs2、rs1 的低半寄存器依次拼接为 rd。",
+  "summaryEn": "Concatenate the low halves of rs2 and rs1 into rd, with rs1 in the low half.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "b-st-ext.adoc",
+      "lineStart": 2358,
+      "lineEnd": 2391,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/b-st-ext.adoc#L2358-L2391",
+      "sha256": "40246bb36702425e34db2a0816bfe36cafc6eb63d5d3a34839891d2be305eed3",
+      "method": "instruction-description"
+    },
+    {
+      "path": "scalar-crypto.adoc",
+      "lineStart": 1467,
+      "lineEnd": 1494,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/scalar-crypto.adoc#L1467-L1494",
+      "sha256": "b25f975a1c56b83b6efafd4f8792a3184d8974a211ea22e366b2827a750c519a",
+      "method": "instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zbb"
+        ],
+        [
+          "Zbkb"
+        ],
+        [
+          "Zcb"
+        ]
+      ],
+      "mask": "0xfe00707f",
+      "match": "0x08004033",
+      "fields": [
+        {
+          "name": "fixed[6:0]",
+          "msb": 6,
+          "lsb": 0,
+          "value": 51,
+          "sourceLabels": [
+            "OP"
+          ]
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[14:12]",
+          "msb": 14,
+          "lsb": 12,
+          "value": 4,
+          "sourceLabels": [
+            "PACK"
+          ]
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "rs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "rs2",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[31:25]",
+          "msb": 31,
+          "lsb": 25,
+          "value": 4,
+          "sourceLabels": [
+            "PACK"
+          ]
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "b-st-ext.adoc",
+          "lineStart": 2346,
+          "lineEnd": 2357,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/b-st-ext.adoc#L2346-L2357",
+          "sha256": "297c235b1a7714ddbbf592121d222a6d6d544b5d8882bd917a0b7b352ed3c1cd",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "Pack the low halves of rs1 and rs2 into rd.",
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    },
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zbkb"
+        ]
+      ],
+      "mask": "0xfe00707f",
+      "match": "0x08004033",
+      "fields": [
+        {
+          "name": "fixed[6:0]",
+          "msb": 6,
+          "lsb": 0,
+          "value": 51,
+          "sourceLabels": [
+            "OP"
+          ]
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[14:12]",
+          "msb": 14,
+          "lsb": 12,
+          "value": 4,
+          "sourceLabels": [
+            "PACK"
+          ]
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "rs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "rs2",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[31:25]",
+          "msb": 31,
+          "lsb": 25,
+          "value": 4,
+          "sourceLabels": [
+            "PACK"
+          ]
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "scalar-crypto.adoc",
+          "lineStart": 1455,
+          "lineEnd": 1466,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/scalar-crypto.adoc#L1455-L1466",
+          "sha256": "297c235b1a7714ddbbf592121d222a6d6d544b5d8882bd917a0b7b352ed3c1cd",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "Pack the low halves of rs1 and rs2 into rd.",
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

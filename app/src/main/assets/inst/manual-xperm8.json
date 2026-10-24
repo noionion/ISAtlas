@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/xperm8",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "xperm8",
+  "summary": "以 rs2 的各字节为索引查找 rs1 的字节，越界返回零。",
+  "summaryEn": "Look up rs1 bytes using rs2 byte indices, returning zero for out-of-range indices.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "b-st-ext.adoc",
+      "lineStart": 3503,
+      "lineEnd": 3542,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/b-st-ext.adoc#L3503-L3542",
+      "sha256": "322b963560ebbdff66241ebf2dbf49182719ea305ece6dc6a27bc8111102d7d0",
+      "method": "instruction-description"
+    },
+    {
+      "path": "scalar-crypto.adoc",
+      "lineStart": 3361,
+      "lineEnd": 3401,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/scalar-crypto.adoc#L3361-L3401",
+      "sha256": "1e28762ca3fa065c8d1d8dd1e1bbca31f16a8d4fd94de233acbce71947f0adc5",
+      "method": "instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zbkx"
+        ]
+      ],
+      "mask": "0xfe00707f",
+      "match": "0x28004033",
+      "fields": [
+        {
+          "name": "fixed[6:0]",
+          "msb": 6,
+          "lsb": 0,
+          "value": 51,
+          "sourceLabels": [
+            "OP"
+          ]
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[14:12]",
+          "msb": 14,
+          "lsb": 12,
+          "value": 4
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "rs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "rs2",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[31:25]",
+          "msb": 31,
+          "lsb": 25,
+          "value": 20
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "b-st-ext.adoc",
+          "lineStart": 3491,
+          "lineEnd": 3502,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/b-st-ext.adoc#L3491-L3502",
+          "sha256": "793fdfda0e24f3376d6005b0003c16cf1211758a93edafb4d4923c6dbbb0a49e",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "Byte-wise lookup of indices into a vector in registers.",
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    },
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zbkx"
+        ]
+      ],
+      "mask": "0xfe00707f",
+      "match": "0x28004033",
+      "fields": [
+        {
+          "name": "fixed[1:0]",
+          "msb": 1,
+          "lsb": 0,
+          "value": 3
+        },
+        {
+          "name": "fixed[6:2]",
+          "msb": 6,
+          "lsb": 2,
+          "value": 12
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[14:12]",
+          "msb": 14,
+          "lsb": 12,
+          "value": 4
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "rs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "rs2",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[31:25]",
+          "msb": 31,
+          "lsb": 25,
+          "value": 20
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "scalar-crypto.adoc",
+          "lineStart": 3348,
+          "lineEnd": 3360,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/scalar-crypto.adoc#L3348-L3360",
+          "sha256": "51759e053f4005fef71caed26a5b48c9fce714781a0ebd8379a5b1f27ee5aa28",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "Byte-wise lookup of indices into a vector in registers.",
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

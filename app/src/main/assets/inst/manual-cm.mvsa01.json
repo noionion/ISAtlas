@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/cm.mvsa01",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "cm.mvsa01",
+  "summary": "将 a0/a1 分别复制到两个选定的 s0–s7 寄存器。",
+  "summaryEn": "Copy a0/a1 into two selected s0–s7 registers.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "zc.adoc",
+      "lineStart": 2211,
+      "lineEnd": 2248,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zc.adoc#L2211-L2248",
+      "sha256": "4288a988df5eda500df608a20b5e68ca99bfce20f659ca13a39546ee5332d78f",
+      "method": "instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 16,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zcmp"
+        ]
+      ],
+      "mask": "0xfc63",
+      "match": "0xac22",
+      "fields": [
+        {
+          "name": "fixed[1:0]",
+          "msb": 1,
+          "lsb": 0,
+          "value": 2,
+          "sourceLabels": [
+            "C2"
+          ]
+        },
+        {
+          "name": "r2s'",
+          "msb": 4,
+          "lsb": 2,
+          "operand": "r2s'",
+          "registerMap": [
+            8,
+            9,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23
+          ],
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[6:5]",
+          "msb": 6,
+          "lsb": 5,
+          "value": 1
+        },
+        {
+          "name": "r1s'",
+          "msb": 9,
+          "lsb": 7,
+          "operand": "r1s'",
+          "registerMap": [
+            8,
+            9,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23
+          ],
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[12:10]",
+          "msb": 12,
+          "lsb": 10,
+          "value": 3
+        },
+        {
+          "name": "fixed[15:13]",
+          "msb": 15,
+          "lsb": 13,
+          "value": 5,
+          "sourceLabels": [
+            "FUNCT3"
+          ]
+        }
+      ],
+      "constraints": [
+        "Register-list/index/stack-adjustment restrictions follow the per-instruction manual section",
+        "RV32E permits only s0/s1 encodings; CM.MVSA01 requires different destination saved registers"
+      ],
+      "sources": [
+        {
+          "path": "zc.adoc",
+          "lineStart": 2187,
+          "lineEnd": 2198,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zc.adoc#L2187-L2198",
+          "sha256": "4337dafaab90ec8bfbed9cb904d85eb0a1e1c3593c65fb8df073dbcd4fde0411",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "Move a0-a1 into two registers of s0-s7",
+      "encodingConstraints": [
+        {
+          "mask": "0x39c",
+          "operator": "notIn",
+          "values": [
+            0,
+            132,
+            264,
+            396,
+            528,
+            660,
+            792,
+            924
+          ],
+          "reason": "CM.MVSA01 requires distinct destination saved registers"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "zcmp.saved-registers",
+          "category": "registers",
+          "summary": "保存寄存器按 UABI 非连续映射；CM.MVSA01 的两个目的寄存器必须不同。",
+          "summaryEn": "Saved registers use the noncontiguous UABI map; CM.MVSA01 destinations must differ.",
+          "check": "saved-registers",
+          "source": {
+            "path": "zc.adoc",
+            "lineStart": 2201,
+            "lineEnd": 2202,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zc.adoc#L2201-L2202",
+            "sha256": "8ea84f0be741da986a16f31de77795e460688328b89ecbd91a35c8603ae17e2f",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

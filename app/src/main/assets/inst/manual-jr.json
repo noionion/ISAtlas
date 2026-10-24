@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/jr",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "jr",
+  "summary": "PC = X(rs1) & ~1",
+  "summaryEn": "PC = X(rs1) & ~1",
+  "kind": "alias",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "rv32.adoc",
+      "lineStart": 466,
+      "lineEnd": 470,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L466-L470",
+      "sha256": "08f79f2be5101fe84f87ab109d94e4a5bf072369a457e1b8879b21d42fa4ed40",
+      "method": "manual-pseudoinstruction"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "E"
+        ],
+        [
+          "I"
+        ]
+      ],
+      "mask": "0xfff07fff",
+      "match": "0x00000067",
+      "fields": [
+        {
+          "name": "imm[11:0]",
+          "msb": 31,
+          "lsb": 20,
+          "operandBits": [
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0
+          ],
+          "value": 0
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "000",
+          "msb": 14,
+          "lsb": 12,
+          "value": 0
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "value": 0
+        },
+        {
+          "name": "1100111",
+          "msb": 6,
+          "lsb": 0,
+          "value": 103
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "rv32.adoc",
+          "lineStart": 466,
+          "lineEnd": 470,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L466-L470",
+          "sha256": "08f79f2be5101fe84f87ab109d94e4a5bf072369a457e1b8879b21d42fa4ed40",
+          "method": "manual-pseudoinstruction"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "control.target",
+          "category": "control",
+          "summary": "控制转移目标的对齐与权限取决于 IALIGN、寄存器值、PC 和分支是否实际跳转。",
+          "summaryEn": "Target alignment and permissions depend on IALIGN, registers, PC and whether a branch is taken.",
+          "check": "external",
+          "source": {
+            "path": "rv32.adoc",
+            "lineStart": 138,
+            "lineEnd": 142,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L138-L142",
+            "sha256": "41ad6989314f83680fc29b8bc8814b1346f67972d3b6802253341f37b52809d7",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ],
+  "aliasOf": "jalr"
+}

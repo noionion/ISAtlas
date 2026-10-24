@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/sha512sum0",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "sha512sum0",
+  "summary": "计算 SHA-512 的 Σ0 变换结果。",
+  "summaryEn": "Compute the result of SHA-512 Σ0.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "scalar-crypto.adoc",
+      "lineStart": 2867,
+      "lineEnd": 2904,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/scalar-crypto.adoc#L2867-L2904",
+      "sha256": "6bac12785bb0ebf62b3aa539cbaa77086bcc2643808337ae3f9b9b1a277a88ac",
+      "method": "instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        64
+      ],
+      "requires": [
+        [
+          "Zk"
+        ],
+        [
+          "Zkn"
+        ],
+        [
+          "Zknh"
+        ]
+      ],
+      "mask": "0xfff0707f",
+      "match": "0x10401013",
+      "fields": [
+        {
+          "name": "fixed[6:0]",
+          "msb": 6,
+          "lsb": 0,
+          "value": 19
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[14:12]",
+          "msb": 14,
+          "lsb": 12,
+          "value": 1
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[24:20]",
+          "msb": 24,
+          "lsb": 20,
+          "value": 4
+        },
+        {
+          "name": "fixed[29:25]",
+          "msb": 29,
+          "lsb": 25,
+          "value": 8
+        },
+        {
+          "name": "fixed[31:30]",
+          "msb": 31,
+          "lsb": 30,
+          "value": 0
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "scalar-crypto.adoc",
+          "lineStart": 2854,
+          "lineEnd": 2866,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/scalar-crypto.adoc#L2854-L2866",
+          "sha256": "f4a06a76890ef66f3ce0d4726ab1a917c1f1443677b031f99c68ad839776819b",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "Implements the Sum0 transformation function as used in the SHA2-512 hash function .",
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

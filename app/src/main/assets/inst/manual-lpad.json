@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/lpad",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "lpad",
+  "summary": "校验间接控制流目标的着陆垫及标签。",
+  "summaryEn": "Validate the landing pad and label of an indirect control-flow target.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "unpriv-cfi.adoc",
+      "lineStart": 69,
+      "lineEnd": 72,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/unpriv-cfi.adoc#L69-L72",
+      "sha256": "9f2b5d3ae893496e458a0cdc5bcfca203439b555b04fabcf34085bd4982cf80f",
+      "method": "cfi-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zicfilp"
+        ]
+      ],
+      "mask": "0x00000fff",
+      "match": "0x00000017",
+      "fields": [
+        {
+          "name": "opcode",
+          "msb": 6,
+          "lsb": 0,
+          "sourceLabels": [
+            "AUIPC"
+          ],
+          "value": 23
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "sourceLabels": [
+            "00000"
+          ],
+          "value": 0
+        },
+        {
+          "name": "LPL",
+          "msb": 31,
+          "lsb": 12,
+          "operand": "LPL"
+        }
+      ],
+      "constraints": [
+        "Behavior depends on active CFI/shadow-stack environment controls; see the source section"
+      ],
+      "sources": [
+        {
+          "path": "unpriv-cfi.adoc",
+          "lineStart": 266,
+          "lineEnd": 274,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/unpriv-cfi.adoc#L266-L274",
+          "sha256": "21dec3bb8e752a57ae6f03e02e0da6f1f440804f3cefb9ff9abf515d48759e1e",
+          "method": "literal-cfi-diagram"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "cfi.controls",
+          "category": "cfi",
+          "summary": "CFI 的使能、当前特权态、影子栈页权限或着陆垫状态决定实际行为；不能只按扩展名判定。",
+          "summaryEn": "CFI enablement, privilege, shadow-stack permissions or landing-pad state determine behavior.",
+          "check": "external",
+          "source": {
+            "path": "unpriv-cfi.adoc",
+            "lineStart": 148,
+            "lineEnd": 148,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/unpriv-cfi.adoc#L148-L148",
+            "sha256": "d177e4c7851eaac9a8869602ece9c9ca987ba2324989621c7e557bf9235d7d4a",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

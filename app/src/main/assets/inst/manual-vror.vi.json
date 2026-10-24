@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/vror.vi",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "vror.vi",
+  "summary": "逐活动元素执行循环右移。",
+  "summaryEn": "Perform rotate right for active elements.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "vector-crypto.adoc",
+      "lineStart": 3077,
+      "lineEnd": 3127,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/vector-crypto.adoc#L3077-L3127",
+      "sha256": "339d0c12ba0e44b6cbbba6520888ad83af1404db4ef4c6efcb785e4095bbd46b",
+      "method": "instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zvbb"
+        ],
+        [
+          "Zvkb"
+        ],
+        [
+          "Zvkn"
+        ],
+        [
+          "Zvknc"
+        ],
+        [
+          "Zvkng"
+        ],
+        [
+          "Zvks"
+        ],
+        [
+          "Zvksc"
+        ],
+        [
+          "Zvksg"
+        ]
+      ],
+      "mask": "0xf800707f",
+      "match": "0x50003057",
+      "fields": [
+        {
+          "name": "OP-V",
+          "msb": 6,
+          "lsb": 0,
+          "value": 87
+        },
+        {
+          "name": "vd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "vd",
+          "registerClass": "vector"
+        },
+        {
+          "name": "OPIVI",
+          "msb": 14,
+          "lsb": 12,
+          "value": 3
+        },
+        {
+          "name": "uimm[4:0]",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "imm",
+          "operandBits": [
+            4,
+            3,
+            2,
+            1,
+            0
+          ],
+          "operandSigned": false
+        },
+        {
+          "name": "vs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "vs2",
+          "registerClass": "vector"
+        },
+        {
+          "name": "vm",
+          "msb": 25,
+          "lsb": 25,
+          "operand": "vm"
+        },
+        {
+          "name": "i5",
+          "msb": 26,
+          "lsb": 26,
+          "operand": "imm",
+          "operandSigned": false,
+          "operandBits": [
+            5
+          ]
+        },
+        {
+          "name": "fixed[31:27]",
+          "msb": 31,
+          "lsb": 27,
+          "value": 10
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "vector-crypto.adoc",
+          "lineStart": 3034,
+          "lineEnd": 3047,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/vector-crypto.adoc#L3034-L3047",
+          "sha256": "ce04e8e53d4d62b66bf93444a82339a36d12abcffc34a41d5573161fdf4c50da",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "Vector rotate right by vector/scalar/immediate.",
+      "contextRules": [
+        {
+          "id": "vector.state",
+          "category": "vector",
+          "summary": "向量指令需要可用的 VS 状态和实现支持，虚拟化状态也可能触发异常。",
+          "summaryEn": "Vector instructions require available VS state and implementation support, including virtualization controls.",
+          "check": "vector-state",
+          "source": {
+            "path": "v-st-ext.adoc",
+            "lineStart": 87,
+            "lineEnd": 87,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L87-L87",
+            "sha256": "37db67ef4aaf7ba9cca37be1932b120d8a597972366f57098e992d18ccd24980",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "vector.vtype",
+          "category": "vector",
+          "summary": "依赖 vtype 的指令在 vill=1 时非法；还需检查 SEW、LMUL、寄存器组及掩码条件。",
+          "summaryEn": "vtype-dependent instructions are illegal when vill=1; SEW, LMUL, groups and masks also constrain execution.",
+          "check": "vtype",
+          "source": {
+            "path": "v-st-ext.adoc",
+            "lineStart": 464,
+            "lineEnd": 465,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L464-L465",
+            "sha256": "50518ffd3b0b3cfbc7d60165e3be3cf3316e4b5867b602db6164570b10fac34e",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

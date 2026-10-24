@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/ntl.pall",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "ntl.pall",
+  "summary": "提示下一次显式访存的数据在所有私有缓存中缺少时间局部性。",
+  "summaryEn": "Hint that the next explicit memory access lacks temporal locality in all private caches.",
+  "kind": "hint",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "zihintntl.adoc",
+      "lineStart": 11,
+      "lineEnd": 14,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zihintntl.adoc#L11-L14",
+      "sha256": "3414f605a8d4810f87050361b12e276f4ce319dc690073db2f42cbb19b27ed85",
+      "method": "hint-operand-derivation"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zihintntl"
+        ]
+      ],
+      "mask": "0xffffffff",
+      "match": "0x00300033",
+      "fields": [
+        {
+          "name": "0000000",
+          "msb": 31,
+          "lsb": 25,
+          "value": 0
+        },
+        {
+          "name": "rs2",
+          "msb": 24,
+          "lsb": 20,
+          "value": 3
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "value": 0
+        },
+        {
+          "name": "000",
+          "msb": 14,
+          "lsb": 12,
+          "value": 0
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "value": 0
+        },
+        {
+          "name": "0110011",
+          "msb": 6,
+          "lsb": 0,
+          "value": 51
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "zihintntl.adoc",
+          "lineStart": 11,
+          "lineEnd": 14,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zihintntl.adoc#L11-L14",
+          "sha256": "3414f605a8d4810f87050361b12e276f4ce319dc690073db2f42cbb19b27ed85",
+          "method": "hint-operand-derivation"
+        }
+      ],
+      "contextRules": []
+    }
+  ]
+}

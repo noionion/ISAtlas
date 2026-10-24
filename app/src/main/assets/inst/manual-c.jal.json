@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/c.jal",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "c.jal",
+  "summary": "x1 = PC + 2; PC += sext(offset)",
+  "summaryEn": "x1 = PC + 2; PC += sext(offset)",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "c-st-ext.adoc",
+      "lineStart": 479,
+      "lineEnd": 482,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/c-st-ext.adoc#L479-L482",
+      "sha256": "277978e15f3a2ae4ff045e91a2ba4734f931b9077f5847e2140252cd6c5c551c",
+      "method": "compressed-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 16,
+      "xlens": [
+        32
+      ],
+      "requires": [
+        [
+          "C"
+        ],
+        [
+          "Zca"
+        ]
+      ],
+      "mask": "0xe003",
+      "match": "0x2001",
+      "fields": [
+        {
+          "name": "001",
+          "msb": 15,
+          "lsb": 13,
+          "value": 1
+        },
+        {
+          "name": "imm[11|4|9:8|10|6|7|3:1|5]",
+          "msb": 12,
+          "lsb": 2,
+          "operand": "imm",
+          "operandBits": [
+            11,
+            4,
+            9,
+            8,
+            10,
+            6,
+            7,
+            3,
+            2,
+            1,
+            5
+          ],
+          "operandSigned": true
+        },
+        {
+          "name": "01",
+          "msb": 1,
+          "lsb": 0,
+          "value": 1
+        }
+      ],
+      "constraints": [
+        "Printed operand restrictions: ['text', 'C.JAL', ':math', [':sub', '(RV32)']]"
+      ],
+      "sources": [
+        {
+          "path": "images/bytefield/rvc-instr-quad1.edn",
+          "lineStart": 26,
+          "lineEnd": 29,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/rvc-instr-quad1.edn#L26-L29",
+          "sha256": "2065436c7dabc921bb2f4e1d7cdc4e4c8280d5c85e810b55cf7536064a3c0b2b",
+          "method": "bytefield-printed-bits"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "control.target",
+          "category": "control",
+          "summary": "控制转移目标的对齐与权限取决于 IALIGN、寄存器值、PC 和分支是否实际跳转。",
+          "summaryEn": "Target alignment and permissions depend on IALIGN, registers, PC and whether a branch is taken.",
+          "check": "external",
+          "source": {
+            "path": "rv32.adoc",
+            "lineStart": 138,
+            "lineEnd": 142,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L138-L142",
+            "sha256": "41ad6989314f83680fc29b8bc8814b1346f67972d3b6802253341f37b52809d7",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

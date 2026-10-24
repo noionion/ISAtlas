@@ -4,7 +4,7 @@ Official RISC-V Instruction Set Manual; RISC-V International and contributors.
 Source: https://github.com/riscv/riscv-isa-manual
 Tag: 20250508
 Commit: 584390d9d872835b1bc45ab9ea946b56db3ad485
-Changes: extract CSR tables/figures into JSON; normalize labels; translate and summarize field descriptions in Chinese and English; annotate encodings and XLEN-specific rules; omit unsupported layouts.
+Changes: extract CSR tables/figures and instruction encodings into JSON; normalize labels; translate and summarize CSR fields and instructions in Chinese and English; annotate encodings and XLEN-specific rules; omit unsupported layouts.
 
 Attribution 4.0 International
 

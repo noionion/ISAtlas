@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/andn",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "andn",
+  "summary": "X(rd) = X(rs1) & ~X(rs2)",
+  "summaryEn": "X(rd) = X(rs1) & ~X(rs2)",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "b-st-ext.adoc",
+      "lineStart": 1068,
+      "lineEnd": 1095,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/b-st-ext.adoc#L1068-L1095",
+      "sha256": "151172760b2dcdd5ae921f41613fcbd40617e07ee799351c96fe309255cc0177",
+      "method": "instruction-description"
+    },
+    {
+      "path": "scalar-crypto.adoc",
+      "lineStart": 1203,
+      "lineEnd": 1231,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/scalar-crypto.adoc#L1203-L1231",
+      "sha256": "a2883b9b9462836201c9b9629e107d2511b4d6603402f9dccc4c29989f173f9f",
+      "method": "instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zbb"
+        ],
+        [
+          "Zbkb"
+        ]
+      ],
+      "mask": "0xfe00707f",
+      "match": "0x40007033",
+      "fields": [
+        {
+          "name": "fixed[6:0]",
+          "msb": 6,
+          "lsb": 0,
+          "value": 51,
+          "sourceLabels": [
+            "OP"
+          ]
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[14:12]",
+          "msb": 14,
+          "lsb": 12,
+          "value": 7,
+          "sourceLabels": [
+            "ANDN"
+          ]
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "rs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "rs2",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[31:25]",
+          "msb": 31,
+          "lsb": 25,
+          "value": 32,
+          "sourceLabels": [
+            "ANDN"
+          ]
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "b-st-ext.adoc",
+          "lineStart": 1056,
+          "lineEnd": 1067,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/b-st-ext.adoc#L1056-L1067",
+          "sha256": "c8d787cc2e4e03b7d00d2bb02a0ce618f625d822ae6ea908d6d71c63e2b6d85c",
+          "method": "literal-wavedrom"
+        },
+        {
+          "path": "scalar-crypto.adoc",
+          "lineStart": 1191,
+          "lineEnd": 1202,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/scalar-crypto.adoc#L1191-L1202",
+          "sha256": "c8d787cc2e4e03b7d00d2bb02a0ce618f625d822ae6ea908d6d71c63e2b6d85c",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "AND with inverted operand",
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

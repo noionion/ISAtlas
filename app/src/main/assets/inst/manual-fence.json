@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/fence",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "fence",
+  "summary": "按 pred/succ 指定的类型排序前后访存与设备 I/O。",
+  "summaryEn": "Order preceding and succeeding memory/device accesses selected by pred/succ.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "rv32.adoc",
+      "lineStart": 13,
+      "lineEnd": 16,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L13-L16",
+      "sha256": "81e984e457688a9af880cd64cf8d6ef0ffccccfa69dee7c3c53d681af09df05a",
+      "method": "manual-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "E"
+        ],
+        [
+          "I"
+        ]
+      ],
+      "mask": "0x0000707f",
+      "match": "0x0000000f",
+      "fields": [
+        {
+          "name": "fm",
+          "msb": 31,
+          "lsb": 28,
+          "operand": "fm"
+        },
+        {
+          "name": "pred",
+          "msb": 27,
+          "lsb": 24,
+          "operand": "pred"
+        },
+        {
+          "name": "succ",
+          "msb": 23,
+          "lsb": 20,
+          "operand": "succ"
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "000",
+          "msb": 14,
+          "lsb": 12,
+          "value": 0
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "0001111",
+          "msb": 6,
+          "lsb": 0,
+          "value": 15
+        }
+      ],
+      "constraints": [
+        "rs1 and rd are reserved for future use; standard software writes zero",
+        "With an E base, integer register operands x16..x31 are reserved"
+      ],
+      "sources": [
+        {
+          "path": "rv-32-64g.adoc",
+          "lineStart": 101,
+          "lineEnd": 101,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv-32-64g.adoc#L101-L101",
+          "sha256": "543c4b44b13b79e42b9e02a441fc155ecb95f91e13a752b378711703e670523d",
+          "method": "printed-bit-table"
+        },
+        {
+          "path": "images/wavedrom/mem-order.edn",
+          "lineStart": 5,
+          "lineEnd": 20,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/wavedrom/mem-order.edn#L5-L20",
+          "sha256": "edaecffab9c0d55029ba6bc71380ab696850fac619d7543290d5fba3d458d397",
+          "method": "explicit-fence-field-widths"
+        },
+        {
+          "path": "rv32e.adoc",
+          "lineStart": 33,
+          "lineEnd": 37,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L33-L37",
+          "sha256": "017cfd65c36fef775beb35f57fbcf97c6c1dfcb780dba2fc050753825194e13e",
+          "method": "reduced-register-base"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

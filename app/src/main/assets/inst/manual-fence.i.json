@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/fence.i",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "fence.i",
+  "summary": "同步本 hart 的数据写入与后续取指。",
+  "summaryEn": "Synchronize this hart's prior data stores with subsequent instruction fetches.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "zifencei.adoc",
+      "lineStart": 4,
+      "lineEnd": 9,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zifencei.adoc#L4-L9",
+      "sha256": "8540a412c5b8330a2da9132c20c8fe5d8252b1dd3d5c505dc793591d0e7eb630",
+      "method": "manual-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zifencei"
+        ]
+      ],
+      "mask": "0x0000707f",
+      "match": "0x0000100f",
+      "fields": [
+        {
+          "name": "imm[11:0]",
+          "msb": 31,
+          "lsb": 20,
+          "operand": "imm",
+          "operandBits": [
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0
+          ],
+          "operandSigned": true
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "001",
+          "msb": 14,
+          "lsb": 12,
+          "value": 1
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "0001111",
+          "msb": 6,
+          "lsb": 0,
+          "value": 15
+        }
+      ],
+      "constraints": [
+        "imm, rs1 and rd are reserved for future use; standard software writes zero"
+      ],
+      "sources": [
+        {
+          "path": "rv-32-64g.adoc",
+          "lineStart": 141,
+          "lineEnd": 141,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv-32-64g.adoc#L141-L141",
+          "sha256": "987b38f2631800ac303743b532f0ae9bb9deaf975d777133b54b090437a31875",
+          "method": "printed-bit-table"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

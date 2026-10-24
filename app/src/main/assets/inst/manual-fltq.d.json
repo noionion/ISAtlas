@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/fltq.d",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "fltq.d",
+  "summary": "浮点比较 a < b，成立写 1，否则写 0，仅信令 NaN 触发无效操作标志。",
+  "summaryEn": "Set rd to (a < b); only signaling NaNs raise invalid.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "zfa.adoc",
+      "lineStart": 217,
+      "lineEnd": 217,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zfa.adoc#L217-L217",
+      "sha256": "0af644e8bb3e287a2f38eeb2b0beae896fabd84b5d23c06c889f246e3f82d224",
+      "method": "prose-encoding-derivation"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "D",
+          "Zfa"
+        ]
+      ],
+      "mask": "0xfe00707f",
+      "match": "0xa2005053",
+      "fields": [
+        {
+          "name": "opcode",
+          "msb": 6,
+          "lsb": 0,
+          "value": 83
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "funct3",
+          "msb": 14,
+          "lsb": 12,
+          "value": 5
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "float"
+        },
+        {
+          "name": "rs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "rs2",
+          "registerClass": "float"
+        },
+        {
+          "name": "funct7",
+          "msb": 31,
+          "lsb": 25,
+          "value": 81
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "zfa.adoc",
+          "lineStart": 217,
+          "lineEnd": 217,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zfa.adoc#L217-L217",
+          "sha256": "0af644e8bb3e287a2f38eeb2b0beae896fabd84b5d23c06c889f246e3f82d224",
+          "method": "prose-encoding-derivation"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "fp.state",
+          "category": "state",
+          "summary": "浮点状态、相关精度支持及虚拟化控制仍需满足当前执行环境。",
+          "summaryEn": "FP state, supported precisions and virtualization controls must permit execution.",
+          "check": "fp-state",
+          "source": {
+            "path": "machine.adoc",
+            "lineStart": 818,
+            "lineEnd": 831,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc#L818-L831",
+            "sha256": "376b8df6c556180e025b17026c19ec3bb089db1e2535f28c6cb9356b0d7fa92f",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

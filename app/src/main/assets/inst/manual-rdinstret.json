@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/rdinstret",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "rdinstret",
+  "summary": "读取 instret 计数器。",
+  "summaryEn": "Read the instret counter.",
+  "kind": "alias",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "counters.adoc",
+      "lineStart": 35,
+      "lineEnd": 36,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/counters.adoc#L35-L36",
+      "sha256": "f18d34dc8555a3d0aa90a638cebf8e5f3f3ea0a33e7e1d87396104a026a4db3e",
+      "method": "counter-alias"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zicntr"
+        ]
+      ],
+      "mask": "0xfffff07f",
+      "match": "0xc0202073",
+      "fields": [
+        {
+          "name": "csr",
+          "msb": 31,
+          "lsb": 20,
+          "value": 3074
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "value": 0
+        },
+        {
+          "name": "010",
+          "msb": 14,
+          "lsb": 12,
+          "value": 2
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "1110011",
+          "msb": 6,
+          "lsb": 0,
+          "value": 115
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "counters.adoc",
+          "lineStart": 35,
+          "lineEnd": 36,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/counters.adoc#L35-L36",
+          "sha256": "f18d34dc8555a3d0aa90a638cebf8e5f3f3ea0a33e7e1d87396104a026a4db3e",
+          "method": "counter-alias"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ],
+  "aliasOf": "csrrs"
+}

@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/zext.h",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "zext.h",
+  "summary": "X(rd) = zext(X(rs1)[15:0])",
+  "summaryEn": "X(rd) = zext(X(rs1)[15:0])",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "b-st-ext.adoc",
+      "lineStart": 3636,
+      "lineEnd": 3665,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/b-st-ext.adoc#L3636-L3665",
+      "sha256": "7cd31284cc576c50e3c853176a96d0d758004cb5d87353a0c2c9eb09fa4085b8",
+      "method": "instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32
+      ],
+      "requires": [
+        [
+          "Zbb"
+        ]
+      ],
+      "mask": "0xfff0707f",
+      "match": "0x08004033",
+      "fields": [
+        {
+          "name": "fixed[6:0]",
+          "msb": 6,
+          "lsb": 0,
+          "value": 51,
+          "sourceLabels": [
+            "OP"
+          ]
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[14:12]",
+          "msb": 14,
+          "lsb": 12,
+          "value": 4,
+          "sourceLabels": [
+            "ZEXT.H"
+          ]
+        },
+        {
+          "name": "rs",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[24:20]",
+          "msb": 24,
+          "lsb": 20,
+          "value": 0
+        },
+        {
+          "name": "fixed[31:25]",
+          "msb": 31,
+          "lsb": 25,
+          "value": 4
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "b-st-ext.adoc",
+          "lineStart": 3611,
+          "lineEnd": 3622,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/b-st-ext.adoc#L3611-L3622",
+          "sha256": "acdb33bc44387c3bfa2b25d530a95c75cfebdc2fe2c37b10250ac8cb6e7bd802",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "Zero-extend halfword",
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    },
+    {
+      "length": 32,
+      "xlens": [
+        64
+      ],
+      "requires": [
+        [
+          "Zbb"
+        ]
+      ],
+      "mask": "0xfff0707f",
+      "match": "0x0800403b",
+      "fields": [
+        {
+          "name": "fixed[6:0]",
+          "msb": 6,
+          "lsb": 0,
+          "value": 59,
+          "sourceLabels": [
+            "OP-32"
+          ]
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[14:12]",
+          "msb": 14,
+          "lsb": 12,
+          "value": 4,
+          "sourceLabels": [
+            "ZEXT.H"
+          ]
+        },
+        {
+          "name": "rs",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[24:20]",
+          "msb": 24,
+          "lsb": 20,
+          "value": 0
+        },
+        {
+          "name": "fixed[31:25]",
+          "msb": 31,
+          "lsb": 25,
+          "value": 4
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "b-st-ext.adoc",
+          "lineStart": 3624,
+          "lineEnd": 3635,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/b-st-ext.adoc#L3624-L3635",
+          "sha256": "d13151f6f439dd4fdd0af484b36849b3e5f2d3f95396ad1fcacc5962938a45db",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "Zero-extend halfword",
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

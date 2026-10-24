@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/c.addi16sp",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "c.addi16sp",
+  "summary": "sp += sext(nzimm)",
+  "summaryEn": "sp += sext(nzimm)",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "c-st-ext.adoc",
+      "lineStart": 557,
+      "lineEnd": 557,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/c-st-ext.adoc#L557-L557",
+      "sha256": "2a20af6bf859c45882695489e2517ee183e130c3fd74d84bec14e1c4e7312a54",
+      "method": "compressed-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 16,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "C"
+        ],
+        [
+          "Zca"
+        ]
+      ],
+      "mask": "0xef83",
+      "match": "0x6101",
+      "fields": [
+        {
+          "name": "011",
+          "msb": 15,
+          "lsb": 13,
+          "value": 3
+        },
+        {
+          "name": "imm[9]",
+          "msb": 12,
+          "lsb": 12,
+          "operand": "imm",
+          "operandBits": [
+            9
+          ],
+          "operandSigned": true
+        },
+        {
+          "name": "2",
+          "msb": 11,
+          "lsb": 7,
+          "value": 2
+        },
+        {
+          "name": "imm[4|6|8:7|5]",
+          "msb": 6,
+          "lsb": 2,
+          "operand": "imm",
+          "operandBits": [
+            4,
+            6,
+            8,
+            7,
+            5
+          ],
+          "operandSigned": true
+        },
+        {
+          "name": "01",
+          "msb": 1,
+          "lsb": 0,
+          "value": 1
+        }
+      ],
+      "constraints": [
+        "Printed operand restrictions: ['text', 'C.ADDI16SP', ':math', [':sub', '(RES, imm=0)']]"
+      ],
+      "sources": [
+        {
+          "path": "images/bytefield/rvc-instr-quad1.edn",
+          "lineStart": 45,
+          "lineEnd": 50,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/rvc-instr-quad1.edn#L45-L50",
+          "sha256": "a3be2cf120551c1ee215e8cac971ae548ff6c3deae565b35d9fbcccaaaa01ce4",
+          "method": "bytefield-printed-bits"
+        }
+      ],
+      "encodingConstraints": [
+        {
+          "mask": "0x107c",
+          "operator": "notIn",
+          "values": [
+            0
+          ],
+          "reason": "zero immediate is reserved"
+        }
+      ],
+      "contextRules": []
+    }
+  ]
+}

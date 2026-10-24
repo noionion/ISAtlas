@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/vfwmaccbf16.vf",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "vfwmaccbf16.vf",
+  "summary": "以 BF16 输入相乘并融合累加至 FP32 元素。",
+  "summaryEn": "Fused-multiply BF16 inputs and accumulate into FP32 elements.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "bfloat16.adoc",
+      "lineStart": 727,
+      "lineEnd": 772,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/bfloat16.adoc#L727-L772",
+      "sha256": "2422c7e0bc49ab4786c2b6cbdcd2a68d4d19cd647452c126acca4f5fcc7de54f",
+      "method": "instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zvfbfwma"
+        ]
+      ],
+      "mask": "0xfc00707f",
+      "match": "0xec005057",
+      "fields": [
+        {
+          "name": "fixed[6:0]",
+          "msb": 6,
+          "lsb": 0,
+          "value": 87,
+          "sourceLabels": [
+            "OP-V"
+          ]
+        },
+        {
+          "name": "vd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "vd",
+          "registerClass": "vector"
+        },
+        {
+          "name": "fixed[14:12]",
+          "msb": 14,
+          "lsb": 12,
+          "value": 5,
+          "sourceLabels": [
+            "OPFVF"
+          ]
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "float"
+        },
+        {
+          "name": "vs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "vs2",
+          "registerClass": "vector"
+        },
+        {
+          "name": "vm",
+          "msb": 25,
+          "lsb": 25,
+          "operand": "vm"
+        },
+        {
+          "name": "fixed[31:26]",
+          "msb": 31,
+          "lsb": 26,
+          "value": 59,
+          "sourceLabels": [
+            "vfwmaccbf16"
+          ]
+        }
+      ],
+      "constraints": [
+        "* SEW is any value other than 16"
+      ],
+      "sources": [
+        {
+          "path": "bfloat16.adoc",
+          "lineStart": 696,
+          "lineEnd": 708,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/bfloat16.adoc#L696-L708",
+          "sha256": "0cea97f750ad29b05e2b97e1cb10516086be01b695e446cbb46b555c5f19022f",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "Vector BF16 widening multiply-accumulate",
+      "contextRules": [
+        {
+          "id": "fp.state",
+          "category": "state",
+          "summary": "浮点状态、相关精度支持及虚拟化控制仍需满足当前执行环境。",
+          "summaryEn": "FP state, supported precisions and virtualization controls must permit execution.",
+          "check": "fp-state",
+          "source": {
+            "path": "machine.adoc",
+            "lineStart": 818,
+            "lineEnd": 831,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc#L818-L831",
+            "sha256": "376b8df6c556180e025b17026c19ec3bb089db1e2535f28c6cb9356b0d7fa92f",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "vector.state",
+          "category": "vector",
+          "summary": "向量指令需要可用的 VS 状态和实现支持，虚拟化状态也可能触发异常。",
+          "summaryEn": "Vector instructions require available VS state and implementation support, including virtualization controls.",
+          "check": "vector-state",
+          "source": {
+            "path": "v-st-ext.adoc",
+            "lineStart": 87,
+            "lineEnd": 87,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L87-L87",
+            "sha256": "37db67ef4aaf7ba9cca37be1932b120d8a597972366f57098e992d18ccd24980",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "vector.vtype",
+          "category": "vector",
+          "summary": "依赖 vtype 的指令在 vill=1 时非法；还需检查 SEW、LMUL、寄存器组及掩码条件。",
+          "summaryEn": "vtype-dependent instructions are illegal when vill=1; SEW, LMUL, groups and masks also constrain execution.",
+          "check": "vtype",
+          "source": {
+            "path": "v-st-ext.adoc",
+            "lineStart": 464,
+            "lineEnd": 465,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L464-L465",
+            "sha256": "50518ffd3b0b3cfbc7d60165e3be3cf3316e4b5867b602db6164570b10fac34e",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "bf16.width",
+          "category": "vector",
+          "summary": "BF16 转换/乘累加需使用规范指定的源/目的元素宽度及寄存器组限制。",
+          "summaryEn": "BF16 conversions/multiply-accumulate require the specified source/destination widths and group restrictions.",
+          "check": "bf16-width",
+          "source": {
+            "path": "bfloat16.adoc",
+            "lineStart": 286,
+            "lineEnd": 290,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/bfloat16.adoc#L286-L290",
+            "sha256": "eb25a76a10b430b3830c2fe87c316e3163548880c79a5993470c27230dd1bead",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

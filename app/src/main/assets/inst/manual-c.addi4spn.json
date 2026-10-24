@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/c.addi4spn",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "c.addi4spn",
+  "summary": "X(rd′) = sp + zext(nzuimm)",
+  "summaryEn": "X(rd′) = sp + zext(nzuimm)",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "c-st-ext.adoc",
+      "lineStart": 602,
+      "lineEnd": 609,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/c-st-ext.adoc#L602-L609",
+      "sha256": "5587890d00fbb535aa4df4059086cec50f61960562a4ae5c6c8935ca4c66d6eb",
+      "method": "compressed-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 16,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "C"
+        ],
+        [
+          "Zca"
+        ]
+      ],
+      "mask": "0xe003",
+      "match": "0x0000",
+      "fields": [
+        {
+          "name": "000",
+          "msb": 15,
+          "lsb": 13,
+          "value": 0
+        },
+        {
+          "name": "uimm[5:4|9:6|2|3]",
+          "msb": 12,
+          "lsb": 5,
+          "operand": "imm",
+          "operandBits": [
+            5,
+            4,
+            9,
+            8,
+            7,
+            6,
+            2,
+            3
+          ],
+          "operandSigned": false
+        },
+        {
+          "name": "rd′",
+          "msb": 4,
+          "lsb": 2,
+          "operand": "rd'",
+          "registerOffset": 8,
+          "registerClass": "integer"
+        },
+        {
+          "name": "00",
+          "msb": 1,
+          "lsb": 0,
+          "value": 0
+        }
+      ],
+      "constraints": [
+        "Printed operand restrictions: ['text', 'C.ADDI4SPN', ':math', [':sub', '(RES, uimm=0)']]"
+      ],
+      "sources": [
+        {
+          "path": "images/bytefield/rvc-instr-quad0.edn",
+          "lineStart": 16,
+          "lineEnd": 20,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/rvc-instr-quad0.edn#L16-L20",
+          "sha256": "93c32688b04f015ed688d4e8c8ab1c08d9bac7441a753122037bf698683f39dc",
+          "method": "bytefield-printed-bits"
+        }
+      ],
+      "encodingConstraints": [
+        {
+          "mask": "0x1fe0",
+          "operator": "notIn",
+          "values": [
+            0
+          ],
+          "reason": "zero immediate is reserved"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

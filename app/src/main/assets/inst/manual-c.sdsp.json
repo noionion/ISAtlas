@@ -1,0 +1,259 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/c.sdsp",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "c.sdsp",
+  "summary": "从 sp + uimm 地址存储 64 位数据。",
+  "summaryEn": "Store 64-bit data at sp + uimm.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "c-st-ext.adoc",
+      "lineStart": 338,
+      "lineEnd": 341,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/c-st-ext.adoc#L338-L341",
+      "sha256": "417a630bcaa2d89749e83fccb5ff4c5bb63bfc85c5b55c18032db558d4105e3d",
+      "method": "compressed-semantics"
+    },
+    {
+      "path": "zilsd.adoc",
+      "lineStart": 242,
+      "lineEnd": 250,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zilsd.adoc#L242-L250",
+      "sha256": "59e366f52bfd782a06e8ec8f2bd6a07743a83384dd0a2dcdec0be82fa0741df2",
+      "method": "instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 16,
+      "xlens": [
+        32
+      ],
+      "requires": [
+        [
+          "Zclsd",
+          "Zilsd"
+        ]
+      ],
+      "mask": "0xe003",
+      "match": "0xe002",
+      "fields": [
+        {
+          "name": "fixed[1:0]",
+          "msb": 1,
+          "lsb": 0,
+          "value": 2,
+          "sourceLabels": [
+            "C2"
+          ]
+        },
+        {
+          "name": "rs2",
+          "msb": 6,
+          "lsb": 2,
+          "operand": "rs2",
+          "sourceLabels": [
+            "src, src[0]=0"
+          ],
+          "registerClass": "integer"
+        },
+        {
+          "name": "imm",
+          "msb": 12,
+          "lsb": 7,
+          "operand": "imm",
+          "sourceLabels": [
+            "offset[5:3|8:6]"
+          ],
+          "operandSigned": true
+        },
+        {
+          "name": "fixed[15:13]",
+          "msb": 15,
+          "lsb": 13,
+          "value": 7,
+          "sourceLabels": [
+            "C.SDSP"
+          ]
+        }
+      ],
+      "constraints": [
+        "RV32 register-pair access; encoded rd/rs2 must be even where required"
+      ],
+      "sources": [
+        {
+          "path": "zilsd.adoc",
+          "lineStart": 232,
+          "lineEnd": 241,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zilsd.adoc#L232-L241",
+          "sha256": "3703af22461b5ee790e98497b5a71b7e9ba59916c553cbe6edf6a42845736a3f",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "summary": "使用偶数/奇数相邻整数寄存器对存储 64 位数据，寄存器对与异常规则见规范。",
+      "summaryEn": "Store 64-bit data using an even/odd adjacent integer-register pair; pair and exception rules follow the specification.",
+      "sourceSynopsis": "Stack-pointer based store doubleword from even/odd register pair, 16-bit encoding",
+      "encodingConstraints": [
+        {
+          "mask": "0x4",
+          "operator": "in",
+          "values": [
+            0
+          ],
+          "reason": "Register-pair base must be even",
+          "xlens": [
+            32
+          ]
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "pair.zilsd",
+          "category": "registers",
+          "summary": "64 位传送使用偶数起始的整数寄存器对；x0 与异常处理有专门规则。",
+          "summaryEn": "64-bit transfers use even-based integer pairs; x0 and exception rules also apply.",
+          "check": "encoded",
+          "source": {
+            "path": "zilsd.adoc",
+            "lineStart": 6,
+            "lineEnd": 6,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zilsd.adoc#L6-L6",
+            "sha256": "be140a637c53ed29fd8654e8dce62b497a93bca9bf0341bf2dc20dbb761167de",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "memory.environment",
+          "category": "memory",
+          "summary": "有效地址、对齐、页表/PMP/PMA 权限及实现支持可能导致访问异常，不能由指令字独立确定。",
+          "summaryEn": "Effective address, alignment, translation/PMP/PMA permissions and implementation support may cause access faults.",
+          "check": "external",
+          "source": {
+            "path": "rv32.adoc",
+            "lineStart": 669,
+            "lineEnd": 677,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L669-L677",
+            "sha256": "d466fcca6ebbf4640e35d7f98f4c86b9d172bbc761fbb0321d39fa9687cc3c62",
+            "method": "context-rule"
+          }
+        }
+      ]
+    },
+    {
+      "length": 16,
+      "xlens": [
+        64
+      ],
+      "requires": [
+        [
+          "C"
+        ],
+        [
+          "Zca"
+        ]
+      ],
+      "mask": "0xe003",
+      "match": "0xe002",
+      "fields": [
+        {
+          "name": "111",
+          "msb": 15,
+          "lsb": 13,
+          "value": 7
+        },
+        {
+          "name": "uimm[5:3|8:6]",
+          "msb": 12,
+          "lsb": 7,
+          "operand": "imm",
+          "operandBits": [
+            5,
+            4,
+            3,
+            8,
+            7,
+            6
+          ],
+          "operandSigned": false
+        },
+        {
+          "name": "rs2",
+          "msb": 6,
+          "lsb": 2,
+          "operand": "rs2",
+          "registerClass": "integer"
+        },
+        {
+          "name": "10",
+          "msb": 1,
+          "lsb": 0,
+          "value": 2
+        }
+      ],
+      "constraints": [
+        "Printed operand restrictions: ['text', 'C.SDSP', ':math', [':sub', '(RV64)']]"
+      ],
+      "sources": [
+        {
+          "path": "images/bytefield/rvc-instr-quad2.edn",
+          "lineStart": 100,
+          "lineEnd": 104,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/rvc-instr-quad2.edn#L100-L104",
+          "sha256": "1d9e391d4e910af18db2e8e098cb5fc6246ea9cf51d28b9f06947a5df42c3dcc",
+          "method": "bytefield-printed-bits"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "memory.environment",
+          "category": "memory",
+          "summary": "有效地址、对齐、页表/PMP/PMA 权限及实现支持可能导致访问异常，不能由指令字独立确定。",
+          "summaryEn": "Effective address, alignment, translation/PMP/PMA permissions and implementation support may cause access faults.",
+          "check": "external",
+          "source": {
+            "path": "rv32.adoc",
+            "lineStart": 669,
+            "lineEnd": 677,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L669-L677",
+            "sha256": "d466fcca6ebbf4640e35d7f98f4c86b9d172bbc761fbb0321d39fa9687cc3c62",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

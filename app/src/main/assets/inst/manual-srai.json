@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/srai",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "srai",
+  "summary": "X(rd) = X(rs1) >>s (shamt)",
+  "summaryEn": "X(rd) = X(rs1) >>s (shamt)",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "rv32.adoc",
+      "lineStart": 322,
+      "lineEnd": 324,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L322-L324",
+      "sha256": "992ab8b44bcb393a350ac10ffa792d851bca874fbf8718cb1c8cc1b0dbfd5eb8",
+      "method": "manual-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32
+      ],
+      "requires": [
+        [
+          "E"
+        ],
+        [
+          "I"
+        ]
+      ],
+      "mask": "0xfe00707f",
+      "match": "0x40005013",
+      "fields": [
+        {
+          "name": "0100000",
+          "msb": 31,
+          "lsb": 25,
+          "value": 32
+        },
+        {
+          "name": "shamt",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "shamt",
+          "operandSigned": false
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "101",
+          "msb": 14,
+          "lsb": 12,
+          "value": 5
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "0010011",
+          "msb": 6,
+          "lsb": 0,
+          "value": 19
+        }
+      ],
+      "constraints": [
+        "With an E base, integer register operands x16..x31 are reserved"
+      ],
+      "sources": [
+        {
+          "path": "rv-32-64g.adoc",
+          "lineStart": 90,
+          "lineEnd": 90,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv-32-64g.adoc#L90-L90",
+          "sha256": "85d40089041eaa946f95ecfeb19fa680e26cd014a3e5bf9e38739fbfae560a4e",
+          "method": "printed-bit-table"
+        },
+        {
+          "path": "rv32e.adoc",
+          "lineStart": 33,
+          "lineEnd": 37,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L33-L37",
+          "sha256": "017cfd65c36fef775beb35f57fbcf97c6c1dfcb780dba2fc050753825194e13e",
+          "method": "reduced-register-base"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    },
+    {
+      "length": 32,
+      "xlens": [
+        64
+      ],
+      "requires": [
+        [
+          "E"
+        ],
+        [
+          "I"
+        ]
+      ],
+      "mask": "0xfc00707f",
+      "match": "0x40005013",
+      "fields": [
+        {
+          "name": "010000",
+          "msb": 31,
+          "lsb": 26,
+          "value": 16
+        },
+        {
+          "name": "shamt",
+          "msb": 25,
+          "lsb": 20,
+          "operand": "shamt",
+          "operandSigned": false
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "101",
+          "msb": 14,
+          "lsb": 12,
+          "value": 5
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "0010011",
+          "msb": 6,
+          "lsb": 0,
+          "value": 19
+        }
+      ],
+      "constraints": [
+        "With an E base, integer register operands x16..x31 are reserved"
+      ],
+      "sources": [
+        {
+          "path": "rv-32-64g.adoc",
+          "lineStart": 127,
+          "lineEnd": 127,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv-32-64g.adoc#L127-L127",
+          "sha256": "ea79105056976a044b7384ce882e7de3b3e191847b6b24e4bd3b25f95f8cf7d7",
+          "method": "printed-bit-table"
+        },
+        {
+          "path": "rv32e.adoc",
+          "lineStart": 33,
+          "lineEnd": 37,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L33-L37",
+          "sha256": "017cfd65c36fef775beb35f57fbcf97c6c1dfcb780dba2fc050753825194e13e",
+          "method": "reduced-register-base"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

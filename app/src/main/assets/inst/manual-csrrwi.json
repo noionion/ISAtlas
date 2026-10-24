@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/csrrwi",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "csrrwi",
+  "summary": "读取 CSR 旧值到 rd，并用 zimm 写入；读写抑制遵循 rd/rs1/zimm 规则。",
+  "summaryEn": "Return the old CSR in rd and replace with zimm; suppress reads/writes according to rd/rs1/zimm rules.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "zicsr.adoc",
+      "lineStart": 63,
+      "lineEnd": 74,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zicsr.adoc#L63-L74",
+      "sha256": "074b846b8574b0869c34c512744c1ddf3012ae0dc77211f718be874e606e5648",
+      "method": "manual-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zicsr"
+        ]
+      ],
+      "mask": "0x0000707f",
+      "match": "0x00005073",
+      "fields": [
+        {
+          "name": "csr",
+          "msb": 31,
+          "lsb": 20,
+          "operand": "csr"
+        },
+        {
+          "name": "uimm",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "imm",
+          "operandSigned": false
+        },
+        {
+          "name": "101",
+          "msb": 14,
+          "lsb": 12,
+          "value": 5
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "1110011",
+          "msb": 6,
+          "lsb": 0,
+          "value": 115
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "rv-32-64g.adoc",
+          "lineStart": 150,
+          "lineEnd": 150,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv-32-64g.adoc#L150-L150",
+          "sha256": "e97355f142041377bdbb22cda5ab23faaef8ce54c45f203eeeb9c6f4966470b8",
+          "method": "printed-bit-table"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "csr.access",
+          "category": "csr",
+          "summary": "CSR 的存在性、最低权限、只读编码、读写抑制及虚拟化拦截共同决定访问结果。",
+          "summaryEn": "CSR existence, privilege, read-only encoding, read/write suppression and virtualization govern access.",
+          "check": "external",
+          "source": {
+            "path": "zicsr.adoc",
+            "lineStart": 29,
+            "lineEnd": 34,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zicsr.adoc#L29-L34",
+            "sha256": "293c2db6f441481321ca2cba30d57d2eb918ff708640e3a3d567e59c03fc5e7b",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

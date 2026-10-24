@@ -561,7 +561,7 @@ def run():
                               "Bytefield visual spans are not bit widths; only explicit width labels are decoded.",
                               "Field access rules absent from figures are not guessed; consult the linked manual."]}
     notices = ["ISAtlas data attribution\n\nOfficial RISC-V Instruction Set Manual; RISC-V International and contributors.",
-               f"Source: {REPOSITORY}\nTag: 20250508\nCommit: {REVISION}\nChanges: extract CSR tables/figures into JSON; normalize labels; translate and summarize field descriptions in Chinese and English; annotate encodings and XLEN-specific rules; omit unsupported layouts.\n",
+               f"Source: {REPOSITORY}\nTag: 20250508\nCommit: {REVISION}\nChanges: extract CSR tables/figures and instruction encodings into JSON; normalize labels; translate and summarize CSR fields and instructions in Chinese and English; annotate encodings and XLEN-specific rules; omit unsupported layouts.\n",
                (UPSTREAM / "LICENSE").read_text(encoding="utf-8")]
     if retained:
         notices += ["\nRetained T-head data: https://github.com/T-head-Semi/thead-extension-spec\nRevision: 5a75db2696881a812a04e6e00347d3920dae03f2\n",

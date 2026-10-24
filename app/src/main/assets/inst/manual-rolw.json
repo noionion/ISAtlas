@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/rolw",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "rolw",
+  "summary": "将源寄存器低 32 位循环左移，字结果符号扩展。",
+  "summaryEn": "Rotate the low source word left by the masked shift amount and sign-extend the word result.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "b-st-ext.adoc",
+      "lineStart": 2699,
+      "lineEnd": 2730,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/b-st-ext.adoc#L2699-L2730",
+      "sha256": "7476b5fd8c2a69cd75f35fa62671a8ab0a180c7c77d87ff3e674ce1bd6077e96",
+      "method": "instruction-description"
+    },
+    {
+      "path": "scalar-crypto.adoc",
+      "lineStart": 1753,
+      "lineEnd": 1785,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/scalar-crypto.adoc#L1753-L1785",
+      "sha256": "b7ea91731faa82f86296915dc072afa0d4f2c1c2872a8af65b9b489882d8de49",
+      "method": "instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        64
+      ],
+      "requires": [
+        [
+          "Zbb"
+        ],
+        [
+          "Zbkb"
+        ]
+      ],
+      "mask": "0xfe00707f",
+      "match": "0x6000103b",
+      "fields": [
+        {
+          "name": "fixed[6:0]",
+          "msb": 6,
+          "lsb": 0,
+          "value": 59,
+          "sourceLabels": [
+            "OP-32"
+          ]
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[14:12]",
+          "msb": 14,
+          "lsb": 12,
+          "value": 1,
+          "sourceLabels": [
+            "ROLW"
+          ]
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "rs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "rs2",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[31:25]",
+          "msb": 31,
+          "lsb": 25,
+          "value": 48,
+          "sourceLabels": [
+            "ROLW"
+          ]
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "b-st-ext.adoc",
+          "lineStart": 2687,
+          "lineEnd": 2698,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/b-st-ext.adoc#L2687-L2698",
+          "sha256": "64433e46baddb12dcd7101a3e84c89a58c47222692e4cb0fedefd9a47c4136f9",
+          "method": "literal-wavedrom"
+        },
+        {
+          "path": "scalar-crypto.adoc",
+          "lineStart": 1741,
+          "lineEnd": 1752,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/scalar-crypto.adoc#L1741-L1752",
+          "sha256": "64433e46baddb12dcd7101a3e84c89a58c47222692e4cb0fedefd9a47c4136f9",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "Rotate Left Word (Register)",
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

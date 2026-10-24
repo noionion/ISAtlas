@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/fsq",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "fsq",
+  "summary": "存储 128 位浮点寄存器位模式，地址为 X(rs1)+sext(imm)。",
+  "summaryEn": "Store a 128-bit FP register bit pattern at X(rs1)+sext(imm).",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "q-st-ext.adoc",
+      "lineStart": 24,
+      "lineEnd": 25,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/q-st-ext.adoc#L24-L25",
+      "sha256": "e6d5337501d0de4f4d35c8e842dfac1b0d53fdfb564dadb6fececea45e2ebbb3",
+      "method": "manual-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Q"
+        ]
+      ],
+      "mask": "0x0000707f",
+      "match": "0x00004027",
+      "fields": [
+        {
+          "name": "imm[11:5]",
+          "msb": 31,
+          "lsb": 25,
+          "operand": "imm",
+          "operandBits": [
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5
+          ],
+          "operandSigned": true
+        },
+        {
+          "name": "rs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "rs2",
+          "registerClass": "float"
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "100",
+          "msb": 14,
+          "lsb": 12,
+          "value": 4
+        },
+        {
+          "name": "imm[4:0]",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "imm",
+          "operandBits": [
+            4,
+            3,
+            2,
+            1,
+            0
+          ],
+          "operandSigned": true
+        },
+        {
+          "name": "0100111",
+          "msb": 6,
+          "lsb": 0,
+          "value": 39
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "rv-32-64g.adoc",
+          "lineStart": 345,
+          "lineEnd": 345,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv-32-64g.adoc#L345-L345",
+          "sha256": "aa84bce502121d62d97c68973a1b65b763d17c147397739067bab2b5bdbf6f4d",
+          "method": "printed-bit-table"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "fp.state",
+          "category": "state",
+          "summary": "浮点状态、相关精度支持及虚拟化控制仍需满足当前执行环境。",
+          "summaryEn": "FP state, supported precisions and virtualization controls must permit execution.",
+          "check": "fp-state",
+          "source": {
+            "path": "machine.adoc",
+            "lineStart": 818,
+            "lineEnd": 831,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc#L818-L831",
+            "sha256": "376b8df6c556180e025b17026c19ec3bb089db1e2535f28c6cb9356b0d7fa92f",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "memory.environment",
+          "category": "memory",
+          "summary": "有效地址、对齐、页表/PMP/PMA 权限及实现支持可能导致访问异常，不能由指令字独立确定。",
+          "summaryEn": "Effective address, alignment, translation/PMP/PMA permissions and implementation support may cause access faults.",
+          "check": "external",
+          "source": {
+            "path": "rv32.adoc",
+            "lineStart": 669,
+            "lineEnd": 677,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L669-L677",
+            "sha256": "d466fcca6ebbf4640e35d7f98f4c86b9d172bbc761fbb0321d39fa9687cc3c62",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

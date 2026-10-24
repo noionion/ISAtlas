@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/divuw",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "divuw",
+  "summary": "X(rd) = sext32(unsigned32(X(rs1)) div unsigned32(X(rs2)))；除零及溢出按规范定义返回值。",
+  "summaryEn": "X(rd) = sext32(unsigned32(X(rs1)) div unsigned32(X(rs2))); division by zero and overflow use the specified architectural results.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "m-st-ext.adoc",
+      "lineStart": 79,
+      "lineEnd": 86,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/m-st-ext.adoc#L79-L86",
+      "sha256": "0a177585dd8b7ddc391812d726875c22e0609ef586375a01da333817f928ab81",
+      "method": "manual-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        64
+      ],
+      "requires": [
+        [
+          "M"
+        ]
+      ],
+      "mask": "0xfe00707f",
+      "match": "0x0200503b",
+      "fields": [
+        {
+          "name": "0000001",
+          "msb": 31,
+          "lsb": 25,
+          "value": 1
+        },
+        {
+          "name": "rs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "rs2",
+          "registerClass": "integer"
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "101",
+          "msb": 14,
+          "lsb": 12,
+          "value": 5
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "0111011",
+          "msb": 6,
+          "lsb": 0,
+          "value": 59
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "rv-32-64g.adoc",
+          "lineStart": 173,
+          "lineEnd": 173,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv-32-64g.adoc#L173-L173",
+          "sha256": "c02051fb65c4d95a23237f4c082d812d6efbdf1208ffe83dcc49447fa7fc26b8",
+          "method": "printed-bit-table"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

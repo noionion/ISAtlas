@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/pause",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "pause",
+  "summary": "提示自旋等待，可暂时降低执行资源占用。",
+  "summaryEn": "Hint a spin-wait loop and optionally reduce execution resource use.",
+  "kind": "hint",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "zihintpause.adoc",
+      "lineStart": 2,
+      "lineEnd": 7,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zihintpause.adoc#L2-L7",
+      "sha256": "e7db9463b0f1837817fe6bc0406a88fc3a3e7b9a4394855ebf306944977c9fc3",
+      "method": "manual-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zihintpause"
+        ]
+      ],
+      "mask": "0xffffffff",
+      "match": "0x0100000f",
+      "fields": [
+        {
+          "name": "0000",
+          "msb": 31,
+          "lsb": 28,
+          "value": 0
+        },
+        {
+          "name": "0001",
+          "msb": 27,
+          "lsb": 24,
+          "value": 1
+        },
+        {
+          "name": "0000",
+          "msb": 23,
+          "lsb": 20,
+          "value": 0
+        },
+        {
+          "name": "00000",
+          "msb": 19,
+          "lsb": 15,
+          "value": 0
+        },
+        {
+          "name": "000",
+          "msb": 14,
+          "lsb": 12,
+          "value": 0
+        },
+        {
+          "name": "00000",
+          "msb": 11,
+          "lsb": 7,
+          "value": 0
+        },
+        {
+          "name": "0001111",
+          "msb": 6,
+          "lsb": 0,
+          "value": 15
+        }
+      ],
+      "constraints": [
+        "rs1 and rd are reserved for future use; standard software writes zero"
+      ],
+      "sources": [
+        {
+          "path": "rv-32-64g.adoc",
+          "lineStart": 103,
+          "lineEnd": 103,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv-32-64g.adoc#L103-L103",
+          "sha256": "13e0b18bbefdfe7d38c53f85e3c83c41d7eb823925d676f508a2b3856f87224e",
+          "method": "printed-bit-table"
+        },
+        {
+          "path": "images/wavedrom/mem-order.edn",
+          "lineStart": 5,
+          "lineEnd": 20,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/wavedrom/mem-order.edn#L5-L20",
+          "sha256": "edaecffab9c0d55029ba6bc71380ab696850fac619d7543290d5fba3d458d397",
+          "method": "explicit-fence-field-widths"
+        }
+      ],
+      "contextRules": []
+    }
+  ]
+}

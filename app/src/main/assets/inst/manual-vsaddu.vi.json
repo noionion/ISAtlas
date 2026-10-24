@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/vsaddu.vi",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "vsaddu.vi",
+  "summary": "逐活动元素执行无符号饱和加法。",
+  "summaryEn": "Perform unsigned saturating addition for active elements.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "v-st-ext.adoc",
+      "lineStart": 3080,
+      "lineEnd": 3080,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L3080-L3080",
+      "sha256": "3eb0155b8e227594810eb39299c1de300dae7d4613ec29d85bb58cac367a7392",
+      "method": "vector-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "V"
+        ],
+        [
+          "Zve32x"
+        ]
+      ],
+      "mask": "0xfc00707f",
+      "match": "0x80003057",
+      "fields": [
+        {
+          "name": "opcode",
+          "msb": 6,
+          "lsb": 0,
+          "value": 87
+        },
+        {
+          "name": "vd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "vd",
+          "registerClass": "vector"
+        },
+        {
+          "name": "funct3",
+          "msb": 14,
+          "lsb": 12,
+          "value": 3
+        },
+        {
+          "name": "simm[4:0]",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "simm",
+          "operandBits": [
+            4,
+            3,
+            2,
+            1,
+            0
+          ],
+          "operandSigned": true
+        },
+        {
+          "name": "vs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "vs2",
+          "registerClass": "vector"
+        },
+        {
+          "name": "vm",
+          "msb": 25,
+          "lsb": 25,
+          "operand": "vm"
+        },
+        {
+          "name": "funct6",
+          "msb": 31,
+          "lsb": 26,
+          "value": 32
+        }
+      ],
+      "constraints": [
+        "Requires a legal current vtype/SEW/LMUL and register-group alignment/overlap; vm=0 uses v0.t where permitted",
+        "Embedded vector profiles support only their specified EEWs/ELEN; FP64 and widening FP32-to-FP64 require V or Zve64d; FP16 requires Zvfh/Zvfhmin as applicable"
+      ],
+      "sources": [
+        {
+          "path": "images/wavedrom/v-inst-table.edn",
+          "lineStart": 63,
+          "lineEnd": 63,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/wavedrom/v-inst-table.edn#L63-L63",
+          "sha256": "c30c647ba929848ba5b388b65604202a2a3d103e288f0e9fac60c75e60c18595",
+          "method": "vector-funct6-table"
+        },
+        {
+          "path": "images/wavedrom/valu-format.edn",
+          "lineStart": 17,
+          "lineEnd": 26,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/wavedrom/valu-format.edn#L17-L26",
+          "sha256": "414d9e01c1b10847ec301312988758364315b8e62334eed5ad0880edc406a04a",
+          "method": "vector-arithmetic-format"
+        },
+        {
+          "path": "v-st-ext.adoc",
+          "lineStart": 5037,
+          "lineEnd": 5039,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L5037-L5039",
+          "sha256": "3647efa44aa132b7391d7acf54afc1e5ddca999f4555981611c24fb8ad51a617",
+          "method": "embedded-vector-subsets"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "vector.state",
+          "category": "vector",
+          "summary": "向量指令需要可用的 VS 状态和实现支持，虚拟化状态也可能触发异常。",
+          "summaryEn": "Vector instructions require available VS state and implementation support, including virtualization controls.",
+          "check": "vector-state",
+          "source": {
+            "path": "v-st-ext.adoc",
+            "lineStart": 87,
+            "lineEnd": 87,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L87-L87",
+            "sha256": "37db67ef4aaf7ba9cca37be1932b120d8a597972366f57098e992d18ccd24980",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "vector.vtype",
+          "category": "vector",
+          "summary": "依赖 vtype 的指令在 vill=1 时非法；还需检查 SEW、LMUL、寄存器组及掩码条件。",
+          "summaryEn": "vtype-dependent instructions are illegal when vill=1; SEW, LMUL, groups and masks also constrain execution.",
+          "check": "vtype",
+          "source": {
+            "path": "v-st-ext.adoc",
+            "lineStart": 464,
+            "lineEnd": 465,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L464-L465",
+            "sha256": "50518ffd3b0b3cfbc7d60165e3be3cf3316e4b5867b602db6164570b10fac34e",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

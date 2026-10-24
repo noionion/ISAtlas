@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/c.mop.9",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "c.mop.9",
+  "summary": "当前定义为空操作的压缩可重定义操作。",
+  "summaryEn": "A compressed may-be-operation currently defined as a no-op.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "zimop.adoc",
+      "lineStart": 68,
+      "lineEnd": 75,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zimop.adoc#L68-L75",
+      "sha256": "5f1ad98d2d6522f0c3ad3e43ec14fa194b2f15be4b28ef602a59d20a93a0a8a3",
+      "method": "semantic-paragraph"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 16,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zcmop"
+        ]
+      ],
+      "mask": "0xffff",
+      "match": "0x6481",
+      "fields": [
+        {
+          "name": "instruction",
+          "msb": 15,
+          "lsb": 0,
+          "value": 25729
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "zimop.adoc",
+          "lineStart": 97,
+          "lineEnd": 97,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zimop.adoc#L97-L97",
+          "sha256": "f93c5b826b14453f4551bcb0ccceac7c338860ddc161c5a17ace9d8324a1c10c",
+          "method": "literal-compressed-mop-table"
+        }
+      ],
+      "contextRules": []
+    }
+  ]
+}

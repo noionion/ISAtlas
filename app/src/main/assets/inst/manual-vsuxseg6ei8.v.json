@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/vsuxseg6ei8.v",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "vsuxseg6ei8.v",
+  "summary": "使用 8 位无序字节偏移索引存储 SEW 位向量元素。",
+  "summaryEn": "Store SEW-bit vector elements using 8-bit unordered byte-offset indices.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "v-st-ext.adoc",
+      "lineStart": 1759,
+      "lineEnd": 1759,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L1759-L1759",
+      "sha256": "3103e8a11e472aa39621bdee21fdfe5286599224653529413a8fb16fd5cf8e02",
+      "method": "vector-segment-family"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "V"
+        ],
+        [
+          "Zve32x"
+        ]
+      ],
+      "mask": "0xfc00707f",
+      "match": "0xa4000027",
+      "fields": [
+        {
+          "name": "fixed[6:0]",
+          "msb": 6,
+          "lsb": 0,
+          "value": 39,
+          "sourceLabels": [
+            "VSX* indexed"
+          ]
+        },
+        {
+          "name": "vs3",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "vs3",
+          "sourceLabels": [
+            "store data"
+          ],
+          "registerClass": "vector"
+        },
+        {
+          "name": "width",
+          "msb": 14,
+          "lsb": 12,
+          "value": 0
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "sourceLabels": [
+            "base address"
+          ],
+          "registerClass": "integer"
+        },
+        {
+          "name": "vs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "vs2",
+          "sourceLabels": [
+            "address offsets"
+          ],
+          "registerClass": "vector"
+        },
+        {
+          "name": "vm",
+          "msb": 25,
+          "lsb": 25,
+          "operand": "vm"
+        },
+        {
+          "name": "mop",
+          "msb": 27,
+          "lsb": 26,
+          "value": 1
+        },
+        {
+          "name": "mew",
+          "msb": 28,
+          "lsb": 28,
+          "value": 0
+        },
+        {
+          "name": "nf",
+          "msb": 31,
+          "lsb": 29,
+          "value": 5
+        }
+      ],
+      "constraints": [
+        "nf encodes segment count minus one; EMUL*(nf+1) <= 8; legal EEW/EMUL and register groups required",
+        "Requires a legal current vtype/SEW/LMUL and register-group alignment/overlap; vm=0 uses v0.t where permitted",
+        "Embedded vector profiles support only their specified EEWs/ELEN; FP64 and widening FP32-to-FP64 require V or Zve64d; FP16 requires Zvfh/Zvfhmin as applicable"
+      ],
+      "sources": [
+        {
+          "path": "images/wavedrom/vmem-format.edn",
+          "lineStart": 95,
+          "lineEnd": 108,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/wavedrom/vmem-format.edn#L95-L108",
+          "sha256": "49e2040a9c51db0fb78b5923ff8b991f18ede57738bcc489fafbfb4e1d3a23b5",
+          "method": "vector-memory-template"
+        },
+        {
+          "path": "images/wavedrom/valu-format.edn",
+          "lineStart": 17,
+          "lineEnd": 26,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/wavedrom/valu-format.edn#L17-L26",
+          "sha256": "414d9e01c1b10847ec301312988758364315b8e62334eed5ad0880edc406a04a",
+          "method": "vector-arithmetic-format"
+        },
+        {
+          "path": "v-st-ext.adoc",
+          "lineStart": 5037,
+          "lineEnd": 5039,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L5037-L5039",
+          "sha256": "3647efa44aa132b7391d7acf54afc1e5ddca999f4555981611c24fb8ad51a617",
+          "method": "embedded-vector-subsets"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "vector.state",
+          "category": "vector",
+          "summary": "向量指令需要可用的 VS 状态和实现支持，虚拟化状态也可能触发异常。",
+          "summaryEn": "Vector instructions require available VS state and implementation support, including virtualization controls.",
+          "check": "vector-state",
+          "source": {
+            "path": "v-st-ext.adoc",
+            "lineStart": 87,
+            "lineEnd": 87,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L87-L87",
+            "sha256": "37db67ef4aaf7ba9cca37be1932b120d8a597972366f57098e992d18ccd24980",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "vector.vtype",
+          "category": "vector",
+          "summary": "依赖 vtype 的指令在 vill=1 时非法；还需检查 SEW、LMUL、寄存器组及掩码条件。",
+          "summaryEn": "vtype-dependent instructions are illegal when vill=1; SEW, LMUL, groups and masks also constrain execution.",
+          "check": "vtype",
+          "source": {
+            "path": "v-st-ext.adoc",
+            "lineStart": 464,
+            "lineEnd": 465,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L464-L465",
+            "sha256": "50518ffd3b0b3cfbc7d60165e3be3cf3316e4b5867b602db6164570b10fac34e",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "memory.environment",
+          "category": "memory",
+          "summary": "有效地址、对齐、页表/PMP/PMA 权限及实现支持可能导致访问异常，不能由指令字独立确定。",
+          "summaryEn": "Effective address, alignment, translation/PMP/PMA permissions and implementation support may cause access faults.",
+          "check": "external",
+          "source": {
+            "path": "rv32.adoc",
+            "lineStart": 669,
+            "lineEnd": 677,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L669-L677",
+            "sha256": "d466fcca6ebbf4640e35d7f98f4c86b9d172bbc761fbb0321d39fa9687cc3c62",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

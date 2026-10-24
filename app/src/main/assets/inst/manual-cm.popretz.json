@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/cm.popretz",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "cm.popretz",
+  "summary": "恢复寄存器、释放栈帧，将 a0 置零并返回 ra。",
+  "summaryEn": "Restore registers, deallocate the stack frame, clear a0 and return through ra.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "zc.adoc",
+      "lineStart": 1912,
+      "lineEnd": 1981,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zc.adoc#L1912-L1981",
+      "sha256": "c14904e66f07b4b5742cdbe95cf06788a872ab331ec5342298f78094053bb226",
+      "method": "instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 16,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zcmp"
+        ]
+      ],
+      "mask": "0xff03",
+      "match": "0xbc02",
+      "fields": [
+        {
+          "name": "fixed[1:0]",
+          "msb": 1,
+          "lsb": 0,
+          "value": 2,
+          "sourceLabels": [
+            "C2"
+          ]
+        },
+        {
+          "name": "spimm[5:4]",
+          "msb": 3,
+          "lsb": 2,
+          "operand": "spimm",
+          "operandBits": [
+            5,
+            4
+          ],
+          "operandSigned": false
+        },
+        {
+          "name": "rlist",
+          "msb": 7,
+          "lsb": 4,
+          "operand": "rlist"
+        },
+        {
+          "name": "fixed[12:8]",
+          "msb": 12,
+          "lsb": 8,
+          "value": 28
+        },
+        {
+          "name": "fixed[15:13]",
+          "msb": 15,
+          "lsb": 13,
+          "value": 5,
+          "sourceLabels": [
+            "FUNCT3"
+          ]
+        }
+      ],
+      "constraints": [
+        "Register-list/index/stack-adjustment restrictions follow the per-instruction manual section",
+        "On RV32E rlist must be 4..6"
+      ],
+      "sources": [
+        {
+          "path": "zc.adoc",
+          "lineStart": 1795,
+          "lineEnd": 1805,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zc.adoc#L1795-L1805",
+          "sha256": "d87a3252bf630cf543e50fef415227e3cf17450bc1709a76bcd6ece28e2a6e1c",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "Destroy stack frame: load ra and 0 to 12 saved registers from the stack frame, deallocate the stack frame, move zero into a0, return to ra.",
+      "encodingConstraints": [
+        {
+          "mask": "0xf0",
+          "operator": "notIn",
+          "values": [
+            0,
+            16,
+            32,
+            48
+          ],
+          "reason": "rlist=0..3 is reserved"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "zcmp.rlist",
+          "category": "registers",
+          "summary": "rlist=0..3 保留；RV32E 仅支持 rlist=4..6，栈调整按寄存器列表计算。",
+          "summaryEn": "rlist=0..3 is reserved; RV32E permits 4..6, with list-dependent stack adjustment.",
+          "check": "rlist",
+          "source": {
+            "path": "zc.adoc",
+            "lineStart": 1434,
+            "lineEnd": 1434,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zc.adoc#L1434-L1434",
+            "sha256": "c36730459b2eae488b4f672be2097740c5e3491c278fade07adba648ac2979f8",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

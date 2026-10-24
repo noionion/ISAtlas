@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/sraw",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "sraw",
+  "summary": "X(rd) = sext32(signed32(X(rs1)) >>s (X(rs2) & 31))",
+  "summaryEn": "X(rd) = sext32(signed32(X(rs1)) >>s (X(rs2) & 31))",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "rv64.adoc",
+      "lineStart": 127,
+      "lineEnd": 132,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv64.adoc#L127-L132",
+      "sha256": "46575cc48f513acec8b9526282bb45595c6ddbefdff153f23886f52da1e9987c",
+      "method": "manual-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        64
+      ],
+      "requires": [
+        [
+          "E"
+        ],
+        [
+          "I"
+        ]
+      ],
+      "mask": "0xfe00707f",
+      "match": "0x4000503b",
+      "fields": [
+        {
+          "name": "0100000",
+          "msb": 31,
+          "lsb": 25,
+          "value": 32
+        },
+        {
+          "name": "rs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "rs2",
+          "registerClass": "integer"
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "101",
+          "msb": 14,
+          "lsb": 12,
+          "value": 5
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "0111011",
+          "msb": 6,
+          "lsb": 0,
+          "value": 59
+        }
+      ],
+      "constraints": [
+        "With an E base, integer register operands x16..x31 are reserved"
+      ],
+      "sources": [
+        {
+          "path": "rv-32-64g.adoc",
+          "lineStart": 136,
+          "lineEnd": 136,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv-32-64g.adoc#L136-L136",
+          "sha256": "1f605ca26f1fb726b37ffcbdf5283f9b383b73caea8ea6f8c9c175876ea931db",
+          "method": "printed-bit-table"
+        },
+        {
+          "path": "rv32e.adoc",
+          "lineStart": 33,
+          "lineEnd": 37,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L33-L37",
+          "sha256": "017cfd65c36fef775beb35f57fbcf97c6c1dfcb780dba2fc050753825194e13e",
+          "method": "reduced-register-base"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

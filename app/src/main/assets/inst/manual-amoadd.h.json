@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/amoadd.h",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "amoadd.h",
+  "summary": "原子执行加并将内存旧值写入 rd，窄结果符号扩展。",
+  "summaryEn": "Atomically perform add and return the old memory value in rd, sign-extending narrow results.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "zabha.adoc",
+      "lineStart": 51,
+      "lineEnd": 54,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zabha.adoc#L51-L54",
+      "sha256": "ad39547cb5c140361db22ba1c5e457a0242e3dc9d11ad28073a20f6d657696a9",
+      "method": "semantic-paragraph"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zabha"
+        ]
+      ],
+      "mask": "0xf800707f",
+      "match": "0x0000102f",
+      "fields": [
+        {
+          "name": "00000",
+          "msb": 31,
+          "lsb": 27,
+          "value": 0
+        },
+        {
+          "name": "aq",
+          "msb": 26,
+          "lsb": 26,
+          "operand": "aq"
+        },
+        {
+          "name": "rl",
+          "msb": 25,
+          "lsb": 25,
+          "operand": "rl"
+        },
+        {
+          "name": "rs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "rs2",
+          "registerClass": "integer"
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "010",
+          "msb": 14,
+          "lsb": 12,
+          "value": 1
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "0101111",
+          "msb": 6,
+          "lsb": 0,
+          "value": 47
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "zabha.adoc",
+          "lineStart": 37,
+          "lineEnd": 49,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zabha.adoc#L37-L49",
+          "sha256": "16c5d06aa80ccdc877ac700b72830f5845cc07d6b8369fdb5bf9ed9683041738",
+          "method": "amo-width-derivation"
+        },
+        {
+          "path": "rv-32-64g.adoc",
+          "lineStart": 193,
+          "lineEnd": 193,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv-32-64g.adoc#L193-L193",
+          "sha256": "cf74247c8bff336fd007488a25c3c70b07f4a4daac29af60b3679940232db947",
+          "method": "printed-bit-table"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "memory.environment",
+          "category": "memory",
+          "summary": "有效地址、对齐、页表/PMP/PMA 权限及实现支持可能导致访问异常，不能由指令字独立确定。",
+          "summaryEn": "Effective address, alignment, translation/PMP/PMA permissions and implementation support may cause access faults.",
+          "check": "external",
+          "source": {
+            "path": "rv32.adoc",
+            "lineStart": 669,
+            "lineEnd": 677,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L669-L677",
+            "sha256": "d466fcca6ebbf4640e35d7f98f4c86b9d172bbc761fbb0321d39fa9687cc3c62",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

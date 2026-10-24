@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/c.lbu",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "c.lbu",
+  "summary": "从 X(rs1′) + uimm 地址加载 8 位无符号数据。",
+  "summaryEn": "Load 8-bit unsigned data at X(rs1′) + uimm.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "zc.adoc",
+      "lineStart": 366,
+      "lineEnd": 392,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zc.adoc#L366-L392",
+      "sha256": "d2514d5ed0211c85fa4254bbe0111031a31fabcd41933d147d20ce2b589346a0",
+      "method": "instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 16,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zcb"
+        ]
+      ],
+      "mask": "0xfc03",
+      "match": "0x8000",
+      "fields": [
+        {
+          "name": "fixed[1:0]",
+          "msb": 1,
+          "lsb": 0,
+          "value": 0,
+          "sourceLabels": [
+            "C0"
+          ]
+        },
+        {
+          "name": "rd'",
+          "msb": 4,
+          "lsb": 2,
+          "operand": "rd'",
+          "registerOffset": 8,
+          "registerClass": "integer"
+        },
+        {
+          "name": "uimm[0|1]",
+          "msb": 6,
+          "lsb": 5,
+          "operand": "imm",
+          "operandBits": [
+            0,
+            1
+          ],
+          "operandSigned": false
+        },
+        {
+          "name": "rs1'",
+          "msb": 9,
+          "lsb": 7,
+          "operand": "rs1'",
+          "registerOffset": 8,
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[12:10]",
+          "msb": 12,
+          "lsb": 10,
+          "value": 0
+        },
+        {
+          "name": "fixed[15:13]",
+          "msb": 15,
+          "lsb": 13,
+          "value": 4,
+          "sourceLabels": [
+            "FUNCT3"
+          ]
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "zc.adoc",
+          "lineStart": 345,
+          "lineEnd": 356,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zc.adoc#L345-L356",
+          "sha256": "3b0faf40f8a51b23c1c4a42160ae259bc760c9ac37629e3d7975b5f0fbe56255",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "Load unsigned byte, 16-bit encoding",
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "memory.environment",
+          "category": "memory",
+          "summary": "有效地址、对齐、页表/PMP/PMA 权限及实现支持可能导致访问异常，不能由指令字独立确定。",
+          "summaryEn": "Effective address, alignment, translation/PMP/PMA permissions and implementation support may cause access faults.",
+          "check": "external",
+          "source": {
+            "path": "rv32.adoc",
+            "lineStart": 669,
+            "lineEnd": 677,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L669-L677",
+            "sha256": "d466fcca6ebbf4640e35d7f98f4c86b9d172bbc761fbb0321d39fa9687cc3c62",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

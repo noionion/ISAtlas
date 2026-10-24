@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/c.flwsp",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "c.flwsp",
+  "summary": "从 sp + uimm 地址加载 32 位浮点数据。",
+  "summaryEn": "Load 32-bit floating-point data at sp + uimm.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "c-st-ext.adoc",
+      "lineStart": 316,
+      "lineEnd": 320,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/c-st-ext.adoc#L316-L320",
+      "sha256": "6caaa61a29c1498f26bb055b5ba59087eefc7e8b3253131c761440b3dde4ea0b",
+      "method": "compressed-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 16,
+      "xlens": [
+        32
+      ],
+      "requires": [
+        [
+          "F",
+          "Zcf"
+        ]
+      ],
+      "mask": "0xe003",
+      "match": "0x6002",
+      "fields": [
+        {
+          "name": "011",
+          "msb": 15,
+          "lsb": 13,
+          "value": 3
+        },
+        {
+          "name": "uimm[5]",
+          "msb": 12,
+          "lsb": 12,
+          "operand": "imm",
+          "operandBits": [
+            5
+          ],
+          "operandSigned": false
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "float"
+        },
+        {
+          "name": "uimm[4:2|7:6]",
+          "msb": 6,
+          "lsb": 2,
+          "operand": "imm",
+          "operandBits": [
+            4,
+            3,
+            2,
+            7,
+            6
+          ],
+          "operandSigned": false
+        },
+        {
+          "name": "10",
+          "msb": 1,
+          "lsb": 0,
+          "value": 2
+        }
+      ],
+      "constraints": [
+        "Printed operand restrictions: ['text', 'C.FLWSP', ':math', [':sub', '(RV32)']]"
+      ],
+      "sources": [
+        {
+          "path": "images/bytefield/rvc-instr-quad2.edn",
+          "lineStart": 33,
+          "lineEnd": 38,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/rvc-instr-quad2.edn#L33-L38",
+          "sha256": "63201ab7866af655be37751d7900984b77d6d5ec1e9f93db7e47d4c964e84b9e",
+          "method": "bytefield-printed-bits"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "fp.state",
+          "category": "state",
+          "summary": "浮点状态、相关精度支持及虚拟化控制仍需满足当前执行环境。",
+          "summaryEn": "FP state, supported precisions and virtualization controls must permit execution.",
+          "check": "fp-state",
+          "source": {
+            "path": "machine.adoc",
+            "lineStart": 818,
+            "lineEnd": 831,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc#L818-L831",
+            "sha256": "376b8df6c556180e025b17026c19ec3bb089db1e2535f28c6cb9356b0d7fa92f",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "memory.environment",
+          "category": "memory",
+          "summary": "有效地址、对齐、页表/PMP/PMA 权限及实现支持可能导致访问异常，不能由指令字独立确定。",
+          "summaryEn": "Effective address, alignment, translation/PMP/PMA permissions and implementation support may cause access faults.",
+          "check": "external",
+          "source": {
+            "path": "rv32.adoc",
+            "lineStart": 669,
+            "lineEnd": 677,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L669-L677",
+            "sha256": "d466fcca6ebbf4640e35d7f98f4c86b9d172bbc761fbb0321d39fa9687cc3c62",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

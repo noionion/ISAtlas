@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/c.sw",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "c.sw",
+  "summary": "从 X(rs1′) + uimm 地址存储 32 位数据。",
+  "summaryEn": "Store 32-bit data at X(rs1′) + uimm.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "c-st-ext.adoc",
+      "lineStart": 334,
+      "lineEnd": 336,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/c-st-ext.adoc#L334-L336",
+      "sha256": "c184ad8ffee43e7495ab99d42148d6e411bc0d60b033c9a4ef448a52e1bf88d7",
+      "method": "compressed-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 16,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "C"
+        ],
+        [
+          "Zca"
+        ]
+      ],
+      "mask": "0xe003",
+      "match": "0xc000",
+      "fields": [
+        {
+          "name": "110",
+          "msb": 15,
+          "lsb": 13,
+          "value": 6
+        },
+        {
+          "name": "uimm[5:3]",
+          "msb": 12,
+          "lsb": 10,
+          "operand": "imm",
+          "operandBits": [
+            5,
+            4,
+            3
+          ],
+          "operandSigned": false
+        },
+        {
+          "name": "rs1′",
+          "msb": 9,
+          "lsb": 7,
+          "operand": "rs1'",
+          "registerOffset": 8,
+          "registerClass": "integer"
+        },
+        {
+          "name": "uimm[2|6]",
+          "msb": 6,
+          "lsb": 5,
+          "operand": "imm",
+          "operandBits": [
+            2,
+            6
+          ],
+          "operandSigned": false
+        },
+        {
+          "name": "rs2′",
+          "msb": 4,
+          "lsb": 2,
+          "operand": "rs2'",
+          "registerOffset": 8,
+          "registerClass": "integer"
+        },
+        {
+          "name": "00",
+          "msb": 1,
+          "lsb": 0,
+          "value": 0
+        }
+      ],
+      "constraints": [
+        "Printed operand restrictions: 'C.SW'"
+      ],
+      "sources": [
+        {
+          "path": "images/bytefield/rvc-instr-quad0.edn",
+          "lineStart": 67,
+          "lineEnd": 73,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/rvc-instr-quad0.edn#L67-L73",
+          "sha256": "fd1f0798e63aead4e1ae537fc45b351dde9e3ecce742536891d059bc3e45f50d",
+          "method": "bytefield-printed-bits"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "memory.environment",
+          "category": "memory",
+          "summary": "有效地址、对齐、页表/PMP/PMA 权限及实现支持可能导致访问异常，不能由指令字独立确定。",
+          "summaryEn": "Effective address, alignment, translation/PMP/PMA permissions and implementation support may cause access faults.",
+          "check": "external",
+          "source": {
+            "path": "rv32.adoc",
+            "lineStart": 669,
+            "lineEnd": 677,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L669-L677",
+            "sha256": "d466fcca6ebbf4640e35d7f98f4c86b9d172bbc761fbb0321d39fa9687cc3c62",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

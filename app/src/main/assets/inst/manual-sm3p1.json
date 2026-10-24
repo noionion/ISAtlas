@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/sm3p1",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "sm3p1",
+  "summary": "计算 SM3 的 P1 置换并符号扩展 32 位结果。",
+  "summaryEn": "Compute SM3 permutation P1 and sign-extend the 32-bit result.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "scalar-crypto.adoc",
+      "lineStart": 3051,
+      "lineEnd": 3092,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/scalar-crypto.adoc#L3051-L3092",
+      "sha256": "aeb9602ccc878b0517ce980b6cbd18cf0f852062e587cf66eb1c84781c668bb2",
+      "method": "instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zks"
+        ],
+        [
+          "Zksh"
+        ]
+      ],
+      "mask": "0xfff0707f",
+      "match": "0x10901013",
+      "fields": [
+        {
+          "name": "fixed[6:0]",
+          "msb": 6,
+          "lsb": 0,
+          "value": 19
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[14:12]",
+          "msb": 14,
+          "lsb": 12,
+          "value": 1
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "fixed[24:20]",
+          "msb": 24,
+          "lsb": 20,
+          "value": 9
+        },
+        {
+          "name": "fixed[29:25]",
+          "msb": 29,
+          "lsb": 25,
+          "value": 8
+        },
+        {
+          "name": "fixed[31:30]",
+          "msb": 31,
+          "lsb": 30,
+          "value": 0
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "scalar-crypto.adoc",
+          "lineStart": 3038,
+          "lineEnd": 3050,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/scalar-crypto.adoc#L3038-L3050",
+          "sha256": "ea4dd7eca4a59326cac95082428a2c8d035998d9b80e0cf154d4c3f39d1ddd7c",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "Implements the P1 transformation function as used in the SM3 hash function .",
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

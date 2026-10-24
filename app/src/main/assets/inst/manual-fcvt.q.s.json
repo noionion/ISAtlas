@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/fcvt.q.s",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "fcvt.q.s",
+  "summary": "将 S 格式转换为 Q 格式，按适用舍入模式处理。",
+  "summaryEn": "Convert S to Q using the applicable rounding mode.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "q-st-ext.adoc",
+      "lineStart": 74,
+      "lineEnd": 77,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/q-st-ext.adoc#L74-L77",
+      "sha256": "6cdb38769615f04705f9ce0700223ac787900d2c26bc4c3802d44a8cff637779",
+      "method": "manual-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "F",
+          "Q"
+        ]
+      ],
+      "mask": "0xfff0007f",
+      "match": "0x46000053",
+      "fields": [
+        {
+          "name": "0100011",
+          "msb": 31,
+          "lsb": 25,
+          "value": 35
+        },
+        {
+          "name": "00000",
+          "msb": 24,
+          "lsb": 20,
+          "value": 0
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "float"
+        },
+        {
+          "name": "rm",
+          "msb": 14,
+          "lsb": 12,
+          "operand": "rm",
+          "values": {
+            "0": "RNE",
+            "1": "RTZ",
+            "2": "RDN",
+            "3": "RUP",
+            "4": "RMM",
+            "7": "DYN"
+          }
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "float"
+        },
+        {
+          "name": "1010011",
+          "msb": 6,
+          "lsb": 0,
+          "value": 83
+        }
+      ],
+      "constraints": [
+        "rm=5/6 reserved; DYN uses frm, whose reserved values are also invalid"
+      ],
+      "sources": [
+        {
+          "path": "rv-32-64g.adoc",
+          "lineStart": 361,
+          "lineEnd": 361,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv-32-64g.adoc#L361-L361",
+          "sha256": "3ab01bb7c5e7711b88a67de3c4b58b65102487b8225c857b80e5ef06c4828de4",
+          "method": "printed-bit-table"
+        }
+      ],
+      "encodingConstraints": [
+        {
+          "mask": "0x7000",
+          "operator": "in",
+          "values": [
+            0,
+            4096,
+            8192,
+            12288,
+            16384,
+            28672
+          ],
+          "reason": "Rounding-mode encodings 5 and 6 are reserved"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "fp.dynamic-rounding",
+          "category": "rounding",
+          "summary": "rm=7 时使用 frm；frm 的保留值不能作为有效舍入模式。",
+          "summaryEn": "rm=7 selects frm; reserved frm values are not valid rounding modes.",
+          "check": "dynamic-rounding",
+          "source": {
+            "path": "f-st-ext.adoc",
+            "lineStart": 85,
+            "lineEnd": 86,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/f-st-ext.adoc#L85-L86",
+            "sha256": "87936f53988dcee44db79fad13ab6014e048b145a269ad1ab055d49ecd6e2e08",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "fp.state",
+          "category": "state",
+          "summary": "浮点状态、相关精度支持及虚拟化控制仍需满足当前执行环境。",
+          "summaryEn": "FP state, supported precisions and virtualization controls must permit execution.",
+          "check": "fp-state",
+          "source": {
+            "path": "machine.adoc",
+            "lineStart": 818,
+            "lineEnd": 831,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc#L818-L831",
+            "sha256": "376b8df6c556180e025b17026c19ec3bb089db1e2535f28c6cb9356b0d7fa92f",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

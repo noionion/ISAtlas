@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/fence.tso",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "fence.tso",
+  "summary": "排序读与读写、写与写，允许非原子写后读重排。",
+  "summaryEn": "Order loads before loads/stores and stores before stores; allow non-AMO store-to-load reordering.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "ztso-st-ext.adoc",
+      "lineStart": 1,
+      "lineEnd": 47,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/ztso-st-ext.adoc#L1-L47",
+      "sha256": "941ddd6a02b0548962e72a15ce677c28be3147efe7412a573569421886156857",
+      "method": "manual-semantics"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Ztso"
+        ]
+      ],
+      "mask": "0xffffffff",
+      "match": "0x8330000f",
+      "fields": [
+        {
+          "name": "1000",
+          "msb": 31,
+          "lsb": 28,
+          "value": 8
+        },
+        {
+          "name": "0011",
+          "msb": 27,
+          "lsb": 24,
+          "value": 3
+        },
+        {
+          "name": "0011",
+          "msb": 23,
+          "lsb": 20,
+          "value": 3
+        },
+        {
+          "name": "00000",
+          "msb": 19,
+          "lsb": 15,
+          "value": 0
+        },
+        {
+          "name": "000",
+          "msb": 14,
+          "lsb": 12,
+          "value": 0
+        },
+        {
+          "name": "00000",
+          "msb": 11,
+          "lsb": 7,
+          "value": 0
+        },
+        {
+          "name": "0001111",
+          "msb": 6,
+          "lsb": 0,
+          "value": 15
+        }
+      ],
+      "constraints": [
+        "rs1 and rd are reserved for future use; standard software writes zero"
+      ],
+      "sources": [
+        {
+          "path": "rv-32-64g.adoc",
+          "lineStart": 102,
+          "lineEnd": 102,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv-32-64g.adoc#L102-L102",
+          "sha256": "e343474830aa4a85059ce0746298ed076056b63fb3f5ce763f7264abec882c2d",
+          "method": "printed-bit-table"
+        },
+        {
+          "path": "images/wavedrom/mem-order.edn",
+          "lineStart": 5,
+          "lineEnd": 20,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/wavedrom/mem-order.edn#L5-L20",
+          "sha256": "edaecffab9c0d55029ba6bc71380ab696850fac619d7543290d5fba3d458d397",
+          "method": "explicit-fence-field-widths"
+        }
+      ],
+      "contextRules": []
+    }
+  ]
+}

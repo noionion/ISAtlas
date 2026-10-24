@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/cm.jalt",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "cm.jalt",
+  "summary": "通过 jvt 索引读取目标地址并跳转，同时将返回地址写入 ra。",
+  "summaryEn": "Jump through the jvt-indexed table entry and write the return address to ra.",
+  "kind": "instruction",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "zc.adoc",
+      "lineStart": 2553,
+      "lineEnd": 2589,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zc.adoc#L2553-L2589",
+      "sha256": "c299867037f23aee99a450073d6cff746a9e96c7ce70dc6a8a201089ccaa5e22",
+      "method": "instruction-description"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 16,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zcmt"
+        ]
+      ],
+      "mask": "0xfc03",
+      "match": "0xa002",
+      "fields": [
+        {
+          "name": "fixed[1:0]",
+          "msb": 1,
+          "lsb": 0,
+          "value": 2,
+          "sourceLabels": [
+            "C2"
+          ]
+        },
+        {
+          "name": "index",
+          "msb": 9,
+          "lsb": 2,
+          "operand": "index"
+        },
+        {
+          "name": "fixed[12:10]",
+          "msb": 12,
+          "lsb": 10,
+          "value": 0
+        },
+        {
+          "name": "fixed[15:13]",
+          "msb": 15,
+          "lsb": 13,
+          "value": 5,
+          "sourceLabels": [
+            "FUNCT3"
+          ]
+        }
+      ],
+      "constraints": [
+        "Register-list/index/stack-adjustment restrictions follow the per-instruction manual section"
+      ],
+      "sources": [
+        {
+          "path": "zc.adoc",
+          "lineStart": 2526,
+          "lineEnd": 2535,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zc.adoc#L2526-L2535",
+          "sha256": "b0e27271f152536c7f5040b58661015be0f0ee5f1739f56c5ff331fd4e101941",
+          "method": "literal-wavedrom"
+        }
+      ],
+      "sourceSynopsis": "jump via table with optional link",
+      "encodingConstraints": [
+        {
+          "mask": "0x3fc",
+          "operator": "notIn",
+          "values": [
+            0,
+            4,
+            8,
+            12,
+            16,
+            20,
+            24,
+            28,
+            32,
+            36,
+            40,
+            44,
+            48,
+            52,
+            56,
+            60,
+            64,
+            68,
+            72,
+            76,
+            80,
+            84,
+            88,
+            92,
+            96,
+            100,
+            104,
+            108,
+            112,
+            116,
+            120,
+            124
+          ],
+          "reason": "indices 0..31 select JT; 32..255 select JALT"
+        }
+      ],
+      "contextRules": []
+    }
+  ]
+}
