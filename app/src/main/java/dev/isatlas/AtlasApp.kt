@@ -59,13 +59,16 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
     val updates = remember(context) { UpdateRepository.get(context) }
     val update by updates.state.collectAsStateWithLifecycle()
     val selected = state.selected
-    val landscapeHome = selected == null && LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val selectedInstruction = state.selectedInstruction
+    val detailOpen = selected != null || selectedInstruction != null
+    val landscapeHome = !detailOpen && LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val drawer = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val keyboard = LocalSoftwareKeyboardController.current
     val screenStates = rememberSaveableStateHolder()
     // Keep the grid alive while its screen is replaced by a register detail.
     val searchGrid = rememberLazyGridState()
+    val instructionGrid = rememberLazyGridState()
     var csrExpanded by rememberSaveable { mutableStateOf(true) }
     var fieldsExpanded by rememberSaveable { mutableStateOf(true) }
     var descriptionsExpanded by rememberSaveable { mutableStateOf(true) }
@@ -77,6 +80,7 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
     LaunchedEffect(state.query, state.xlen, state.privilege, state.namespace, state.extensions) {
         if (previousQuery != state.query || previousWidth != state.xlen || previousPrivilege != state.privilege || previousNamespace != state.namespace || previousExtensions != state.extensions.sorted().joinToString()) {
             searchGrid.scrollToItem(0)
+            instructionGrid.scrollToItem(0)
             previousQuery = state.query
             previousWidth = state.xlen
             previousPrivilege = state.privilege
@@ -84,11 +88,11 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
             previousExtensions = state.extensions.sorted().joinToString()
         }
     }
-    BackHandler(enabled = state.selectedId != null) { model.close() }
+    BackHandler(enabled = detailOpen) { model.close() }
     BackHandler(enabled = drawer.isOpen) { scope.launch { drawer.close() } }
     BackHandler(enabled = state.showAbout) { model.showAbout(false) }
     BackHandler(enabled = state.showSources) { model.showSources(false) }
-    RightFilterDrawer(state = drawer, enabled = selected == null && !state.showAbout,
+    RightFilterDrawer(state = drawer, enabled = !detailOpen && !state.showAbout,
         panel = { FilterPanel(state, model) }) {
         Box(Modifier.fillMaxSize()) {
             Scaffold(
@@ -96,17 +100,17 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
                 contentWindowInsets = WindowInsets.safeDrawing,
                 topBar = {
                     TopAppBar(
-                        expandedHeight = if (landscapeHome || selected != null) 48.dp else 64.dp,
+                        expandedHeight = if (landscapeHome || detailOpen) 48.dp else 64.dp,
                         windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
                         title = {
                             Row(Modifier.fillMaxWidth().testTag("home-app-bar"), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                                Text(selected?.name ?: "ISAtlas", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold,
+                                Text(selected?.name ?: selectedInstruction?.instruction?.name ?: "ISAtlas", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold,
                                     modifier = Modifier.testTag("app-title"), maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 if (landscapeHome) SearchInput(state.query, model::query, Modifier.weight(1f, fill = false).widthIn(max = 480.dp), compact = true)
                             }
                         },
                         navigationIcon = {
-                            if (selected != null) IconButton(onClick = model::close) {
+                            if (detailOpen) IconButton(onClick = model::close) {
                                 Icon(Icons.AutoMirrored.Filled.ArrowBack, "返回搜索")
                             }
                         },
@@ -116,21 +120,22 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
                                     Icon(Icons.Default.Info, "关于 ISAtlas")
                                 }
                             }
-                            if (selected == null) IconButton(onClick = { keyboard?.hide(); scope.launch { drawer.open() } }) { Icon(Icons.Default.Menu, "筛选") }
+                            if (!detailOpen) IconButton(onClick = { keyboard?.hide(); scope.launch { drawer.open() } }) { Icon(Icons.Default.Menu, "筛选") }
                         },
                     )
                 },
             ) { insets ->
                 Box(Modifier.fillMaxSize().padding(insets)) {
-                    screenStates.SaveableStateProvider(selected?.id ?: "search") {
+                    screenStates.SaveableStateProvider(selected?.id ?: selectedInstruction?.key ?: "search") {
                         when {
                             state.loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
                             state.error != null -> Column(Modifier.align(Alignment.Center).padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(state.error!!)
                                 Button(onClick = model::load) { Text("重试") }
                             }
+                            selectedInstruction != null -> InstructionDetail(state, selectedInstruction, model::xlen)
                             selected != null -> key(selected.id) { RegisterDetail(state, selected, model::xlen) }
-                            else -> SearchScreen(state, model, searchGrid, showSearch = !landscapeHome,
+                            else -> CatalogSearchScreen(state, model, searchGrid, instructionGrid, showSearch = !landscapeHome,
                                 expanded = mapOf(SearchCategory.CSR to csrExpanded, SearchCategory.FIELD to fieldsExpanded, SearchCategory.DESCRIPTION to descriptionsExpanded),
                                 onToggle = { category -> when (category) {
                                     SearchCategory.CSR -> csrExpanded = !csrExpanded
@@ -167,7 +172,7 @@ private fun WidthPicker(xlen: Int, onChange: (Int) -> Unit) {
 }
 
 @Composable
-private fun SearchInput(query: String, onQuery: (String) -> Unit, modifier: Modifier = Modifier, compact: Boolean = false) {
+internal fun SearchInput(query: String, onQuery: (String) -> Unit, modifier: Modifier = Modifier, compact: Boolean = false) {
     if (compact) {
         BasicTextField(
             value = query, onValueChange = onQuery, singleLine = true,
@@ -179,7 +184,7 @@ private fun SearchInput(query: String, onQuery: (String) -> Unit, modifier: Modi
                     Row(Modifier.fillMaxSize().padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Icon(Icons.Default.Search, null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         Box(Modifier.weight(1f)) {
-                            if (query.isEmpty()) Text("搜索 CSR、地址或字段", style = MaterialTheme.typography.bodyMedium,
+                            if (query.isEmpty()) Text("搜索名称、地址或编码", style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             input()
                         }
@@ -196,7 +201,7 @@ private fun SearchInput(query: String, onQuery: (String) -> Unit, modifier: Modi
         value = query, onValueChange = onQuery,
         modifier = modifier.heightIn(min = 48.dp).testTag("search-input"),
         singleLine = true, textStyle = MaterialTheme.typography.bodyMedium,
-        placeholder = { Text("搜索 CSR、地址或字段", style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        placeholder = { Text("搜索名称、地址或编码", style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         leadingIcon = { Icon(Icons.Default.Search, null, Modifier.size(20.dp)) },
         trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { onQuery("") }) { Icon(Icons.Default.Clear, "清空搜索") } },
         shape = RoundedCornerShape(12.dp),
@@ -204,7 +209,7 @@ private fun SearchInput(query: String, onQuery: (String) -> Unit, modifier: Modi
 }
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun SearchScreen(state: AtlasState, model: AppViewModel, listState: LazyGridState, showSearch: Boolean,
+internal fun SearchScreen(state: AtlasState, model: AppViewModel, listState: LazyGridState, showSearch: Boolean,
                          expanded: Map<SearchCategory, Boolean>, onToggle: (SearchCategory) -> Unit, onOpen: (SearchHit) -> Unit) {
     val results = remember(state.pack, state.query, state.xlen, state.privilege, state.namespace, state.extensions, state.compilerIsa) { state.results }
     val groups = remember(results) { results.groupBy { it.category } }

@@ -4,10 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import dev.isatlas.core.Catalog
-import dev.isatlas.core.DataPack
-import dev.isatlas.core.Search
-import dev.isatlas.core.CompilerIsaOptions
+import dev.isatlas.core.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,6 +16,9 @@ data class AtlasState(
     val loading: Boolean = true,
     val error: String? = null,
     val pack: DataPack? = null,
+    val instructions: InstructionCatalog? = null,
+    val instructionPage: Int = 0,
+    val selectedInstructionKey: String? = null,
     val query: String = "",
     val xlen: Int = 64,
     val privilege: String? = null,
@@ -32,6 +32,8 @@ data class AtlasState(
     val showAbout: Boolean = false,
     val showSources: Boolean = false,
 ) {
+    val instructionResults get() = instructions?.let { InstructionSearch.query(it, query, CatalogFilter(xlen, privilege, namespace, compilerIsa?.associatedTags(extensions) ?: extensions), compilerIsa) } ?: InstructionResults(emptyList())
+    val selectedInstruction get() = selectedInstructionKey?.let { key -> instructions?.instructions?.firstNotNullOfOrNull { instruction -> instruction.encodings.mapIndexed { index, encoding -> InstructionHit(instruction, encoding, index) }.find { it.key == key } } }
     val selected get() = pack?.registers?.find { it.id == selectedId }
     val results get() = pack?.let { Search.query(it, query, xlen, privilege, namespace,
         compilerIsa?.associatedTags(extensions) ?: extensions) }.orEmpty()
@@ -40,6 +42,8 @@ data class AtlasState(
 class AppViewModel(application: Application, private val saved: SavedStateHandle) : AndroidViewModel(application) {
     private val prefs = application.getSharedPreferences("atlas", 0)
     private val mutable = MutableStateFlow(AtlasState(
+        instructionPage = saved["instructionPage"] ?: 0,
+        selectedInstructionKey = saved["selectedInstructionKey"],
         query = saved["query"] ?: "",
         xlen = saved["xlen"] ?: prefs.getInt("xlen", 64),
         selectedId = saved["selectedId"],
@@ -61,11 +65,14 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
                         assets.open("csr/$name").bufferedReader().use { it.readText() }
                     }
                     val compiler = assets.open("march-extensions.json").bufferedReader().use { CompilerIsaOptions.decode(it.readText()) }
-                    pack to compiler
+                    val instructions = InstructionCatalog.decodeFiles(assets.open("riscv-instructions.json").bufferedReader().use { it.readText() }) { name ->
+                        assets.open("inst/$name").bufferedReader().use { it.readText() }
+                    }
+                    Triple(pack, compiler, instructions)
                 }
             }
             result.fold(
-                onSuccess = { (pack, compiler) -> mutable.update { it.copy(loading = false, pack = pack, compilerIsa = compiler) } },
+                onSuccess = { (pack, compiler, instructions) -> mutable.update { it.copy(loading = false, pack = pack, compilerIsa = compiler, instructions = instructions) } },
                 onFailure = { mutable.update { it.copy(loading = false, error = "内置数据包读取失败，请重试。") } },
             )
         }
@@ -100,10 +107,13 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
         saved["selectedField"] = field
         mutable.update { it.copy(selectedId = id, selectedField = field) }
     }
+    fun page(value: Int) { saved["instructionPage"] = value; mutable.update { it.copy(instructionPage = value) } }
+    fun openInstruction(key: String) { saved["selectedInstructionKey"] = key; mutable.update { it.copy(selectedInstructionKey = key) } }
     fun close() {
+        saved["selectedInstructionKey"] = null
         saved["selectedId"] = null
         saved["selectedField"] = null
-        mutable.update { it.copy(selectedId = null, selectedField = null) }
+        mutable.update { it.copy(selectedId = null, selectedField = null, selectedInstructionKey = null) }
     }
     fun showAbout(value: Boolean) {
         saved["showAbout"] = value

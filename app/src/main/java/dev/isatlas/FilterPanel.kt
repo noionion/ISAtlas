@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 fun RightFilterDrawer(state: DrawerState, enabled: Boolean, panel: @Composable () -> Unit, content: @Composable () -> Unit) {
     val contentDirection = LocalLayoutDirection.current
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        ModalNavigationDrawer(drawerState = state, gesturesEnabled = enabled,
+        ModalNavigationDrawer(drawerState = state, gesturesEnabled = enabled && state.isOpen,
             drawerContent = { CompositionLocalProvider(LocalLayoutDirection provides contentDirection) { panel() } }) {
             CompositionLocalProvider(LocalLayoutDirection provides contentDirection) { content() }
         }
@@ -48,8 +48,11 @@ fun FilterPanel(state: AtlasState, model: AppViewModel) {
     var extensionQuery by rememberSaveable { mutableStateOf("") }
     val extensionGrid = rememberLazyGridState()
     LaunchedEffect(extensionQuery) { extensionGrid.scrollToItem(0) }
-    val catalogOptions = remember(state.compilerIsa, state.pack) {
-        state.pack?.let { state.compilerIsa?.catalogOptions(it) }.orEmpty()
+    val catalogOptions = remember(state.compilerIsa, state.pack, state.instructions) {
+        val tags = state.instructions?.instructions.orEmpty().flatMap { it.encodings }.flatMap { it.tags }.toSet()
+        (state.pack?.let { state.compilerIsa?.catalogOptions(it) }.orEmpty() + state.compilerIsa?.tokens.orEmpty().filter { token ->
+            token in tags
+        }).distinct()
     }
     val options = remember(catalogOptions, extensionQuery) {
         val query = extensionQuery.trim()
@@ -85,7 +88,7 @@ fun FilterPanel(state: AtlasState, model: AppViewModel) {
             OutlinedTextField(extensionQuery, { extensionQuery = it }, Modifier.fillMaxWidth().testTag("extension-search"),
                 placeholder = { Text("搜索细分扩展，如 Zicfiss", style = MaterialTheme.typography.bodySmall) }, singleLine = true,
                 textStyle = MaterialTheme.typography.bodySmall, shape = RoundedCornerShape(10.dp))
-            if (options.isEmpty()) Text("没有收录 CSR 的匹配扩展", style = MaterialTheme.typography.bodySmall)
+            if (options.isEmpty()) Text("没有收录数据的匹配扩展", style = MaterialTheme.typography.bodySmall)
             else LazyVerticalGrid(columns = GridCells.Fixed(2), state = extensionGrid, modifier = Modifier.fillMaxWidth().height(if (landscape) (configuration.screenHeightDp - 250).dp.coerceIn(96.dp, 240.dp) else 240.dp).testTag("extension-options"),
                 horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 items(options, key = { it }) { extension ->
@@ -98,7 +101,7 @@ fun FilterPanel(state: AtlasState, model: AppViewModel) {
     val sources: @Composable ColumnScope.() -> Unit = {
             Text("数据来源", style = MaterialTheme.typography.labelLarge)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(0.dp)) {
-                val namespaces = state.pack?.registers.orEmpty().map { it.namespace.ifBlank { state.pack!!.namespace } }.distinct().sorted()
+                val namespaces = (state.pack?.registers.orEmpty().map { it.namespace.ifBlank { state.pack!!.namespace } } + state.instructions?.instructions.orEmpty().map { it.namespace }).distinct().sorted()
                 (listOf<Pair<String?, String>>(null to "全部") + namespaces.map { value ->
                     value to when (value) { "manual" -> "ISA 手册"; "thead" -> "玄铁"; else -> value }
                 }).forEach { (value, label) ->

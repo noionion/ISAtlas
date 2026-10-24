@@ -63,11 +63,11 @@ fun RegisterDiagram(fields: List<FieldDefinition>, xlen: Int, selected: String?,
     val fontHeight = with(density) { (namePaint.fontMetrics.descent - namePaint.fontMetrics.ascent).toDp() }
     BoxWithConstraints(Modifier.fillMaxWidth().testTag("register-diagram")) {
         val viewportWidth = maxWidth
-        var laneBits by rememberSaveable { mutableIntStateOf(if (orientation == Configuration.ORIENTATION_LANDSCAPE) 32 else 16) }
+        var laneBits by rememberSaveable(xlen) { mutableIntStateOf(minOf(xlen, if (orientation == Configuration.ORIENTATION_LANDSCAPE) 32 else 16)) }
         var laneOrientation by rememberSaveable { mutableIntStateOf(orientation) }
         LaunchedEffect(orientation) {
             if (laneOrientation != orientation) {
-                laneBits = if (orientation == Configuration.ORIENTATION_LANDSCAPE) 32 else 16
+                laneBits = minOf(xlen, if (orientation == Configuration.ORIENTATION_LANDSCAPE) 32 else 16)
                 laneOrientation = orientation
             }
         }
@@ -95,7 +95,7 @@ fun RegisterDiagram(fields: List<FieldDefinition>, xlen: Int, selected: String?,
                     Text(if (landscape) fields.firstOrNull { it.name == selected }?.let { "已选：${it.name} ${it.layout(xlen)!!.label} · ${it.access}" } ?: "拖动选择字段" else "MSB → LSB", Modifier.weight(1f), fontFamily = FontFamily.Monospace,
                         style = MaterialTheme.typography.labelSmall, color = colors.onSurfaceVariant)
                     CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 32.dp) {
-                    listOf(16, 32).forEach { bits ->
+                    listOf(16, 32).filter { it <= xlen }.forEach { bits ->
                         FilterChip(selected = laneBits == bits, onClick = { laneBits = bits }, label = { Text("$bits 位/行") })
                     }
                 }
