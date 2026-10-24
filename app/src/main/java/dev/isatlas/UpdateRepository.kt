@@ -1,13 +1,11 @@
 package dev.isatlas
 
-import android.Manifest
 import android.app.*
 import android.content.*
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Environment
-import androidx.core.content.FileProvider
 import androidx.core.content.edit
 import androidx.core.net.toUri
 import dev.isatlas.core.*
@@ -29,11 +27,17 @@ internal data class UpdateState(
     val message: String? = null,
     val prompt: UpdatePrompt? = null,
     val skipped: Boolean = false,
+    val readyNotice: Boolean = false,
+    val installation: InstallState = InstallState(),
 ) {
     val hasUpdate get() = release != null
     val busy get() = stage in setOf(UpdateStage.CHOOSING, UpdateStage.DOWNLOADING, UpdateStage.VERIFYING)
     val summary: String get() = when {
         checking -> "正在并行检查官方与镜像…"
+        installation.phase == InstallPhase.PREPARING -> "正在准备安装更新…"
+        installation.phase == InstallPhase.SUBMITTED -> "已提交系统安装，可继续查询"
+        installation.phase == InstallPhase.CONFIRMATION -> "更新需要系统确认，点击继续安装"
+        installation.message != null -> installation.message
         stage == UpdateStage.CHOOSING -> "正在选择可用下载渠道…"
         stage == UpdateStage.DOWNLOADING -> "后台下载中${progress?.let { " · $it%" }.orEmpty()}${channel?.let { " · $it" }.orEmpty()}"
         stage == UpdateStage.VERIFYING -> "下载完成，正在校验安装包…"
@@ -50,6 +54,7 @@ internal class UpdateRepository(
     private val prefs: SharedPreferences = context.getSharedPreferences("app-updates", Context.MODE_PRIVATE),
     private val installed: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0),
     private val client: UpdateClient = UpdateClient(),
+    private val installer: AppInstaller = AppInstaller(prefs, PackageInstallSessions(context.applicationContext), installed.versionName.orEmpty()),
 ) {
     private val context = context.applicationContext as Application
     private val downloads = context.getSystemService(DownloadManager::class.java)
@@ -66,11 +71,29 @@ internal class UpdateRepository(
     private var manualCheckRequested = false
     private var lastAttempt = 0L
     private var promptedVersion: String? = null
-    private var installPrompted = false
+    private var readyAnnounced = false
     private var lastBytes = -1L
     private var lastProgressAt = System.currentTimeMillis()
 
     init {
+        scope.launch {
+            installer.state.collect { installation ->
+                if (installation.completed) {
+                    val id = prefs.getLong("downloadId", -1)
+                    prefs.edit { remove("release"); remove("downloadId"); remove("taskRelease") }
+                    if (id != -1L) scope.launch(Dispatchers.IO) { runCatching { downloads.remove(id) } }
+                    mutable.update { it.copy(release = null, stage = UpdateStage.IDLE, readyNotice = false, prompt = null,
+                        installation = installation, message = "更新已安装") }
+                    return@collect
+                }
+                mutable.update { it.copy(installation = installation,
+                    readyNotice = when {
+                        installation.busy -> false
+                        installation.message != null -> true
+                        else -> it.readyNotice
+                    }) }
+            }
+        }
         if (prefs.getLong("downloadId", -1) != -1L) {
             val task = AppUpdates.restore(prefs.getString("taskRelease", null))?.takeIf(::newer)
             if (task != null) mutable.update { it.copy(release = task, stage = UpdateStage.DOWNLOADING) }
@@ -90,6 +113,7 @@ internal class UpdateRepository(
         foreground = true
         observer?.cancel()
         observer = scope.launch {
+            installer.reconcile()
             refreshDownload()
             maybePrompt()
             if (!state.value.busy && state.value.stage != UpdateStage.READY &&
@@ -131,9 +155,9 @@ internal class UpdateRepository(
     private fun maybePrompt() {
         if (!foreground) return
         val value = state.value
-        if (value.stage == UpdateStage.READY && !installPrompted) {
-            installPrompted = true
-            mutable.update { it.copy(prompt = UpdatePrompt.INSTALL) }
+        if (value.stage == UpdateStage.READY && !readyAnnounced) {
+            readyAnnounced = true
+            mutable.update { it.copy(readyNotice = true) }
         } else if (!value.busy && value.stage != UpdateStage.READY && !value.skipped &&
             value.release != null && promptedVersion != value.release.version) openPrompt()
     }
@@ -141,10 +165,11 @@ internal class UpdateRepository(
     fun openPrompt() {
         val release = state.value.release ?: return
         promptedVersion = release.version
-        if (state.value.stage == UpdateStage.READY) installPrompted = true
+        if (state.value.stage == UpdateStage.READY) readyAnnounced = true
         mutable.update { it.copy(prompt = if (it.stage == UpdateStage.READY) UpdatePrompt.INSTALL else UpdatePrompt.RELEASE) }
     }
     fun dismiss() { mutable.update { it.copy(prompt = null) } }
+    fun dismissReadyNotice() { readyAnnounced = true; mutable.update { it.copy(readyNotice = false) } }
     fun skip() {
         val version = state.value.release?.version ?: return
         prefs.edit { putString("skipped", version) }
@@ -164,7 +189,7 @@ internal class UpdateRepository(
                         putString("channelOrder", order.joinToString(","))
                         putInt("channelPosition", 0)
                     }
-                    installPrompted = false
+                    readyAnnounced = false
                     enqueue(release, order.first())
                 } catch (cancelled: CancellationException) { throw cancelled
                 } catch (_: Exception) { fail("官方与镜像下载渠道暂不可用，请重试。") }
@@ -224,7 +249,7 @@ internal class UpdateRepository(
                             try {
                                 verifyApk(release)
                                 mutable.update { it.copy(stage = UpdateStage.READY, message = null) }
-                                if (foreground) maybePrompt() else runCatching { notifyReady(release) }
+                                maybePrompt()
                             } catch (_: Exception) {
                                 // A corrupt or unexpected mirror response is not installable; try the next source.
                                 tryNextChannel(release)
@@ -290,9 +315,16 @@ internal class UpdateRepository(
         return file
     }
 
-    fun install(activity: Activity) {
-        if (state.value.stage != UpdateStage.READY) return
+    fun install() {
+        if (state.value.stage != UpdateStage.READY || state.value.installation.busy) return
+        if (state.value.installation.phase == InstallPhase.CONFIRMATION) {
+            dismiss()
+            installer.requestConfirmation()
+            return
+        }
         val release = state.value.release ?: return
+        // Hide the prompt immediately; APK validation and session writes stay off the UI thread.
+        mutable.update { it.copy(prompt = null, readyNotice = false, message = null) }
         scope.launch {
             val file = try {
                 withContext(Dispatchers.IO) { verifyApk(release) }
@@ -307,21 +339,21 @@ internal class UpdateRepository(
                 val own = context.packageManager.getPackageInfo(context.packageName,
                     if (Build.VERSION.SDK_INT >= 28) PackageManager.GET_SIGNING_CERTIFICATES else PackageManager.GET_SIGNATURES)
                 require(signers(own) == setOf(RELEASE_CERTIFICATE)) { "SIGNATURE_CONFLICT" }
-                val uri = FileProvider.getUriForFile(context, "${context.packageName}.updates", file)
-                activity.startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(uri, "application/vnd.android.package-archive")
-                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
-                dismiss()
-                context.getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID)
+                installer.submit(file, release.version)
             } catch (cancelled: CancellationException) { throw cancelled
             } catch (error: Exception) {
                 mutable.update { it.copy(message = if (error.message == "SIGNATURE_CONFLICT")
                     "当前为不同签名的安装包，无法覆盖安装发布版。请先备份设置并手动安装发布版。"
-                    else "无法打开安装程序，请重新下载或稍后重试。") }
+                    else "无法提交安装，请稍后重试。", readyNotice = true) }
             }
         }
     }
 
     fun permissionDenied() { mutable.update { it.copy(message = "未获得安装权限，可稍后点击安装并授权。") } }
+    fun installationResult(intent: Intent) { installer.result(intent) }
+    fun takeInstallConfirmation(): Intent? = installer.takeConfirmation()
+    fun installConfirmationUnavailable() { installer.confirmationUnavailable() }
+    fun installConfirmationReturned() { scope.launch { installer.reconcile() } }
     private fun fail(message: String) {
         val id = prefs.getLong("downloadId", -1)
         prefs.edit { remove("downloadId") }
@@ -329,23 +361,9 @@ internal class UpdateRepository(
         mutable.update { it.copy(stage = UpdateStage.FAILED, message = message, progress = null) }
     }
 
-    private fun notifyReady(release: AppRelease) {
-        if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return
-        val notifications = context.getSystemService(NotificationManager::class.java)
-        notifications.createNotificationChannel(NotificationChannel(CHANNEL_ID, "应用更新", NotificationManager.IMPORTANCE_DEFAULT))
-        val intent = Intent(context, MainActivity::class.java).putExtra("show_update", true)
-            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        val pending = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        notifications.notify(NOTIFICATION_ID, Notification.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_update_notification).setContentTitle("ISAtlas ${release.version} 已下载")
-            .setContentText("安装包已校验，点击安装更新").setContentIntent(pending).setAutoCancel(true).build())
-    }
-
     companion object {
         // Public release certificate fingerprint, not a private signing key.
         private const val RELEASE_CERTIFICATE = "28938b131f0753fb4f6def96ad4af00bb915f984bb17d8f47ddfeb4c5ba9a2d8"
-        private const val CHANNEL_ID = "app-updates"
-        private const val NOTIFICATION_ID = 3001
         @Volatile private var instance: UpdateRepository? = null
         fun get(context: Context): UpdateRepository = instance ?: synchronized(this) {
             instance ?: UpdateRepository(context.applicationContext).also { instance = it }

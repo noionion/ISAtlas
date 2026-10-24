@@ -122,6 +122,40 @@ class UpdateFlowTest {
         compose.runOnIdle { assertEquals(1, installCount) }
     }
 
+    @Test fun readyNoticeDoesNotInterruptQueryAndRequiresAnInstallClick() {
+        var update by mutableStateOf(UpdateState(release = release, stage = UpdateStage.READY, readyNotice = true))
+        var query by mutableStateOf("")
+        var installs = 0
+        var hideKeyboard: () -> Unit = {}
+        var rootView: android.view.View? = null
+        compose.setContent { MaterialTheme {
+            val keyboard = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
+            val view = androidx.compose.ui.platform.LocalView.current
+            SideEffect { hideKeyboard = { keyboard?.hide() }; rootView = view }
+            Box(Modifier.fillMaxSize()) {
+                OutlinedTextField(query, { query = it }, label = { Text("查询") })
+                UpdateReadyNotice(update, onDismiss = { update = update.copy(readyNotice = false) }, onInstall = { installs++ })
+            }
+        } }
+        compose.onNodeWithTag("update-dialog").assertDoesNotExist()
+        compose.onNodeWithTag("update-ready-notice").assertIsDisplayed()
+        compose.onNode(hasSetTextAction()).performTextInput("mstatus.MIE")
+        compose.runOnIdle { assertEquals("mstatus.MIE", query); assertEquals(0, installs) }
+        // Settle the platform IME animation before clicking a newly re-created bottom action.
+        compose.runOnIdle { hideKeyboard() }
+        compose.waitUntil(5_000) {
+            rootView?.let { androidx.core.view.ViewCompat.getRootWindowInsets(it)?.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime())?.bottom } == 0
+        }
+        compose.onNodeWithContentDescription("稍后安装").performClick()
+        compose.onNodeWithTag("update-ready-notice").assertDoesNotExist()
+        compose.runOnIdle { assertTrue(update.hasUpdate); update = update.copy(readyNotice = true) }
+        compose.waitUntil(5_000) {
+            runCatching { compose.onNodeWithTag("update-notice-install").assertIsDisplayed() }.isSuccess
+        }
+        compose.onNodeWithTag("update-notice-install").assertIsDisplayed().performClick()
+        compose.waitUntil(5_000) { installs == 1 }
+    }
+
     @Test fun skipPersistsAcrossRepositoryRecreationAndManualCheckCanOverrideIt() = runBlocking {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val prefs = context.getSharedPreferences("update-test-skip", Context.MODE_PRIVATE)
@@ -178,8 +212,10 @@ class UpdateFlowTest {
             restored.resume()
             await(120_000) { restored.state.value.stage in setOf(UpdateStage.READY, UpdateStage.FAILED) }
             assertEquals(restored.state.value.message, UpdateStage.READY, restored.state.value.stage)
-            assertEquals(UpdatePrompt.INSTALL, restored.state.value.prompt)
-            restored.dismiss()
+            assertNull(restored.state.value.prompt)
+            assertTrue(restored.state.value.readyNotice)
+            restored.dismissReadyNotice()
+            assertFalse(restored.state.value.readyNotice)
             assertTrue(restored.state.value.hasUpdate)
         } finally {
             first.pause()
