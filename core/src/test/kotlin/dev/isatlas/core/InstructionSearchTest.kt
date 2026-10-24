@@ -57,6 +57,25 @@ class InstructionSearchTest {
     @Test fun `bad numeric input is explained and never silently truncated`() {
         listOf("0xzz", "0x100000000", "0b102").forEach { assertNotNull(search(it).error) }
     }
+    @Test fun `compressed shadow stack needs both extensions while mop remains searchable`() {
+        listOf("6081", "0x6081", "0b0110000010000001").forEach { input ->
+            val mop = search(input, extensions = setOf("zcmop")).hits.map { it.instruction.name }
+            assertTrue(input, "c.mop.1" in mop)
+            assertFalse(input, "c.sspush" in mop)
+            val shadow = search(input, extensions = setOf("zcmop", "zicfiss")).hits.map { it.instruction.name }
+            assertTrue(input, "c.sspush" in shadow)
+        }
+        assertTrue(search("c.sspush", extensions = setOf("zcmop")).hits.isEmpty())
+        assertEquals(setOf(InstructionFilterDimension.EXTENSION), search("c.sspush", extensions = setOf("zcmop")).diagnostic!!.clear)
+        assertTrue(search("6081").hits.any { it.instruction.name == "c.sspush" })
+    }
+    @Test fun `alternative extension groups are not incorrectly combined into one requirement`() {
+        assertTrue(search("mul", extensions = setOf("zmmul")).hits.any { it.instruction.name == "mul" })
+        assertTrue(search("mul", extensions = setOf("m")).hits.any { it.instruction.name == "mul" })
+        assertTrue(search("fadd.d", extensions = setOf("d")).hits.isNotEmpty())
+        assertTrue(search("fadd.d", extensions = setOf("zdinx")).hits.isNotEmpty())
+        assertTrue(search("fadd.d", extensions = setOf("f")).hits.isEmpty())
+    }
     @Test fun `ret matches mnemonic fragments without matching return in amo prose`() {
         val hits = search("ret").hits
         assertTrue(hits.map { it.instruction.name }.containsAll(listOf("ret", "mret", "sret")))

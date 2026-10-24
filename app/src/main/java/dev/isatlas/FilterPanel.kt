@@ -80,7 +80,7 @@ fun FilterPanel(state: AtlasState, model: AppViewModel) {
                 TextButton(onClick = { model.clearExtensions(); extensionQuery = "" }) { Text("全部扩展") }
             }
             val selectedExtensions = state.extensions.filter { it in state.compilerIsa?.selectable.orEmpty() }.sorted()
-            Text(if (selectedExtensions.isEmpty()) "-march 扩展；多选时匹配任一扩展" else "已选：${selectedExtensions.joinToString(" · ")}",
+            Text(if (selectedExtensions.isEmpty()) "CSR 匹配任一关联扩展；INST 需满足一组完整扩展条件" else "已选：${selectedExtensions.joinToString(" · ")}",
                 maxLines = if (landscape) 2 else Int.MAX_VALUE, overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text("选择扩展时自动关联必需的前置项。", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

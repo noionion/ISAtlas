@@ -106,4 +106,19 @@ class InstructionFlowTest {
         compose.onNodeWithTag("relax-instruction-filters").assertDoesNotExist()
     }
 
+    @Test fun compressedMopRequiresShadowStackExtension() {
+        compose.onNodeWithTag("search-input").performTextReplacement("6081")
+        compose.onNodeWithContentDescription("筛选").performClick()
+        compose.onNodeWithTag("extension-search").performTextReplacement("zcmop")
+        compose.onNodeWithTag("extension-zcmop").performClick()
+        closeFilters()
+        compose.onNodeWithTag("inst-riscv/manual/inst/c.mop.1:0").assertIsDisplayed()
+        compose.onNodeWithTag("inst-riscv/manual/inst/c.sspush:0").assertDoesNotExist()
+        compose.onNodeWithContentDescription("筛选").performClick()
+        compose.onNodeWithTag("extension-search").performTextReplacement("zicfiss")
+        compose.onNodeWithTag("extension-zicfiss").performClick()
+        closeFilters()
+        compose.onNodeWithTag("inst-riscv/manual/inst/c.sspush:0").assertIsDisplayed()
+        compose.onNodeWithTag("inst-riscv/manual/inst/c.mop.1:0").assertIsDisplayed()
+    }
 }

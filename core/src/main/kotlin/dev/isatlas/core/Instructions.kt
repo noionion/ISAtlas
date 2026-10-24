@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import java.security.MessageDigest
 
-/** The same union-of-extensions filter is used by both catalogs. */
+/** Shared catalog filtering; instructions additionally validate complete requirement groups. */
 data class CatalogFilter(val xlen: Int, val privilege: String? = null, val namespace: String? = null,
                          val extensions: Set<String> = emptySet()) {
     fun accepts(widths: List<Int>, mode: String, source: String, tags: Set<String>) =
@@ -29,6 +29,9 @@ fun privilegeRank(mode: String) = listOf("M", "S", "H", "VS", "U", "D").indexOf(
     val sources: List<InstructionSource> = emptyList()) {
     val tags get() = requires.flatten().map { it.lowercase() }.toSet()
     val requirements get() = requires.joinToString(" / ") { it.joinToString(" + ") }
+    /** Alternative groups are OR; capabilities within one group are AND. */
+    fun supportsExtensions(capabilities: Set<String>): Boolean = capabilities.isEmpty() ||
+        requires.any { group -> group.all { it.lowercase() in capabilities } }
     fun fixedMatches(word: Long): Boolean = word in 0 until (1L shl length) && word and mask.hex() == match.hex()
     fun matches(word: Long, xlen: Int): Boolean = fixedMatches(word) && encodingConstraints.filter { xlen in it.xlens }.all {
             val value = word and it.mask.hex()
@@ -97,6 +100,8 @@ object InstructionSearch {
         val parsed = InstructionInput.parse(input)
         if (parsed.error != null) return InstructionResults(emptyList(), parsed.error, InstructionDiagnostic(InstructionDiagnosticKind.INPUT, parsed.error))
         val word = parsed.word
+        val selectedExtensions = compiler?.associatedTags(filter.extensions) ?: filter.extensions.map { it.lowercase() }.toSet()
+        val effectiveFilter = filter.copy(extensions = selectedExtensions)
         val parentTags = compiler?.tokens.orEmpty().filter { it in setOf("m", "a", "b", "c", "v") }.associateWith { compiler!!.associatedTags(setOf(it)) - setOf("i", "e", "f", "d", "zicsr") }
         val available = mutableListOf<Pair<InstructionHit, Set<String>>>()
         var fixedCandidate = false
@@ -115,7 +120,8 @@ object InstructionSearch {
             val hit = InstructionHit(instruction, encoding, index, word, category)
             val anyWidthMatch = if (word == null) textMatch else encoding.xlens.any { encoding.matches(word, it) }
             if (anyWidthMatch) available += hit to tags
-            if (!anyWidthMatch || !filter.accepts(encoding.xlens, encoding.privilege, instruction.namespace, tags) ||
+            if (!anyWidthMatch || !effectiveFilter.accepts(encoding.xlens, encoding.privilege, instruction.namespace, tags) ||
+                !encoding.supportsExtensions(selectedExtensions) ||
                 (word != null && !encoding.matches(word, filter.xlen))) null else hit
         } }.sortedWith(compareBy<InstructionHit> { it.category.ordinal }
             .thenBy { privilegeRank(it.encoding.privilege) }
@@ -130,7 +136,7 @@ object InstructionSearch {
                     if (filter.xlen !in widths) add(InstructionFilterDimension.WIDTH)
                     if (filter.privilege != null && filter.privilege != normalizePrivilege(hit.encoding.privilege)) add(InstructionFilterDimension.PRIVILEGE)
                     if (filter.namespace != null && filter.namespace != hit.instruction.namespace) add(InstructionFilterDimension.SOURCE)
-                    if (filter.extensions.isNotEmpty() && filter.extensions.none { it.lowercase() in tags }) add(InstructionFilterDimension.EXTENSION)
+                    if (selectedExtensions.isNotEmpty() && (selectedExtensions.none { it in tags } || !hit.encoding.supportsExtensions(selectedExtensions))) add(InstructionFilterDimension.EXTENSION)
                 }
                 blocked to widths
             }
