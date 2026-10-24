@@ -1,6 +1,7 @@
 package dev.isatlas
 
 import android.os.Bundle
+import android.content.Intent
 import android.content.res.Configuration
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,8 +16,24 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 
 class MainActivity : ComponentActivity() {
+    override fun onResume() {
+        super.onResume()
+        UpdateRepository.get(this).resume()
+    }
+
+    override fun onPause() {
+        UpdateRepository.get(this).pause()
+        super.onPause()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (intent.getBooleanExtra("show_update", false)) UpdateRepository.get(this).openPrompt()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (intent.getBooleanExtra("show_update", false)) UpdateRepository.get(this).openPrompt()
         enableEdgeToEdge()
         val bars = WindowCompat.getInsetsController(window, window.decorView)
         bars.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE

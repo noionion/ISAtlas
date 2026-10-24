@@ -35,6 +35,7 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
@@ -54,6 +55,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun AtlasApp(model: AppViewModel = viewModel()) {
     val state by model.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val updates = remember(context) { UpdateRepository.get(context) }
+    val update by updates.state.collectAsStateWithLifecycle()
     val selected = state.selected
     val landscapeHome = selected == null && LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val drawer = rememberDrawerState(DrawerValue.Closed)
@@ -107,7 +111,11 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
                             }
                         },
                         actions = {
-                            IconButton(onClick = { keyboard?.hide(); model.showAbout(true) }) { Icon(Icons.Default.Info, "关于 ISAtlas") }
+                            IconButton(onClick = { keyboard?.hide(); model.showAbout(true) }) {
+                                BadgedBox(badge = { if (update.hasUpdate) UpdateBadge("home-update-badge") }) {
+                                    Icon(Icons.Default.Info, "关于 ISAtlas")
+                                }
+                            }
                             if (selected == null) IconButton(onClick = { keyboard?.hide(); scope.launch { drawer.open() } }) { Icon(Icons.Default.Menu, "筛选") }
                         },
                     )
@@ -138,13 +146,15 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
             }
             RaisedPage(state.showAbout, "关于 ISAtlas", "收起关于", { model.showAbout(false) },
                 modifier = if (state.showSources) Modifier.clearAndSetSemantics {} else Modifier) {
-                AboutScreen(state.pack, onShowSources = { model.showSources(true) })
+                AboutScreen(state.pack, onShowSources = { model.showSources(true) }, update = update,
+                    onCheckUpdate = { updates.check(manual = true) })
             }
             RaisedPage(state.showSources, "数据源与许可", "返回关于", { model.showSources(false) }) {
                 DataSourcesScreen(state.pack)
             }
         }
     }
+    UpdateDialogs(updates, update)
 }
 
 @Composable

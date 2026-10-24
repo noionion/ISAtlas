@@ -25,7 +25,7 @@ import dev.isatlas.core.DataPack
 private const val PROJECT_URL = "https://github.com/noionion/ISAtlas"
 
 @Composable
-fun AboutScreen(pack: DataPack?, onShowSources: () -> Unit) {
+internal fun AboutScreen(pack: DataPack?, onShowSources: () -> Unit, update: UpdateState, onCheckUpdate: () -> Unit) {
     val context = LocalContext.current
     val version = remember(context) {
         runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }
@@ -53,6 +53,8 @@ fun AboutScreen(pack: DataPack?, onShowSources: () -> Unit) {
                 }
             }
             AboutRow("软件版本", version, tag = "about-app-version")
+            AboutRow(if (update.stage == UpdateStage.READY) "安装更新" else "检查更新", subtitle = update.summary,
+                tag = "about-check-update", showBadge = update.hasUpdate, onClick = onCheckUpdate)
 
             // Database management belongs here; local import can extend this section later.
             AboutHeading("数据库")
@@ -84,14 +86,18 @@ internal fun AboutHeading(title: String) {
 }
 
 @Composable
-internal fun AboutRow(label: String, value: String? = null, subtitle: String? = null, tag: String? = null, onClick: (() -> Unit)? = null) {
+internal fun AboutRow(label: String, value: String? = null, subtitle: String? = null, tag: String? = null,
+    showBadge: Boolean = false, onClick: (() -> Unit)? = null) {
     Column {
         val action = if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier
         Row(Modifier.fillMaxWidth().then(if (value == null && tag != null) Modifier.testTag(tag) else Modifier)
             .then(action).padding(vertical = 16.dp), verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(label, style = MaterialTheme.typography.bodyLarge)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(label, style = MaterialTheme.typography.bodyLarge)
+                    if (showBadge) UpdateBadge("about-update-badge")
+                }
                 if (subtitle != null) Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             if (value != null) Text(value, if (tag != null) Modifier.testTag(tag) else Modifier,
