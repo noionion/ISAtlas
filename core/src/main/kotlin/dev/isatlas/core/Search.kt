@@ -14,8 +14,6 @@ data class SearchHit(
 }
 
 object Search {
-    private val privilegeOrder = listOf("M", "S", "H", "VS", "U", "D")
-
     fun query(pack: DataPack, input: String, xlen: Int, privilege: String? = null, namespace: String? = null,
               extensions: Set<String> = emptySet()): List<SearchHit> {
         val query = input.trim().lowercase(Locale.ROOT)
@@ -25,9 +23,8 @@ object Search {
         if (numeric && address == null) return emptyList()
         val extensionTags = extensions.map { it.lowercase(Locale.ROOT) }.toSet()
         return buildList {
-            pack.registers.filter { xlen in it.xlens && (privilege == null || privilege == it.privilege) &&
-                (namespace == null || namespace == it.namespace.ifBlank { pack.namespace }) &&
-                (extensionTags.isEmpty() || IsaExtensionTags.associated(it).any { tag -> tag in extensionTags }) }.forEach { reg ->
+            val filter = CatalogFilter(xlen, privilege, namespace, extensionTags)
+            pack.registers.filter { filter.accepts(it.xlens, it.privilege, it.namespace.ifBlank { pack.namespace }, IsaExtensionTags.associated(it)) }.forEach { reg ->
                 val name = reg.name.lowercase(Locale.ROOT)
                 val namespaced = "${reg.namespace.ifBlank { pack.namespace }}.$name".lowercase(Locale.ROOT)
                 val identifiers = "$name $namespaced"
@@ -70,7 +67,7 @@ object Search {
                 }
             }
         }.sortedWith(compareBy<SearchHit> { it.category.ordinal }
-            .thenBy { privilegeOrder.indexOf(it.register.privilege).let { rank -> if (rank < 0) Int.MAX_VALUE else rank } }
+            .thenBy { privilegeRank(it.register.privilege) }
             .thenBy { (it.register.locator as RegisterLocator.Csr).address }
             .thenByDescending { it.score }
             .thenBy { it.register.name }

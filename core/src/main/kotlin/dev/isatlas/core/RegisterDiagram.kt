@@ -16,7 +16,7 @@ fun DiagramLane.fieldAtFraction(fraction: Float): FieldDefinition? {
 }
 
 fun registerDiagramLanes(fields: List<FieldDefinition>, xlen: Int, laneBits: Int, regions: List<BitRegion> = emptyList()): List<DiagramLane> {
-    require(xlen in listOf(32, 64) && laneBits in listOf(16, 32))
+    require(xlen in listOf(16, 32, 64) && laneBits in listOf(16, 32) && laneBits <= xlen)
     fun owner(bit: Int) = fields.firstOrNull { it.layout(xlen)?.let { bits -> bit in bits.lsb..bits.msb } == true } to
         regions.firstOrNull { it.layout(xlen)?.let { bits -> bit in bits.lsb..bits.msb } == true }
     return (xlen - 1 downTo 0 step laneBits).map { high ->
