@@ -13,6 +13,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
@@ -41,13 +43,13 @@ fun CatalogSearchScreen(state: AtlasState, model: AppViewModel, csrGrid: LazyGri
         }
         HorizontalPager(state = pager, modifier = Modifier.weight(1f).testTag("catalog-pager")) { page ->
             if (page == 0) SearchScreen(state, model, csrGrid, false, expanded, onToggle, onOpen)
-            else InstructionResultsScreen(state, instGrid) { keyboard?.hide(); model.openInstruction(it.key) }
+            else InstructionResultsScreen(state, instGrid, model::relaxInstructionFilters) { keyboard?.hide(); model.openInstruction(it) }
         }
     }
 }
 
 @Composable
-private fun InstructionResultsScreen(state: AtlasState, grid: LazyGridState, onOpen: (InstructionHit) -> Unit) {
+private fun InstructionResultsScreen(state: AtlasState, grid: LazyGridState, onRelax: (InstructionDiagnostic) -> Unit, onOpen: (InstructionHit) -> Unit) {
     val result = remember(state.instructions, state.query, state.xlen, state.privilege, state.namespace, state.extensions, state.compilerIsa) { state.instructionResults }
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -59,7 +61,15 @@ private fun InstructionResultsScreen(state: AtlasState, grid: LazyGridState, onO
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             if (result.hits.isEmpty()) item(span = { GridItemSpan(maxLineSpan) }) {
-                Text(result.error ?: "当前数据范围内没有匹配项", Modifier.padding(24.dp))
+                Column(Modifier.fillMaxWidth().padding(24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("当前数据范围内没有匹配项", fontWeight = FontWeight.Bold)
+                    Text(result.diagnostic?.message ?: result.error ?: "请调整关键词或筛选条件。", style = MaterialTheme.typography.bodyMedium)
+                    result.diagnostic?.takeIf { it.clear.isNotEmpty() }?.let { diagnostic ->
+                        TextButton(onClick = { onRelax(diagnostic) }, modifier = Modifier.testTag("relax-instruction-filters")) {
+                            Text(diagnostic.suggestedXlen?.let { "切换 RV$it 并清除相关筛选" } ?: "清除相关筛选")
+                        }
+                    }
+                }
             }
             items(result.hits, key = { it.key }) { hit ->
                 ElevatedCard(onClick = { onOpen(hit) }, modifier = Modifier.testTag("inst-${hit.key}")) {
@@ -71,7 +81,14 @@ private fun InstructionResultsScreen(state: AtlasState, grid: LazyGridState, onO
                         Text(hit.encoding.summary ?: hit.instruction.summary, maxLines = 2, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
                         if (hit.category == InstructionMatchCategory.DESCRIPTION) Text("描述匹配", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(hit.encoding.requirements, maxLines = 2, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelSmall)
-                        if (hit.word != null) Text("编码匹配 · ${hit.encoding.operands(hit.word!!).entries.joinToString { "${it.key}=${it.value}" }}", style = MaterialTheme.typography.bodySmall)
+                        if (hit.word != null) {
+                            val address = InstructionCsr.address(hit.encoding, hit.word!!)
+                            val csrs = address?.let { state.pack?.let { pack -> InstructionCsr.resolve(pack, it, state.xlen, state.namespace) } }.orEmpty()
+                            InstructionAssembly.render(hit, state.abiRegisters, csrs.singleOrNull()?.name, state.xlen)?.let { assembly ->
+                                Text(assembly.text, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
+                                if (!assembly.complete) Text("操作数字段（汇编格式待补充）", style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
                         else Text("${hit.encoding.match} / ${hit.encoding.mask}", fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.labelSmall)
                         if (hit.instruction.kind != "instruction") Text(if (hit.instruction.kind == "alias") "别名 → ${hit.instruction.aliasOf}" else "HINT", style = MaterialTheme.typography.labelSmall)
                     }
@@ -82,13 +99,14 @@ private fun InstructionResultsScreen(state: AtlasState, grid: LazyGridState, onO
 }
 
 @Composable
-fun InstructionDetail(state: AtlasState, hit: InstructionHit, onWidth: (Int) -> Unit) {
+fun InstructionDetail(state: AtlasState, hit: InstructionHit, onWidth: (Int) -> Unit, onAbi: (Boolean) -> Unit, onCsr: (String) -> Unit) {
     val instruction = hit.instruction
     val variants = instruction.encodings.withIndex().filter { state.xlen in it.value.xlens }
     var variantIndex by rememberSaveable(hit.key) { mutableIntStateOf(hit.index) }
     val variant = variants.find { it.index == variantIndex } ?: variants.firstOrNull()
     val encoding = variant?.value
     var selectedField by rememberSaveable(hit.key, variant?.index) { mutableStateOf<String?>(null) }
+    val clipboard = LocalClipboardManager.current
     val uri = LocalUriHandler.current
     var linkError by remember { mutableStateOf(false) }
     LazyColumn(Modifier.fillMaxSize().testTag("instruction-detail"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -117,8 +135,34 @@ fun InstructionDetail(state: AtlasState, hit: InstructionHit, onWidth: (Int) -> 
             }
             item {
                 SelectionContainer { Text("match: ${encoding.match}\nmask:  ${encoding.mask}", fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall) }
-                val matched = state.instructionResults.hits.find { it.key == hit.key }?.word
-                if (matched != null) SelectionContainer { Text(encoding.operands(matched).entries.joinToString("\n") { "${it.key} = ${it.value}" }) }
+                val matched = hit.word?.takeIf { encoding.matches(it, state.xlen) }
+                if (matched != null) {
+                    val address = InstructionCsr.address(encoding, matched)
+                    val csrs = address?.let { state.pack?.let { pack -> InstructionCsr.resolve(pack, it, state.xlen, state.namespace) } }.orEmpty()
+                    val current = hit.copy(encoding = encoding, index = variant.index, word = matched)
+                    InstructionAssembly.render(current, state.abiRegisters, csrs.singleOrNull()?.name, state.xlen)?.let { assembly ->
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            FilterChip(state.abiRegisters, { onAbi(true) }, label = { Text("ABI") }, modifier = Modifier.testTag("register-names-abi"))
+                            FilterChip(!state.abiRegisters, { onAbi(false) }, label = { Text("x / f 编号") }, modifier = Modifier.testTag("register-names-number"))
+                            Spacer(Modifier.weight(1f))
+                            TextButton(onClick = { clipboard.setText(AnnotatedString(assembly.text)) }) { Text(if (assembly.complete) "复制汇编" else "复制字段") }
+                        }
+                        if (!assembly.complete) Text("操作数字段（汇编格式待补充）", style = MaterialTheme.typography.labelSmall)
+                        SelectionContainer { Text(assembly.text, modifier = Modifier.testTag("instruction-assembly"), fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold) }
+                    }
+                    SelectionContainer { Text(encoding.operands(matched).entries.joinToString("\n") { "${it.key} = ${it.value}" }, style = MaterialTheme.typography.bodySmall) }
+                    if (address != null) {
+                        Text("CSR · 0x${address.toString(16).padStart(3, '0')}", style = MaterialTheme.typography.labelMedium)
+                        if (csrs.isEmpty()) Text("当前位宽和来源范围内未收录此 CSR。", style = MaterialTheme.typography.bodySmall)
+                        else {
+                            if (csrs.size > 1) Text("存在多个来源候选，请选择：", style = MaterialTheme.typography.bodySmall)
+                            csrs.forEach { csr -> TextButton(onClick = { onCsr(csr.id) }, modifier = Modifier.testTag("instruction-csr-${csr.id}")) {
+                                Text("${csr.name} · ${csr.namespace.ifBlank { state.pack!!.namespace }} ↗")
+                            } }
+                        }
+                    }
+                } else if (hit.word != null) Text("原机器码不匹配当前位宽或编码变体。", style = MaterialTheme.typography.bodySmall)
+
             }
             if (encoding.contextRules.isNotEmpty() || encoding.constraints.isNotEmpty()) item {
                 var expanded by rememberSaveable(hit.key, variant?.index) { mutableStateOf(false) }

@@ -19,6 +19,8 @@ data class AtlasState(
     val instructions: InstructionCatalog? = null,
     val instructionPage: Int = 0,
     val selectedInstructionKey: String? = null,
+    val selectedInstructionWord: Long? = null,
+    val abiRegisters: Boolean = true,
     val query: String = "",
     val xlen: Int = 64,
     val privilege: String? = null,
@@ -33,7 +35,7 @@ data class AtlasState(
     val showSources: Boolean = false,
 ) {
     val instructionResults get() = instructions?.let { InstructionSearch.query(it, query, CatalogFilter(xlen, privilege, namespace, compilerIsa?.associatedTags(extensions) ?: extensions), compilerIsa) } ?: InstructionResults(emptyList())
-    val selectedInstruction get() = selectedInstructionKey?.let { key -> instructions?.instructions?.firstNotNullOfOrNull { instruction -> instruction.encodings.mapIndexed { index, encoding -> InstructionHit(instruction, encoding, index) }.find { it.key == key } } }
+    val selectedInstruction get() = selectedInstructionKey?.let { key -> instructions?.instructions?.firstNotNullOfOrNull { instruction -> instruction.encodings.mapIndexed { index, encoding -> InstructionHit(instruction, encoding, index, selectedInstructionWord) }.find { it.key == key } } }
     val selected get() = pack?.registers?.find { it.id == selectedId }
     val results get() = pack?.let { Search.query(it, query, xlen, privilege, namespace,
         compilerIsa?.associatedTags(extensions) ?: extensions) }.orEmpty()
@@ -44,6 +46,8 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
     private val mutable = MutableStateFlow(AtlasState(
         instructionPage = saved["instructionPage"] ?: 0,
         selectedInstructionKey = saved["selectedInstructionKey"],
+        selectedInstructionWord = saved["selectedInstructionWord"],
+        abiRegisters = prefs.getBoolean("abiRegisters", true),
         query = saved["query"] ?: "",
         xlen = saved["xlen"] ?: prefs.getInt("xlen", 64),
         selectedId = saved["selectedId"],
@@ -108,12 +112,35 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
         mutable.update { it.copy(selectedId = id, selectedField = field) }
     }
     fun page(value: Int) { saved["instructionPage"] = value; mutable.update { it.copy(instructionPage = value) } }
-    fun openInstruction(key: String) { saved["selectedInstructionKey"] = key; mutable.update { it.copy(selectedInstructionKey = key) } }
+    fun openInstruction(hit: InstructionHit) {
+        saved["selectedInstructionKey"] = hit.key
+        saved["selectedInstructionWord"] = hit.word
+        saved["selectedId"] = null
+        saved["selectedField"] = null
+        mutable.update { it.copy(selectedInstructionKey = hit.key, selectedInstructionWord = hit.word, selectedId = null, selectedField = null) }
+    }
+    fun abiRegisters(value: Boolean) {
+        prefs.edit().putBoolean("abiRegisters", value).apply()
+        mutable.update { it.copy(abiRegisters = value) }
+    }
+    fun relaxInstructionFilters(diagnostic: InstructionDiagnostic) {
+        diagnostic.suggestedXlen?.let(::xlen)
+        if (InstructionFilterDimension.PRIVILEGE in diagnostic.clear) privilege(null)
+        if (InstructionFilterDimension.SOURCE in diagnostic.clear) namespace(null)
+        if (InstructionFilterDimension.EXTENSION in diagnostic.clear) clearExtensions()
+    }
     fun close() {
+        if (mutable.value.selectedId != null && mutable.value.selectedInstructionKey != null) {
+            saved["selectedId"] = null
+            saved["selectedField"] = null
+            mutable.update { it.copy(selectedId = null, selectedField = null) }
+            return
+        }
+        saved["selectedInstructionWord"] = null
         saved["selectedInstructionKey"] = null
         saved["selectedId"] = null
         saved["selectedField"] = null
-        mutable.update { it.copy(selectedId = null, selectedField = null, selectedInstructionKey = null) }
+        mutable.update { it.copy(selectedId = null, selectedField = null, selectedInstructionKey = null, selectedInstructionWord = null) }
     }
     fun showAbout(value: Boolean) {
         saved["showAbout"] = value

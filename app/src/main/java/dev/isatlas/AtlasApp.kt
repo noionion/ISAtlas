@@ -111,7 +111,7 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
                         },
                         navigationIcon = {
                             if (detailOpen) IconButton(onClick = model::close) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, "返回搜索")
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, if (selected != null && selectedInstruction != null) "返回指令" else "返回搜索")
                             }
                         },
                         actions = {
@@ -133,8 +133,8 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
                                 Text(state.error!!)
                                 Button(onClick = model::load) { Text("重试") }
                             }
-                            selectedInstruction != null -> InstructionDetail(state, selectedInstruction, model::xlen)
                             selected != null -> key(selected.id) { RegisterDetail(state, selected, model::xlen) }
+                            selectedInstruction != null -> InstructionDetail(state, selectedInstruction, model::xlen, model::abiRegisters, { model.open(it) })
                             else -> CatalogSearchScreen(state, model, searchGrid, instructionGrid, showSearch = !landscapeHome,
                                 expanded = mapOf(SearchCategory.CSR to csrExpanded, SearchCategory.FIELD to fieldsExpanded, SearchCategory.DESCRIPTION to descriptionsExpanded),
                                 onToggle = { category -> when (category) {

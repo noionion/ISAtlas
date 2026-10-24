@@ -63,4 +63,47 @@ class InstructionFlowTest {
         closeFilters()
         compose.onNodeWithText("当前数据范围内没有匹配项").assertIsDisplayed()
     }
+
+    @Test fun assemblyNamesAndCopy() {
+        compose.onNodeWithTag("search-input").performTextReplacement("0x00b50533")
+        compose.onNodeWithTag("inst-riscv/manual/inst/add:0").performClick()
+        compose.onNodeWithTag("register-names-abi").performScrollTo().performClick()
+        compose.onNodeWithTag("instruction-assembly").assertTextEquals("add a0, a0, a1")
+        compose.onNodeWithTag("register-names-number").performClick()
+        compose.onNodeWithTag("instruction-assembly").assertTextEquals("add x10, x10, x11")
+        compose.onNodeWithText("复制汇编").performClick()
+        compose.runOnUiThread {
+            val clipboard = compose.activity.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            org.junit.Assert.assertEquals("add x10, x10, x11", clipboard.primaryClip!!.getItemAt(0).text.toString())
+        }
+    }
+
+    @Test fun instructionCsrRoundTripPreservesWordAndDetail() {
+        compose.onNodeWithTag("search-input").performTextReplacement("0x300110f3")
+        compose.onNodeWithTag("inst-riscv/manual/inst/csrrw:0").performClick()
+        compose.onNodeWithTag("register-names-abi").performScrollTo().performClick()
+        compose.onNodeWithTag("instruction-assembly").assertTextEquals("csrrw ra, mstatus, sp")
+        compose.onNodeWithText("mstatus · manual ↗").performScrollTo().performClick()
+        compose.onNodeWithTag("app-title").assertTextEquals("mstatus")
+        compose.onNodeWithContentDescription("返回指令").performClick()
+        compose.onNodeWithTag("instruction-assembly").assertIsDisplayed().assertTextEquals("csrrw ra, mstatus, sp")
+        compose.onNodeWithContentDescription("返回搜索").performClick()
+        compose.onNodeWithTag("catalog-tab-INST").assertIsSelected()
+        compose.onNodeWithTag("search-input").assertTextContains("0x300110f3")
+    }
+
+    @Test fun diagnosisCanRecoverFiltersWithoutChangingInput() {
+        compose.onNodeWithTag("search-input").performTextReplacement("mret")
+        compose.onNodeWithContentDescription("筛选").performClick()
+        compose.onNodeWithTag("filter-permission-U").performClick()
+        closeFilters()
+        compose.onNodeWithText("已收录的匹配项被权限筛选排除。").assertIsDisplayed()
+        compose.onNodeWithTag("relax-instruction-filters").performClick()
+        compose.onNodeWithTag("inst-riscv/manual/inst/mret:0").assertIsDisplayed()
+        compose.onNodeWithTag("search-input").assertTextContains("mret")
+        compose.onNodeWithTag("search-input").performTextReplacement("0b102")
+        compose.onNodeWithText("二进制编码只能包含 0 和 1。").assertIsDisplayed()
+        compose.onNodeWithTag("relax-instruction-filters").assertDoesNotExist()
+    }
+
 }
