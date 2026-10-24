@@ -29,8 +29,8 @@ fun privilegeRank(mode: String) = listOf("M", "S", "H", "VS", "U", "D").indexOf(
     val sources: List<InstructionSource> = emptyList()) {
     val tags get() = requires.flatten().map { it.lowercase() }.toSet()
     val requirements get() = requires.joinToString(" / ") { it.joinToString(" + ") }
-    fun matches(word: Long, xlen: Int): Boolean = word in 0 until (1L shl length) &&
-        word and mask.hex() == match.hex() && encodingConstraints.filter { xlen in it.xlens }.all {
+    fun fixedMatches(word: Long): Boolean = word in 0 until (1L shl length) && word and mask.hex() == match.hex()
+    fun matches(word: Long, xlen: Int): Boolean = fixedMatches(word) && encodingConstraints.filter { xlen in it.xlens }.all {
             val value = word and it.mask.hex()
             when (it.operator) { "notIn" -> value !in it.values; "in" -> value in it.values; else -> false }
         }
@@ -85,7 +85,7 @@ data class InstructionHit(val instruction: InstructionDefinition, val encoding: 
     val category: InstructionMatchCategory = InstructionMatchCategory.NAME) {
     val key get() = "${instruction.id}:$index"
 }
-data class InstructionResults(val hits: List<InstructionHit>, val error: String? = null)
+data class InstructionResults(val hits: List<InstructionHit>, val error: String? = null, val diagnostic: InstructionDiagnostic? = null)
 object InstructionSearch {
     fun query(catalog: InstructionCatalog, input: String, filter: CatalogFilter, compiler: CompilerIsaOptions? = null): InstructionResults {
         val query = input.trim().lowercase()
@@ -94,35 +94,54 @@ object InstructionSearch {
         val descriptionPatterns = tokens.associateWith { token ->
             if (token.matches(Regex("[a-z0-9_.]+"))) Regex("(?<![a-z0-9_])${Regex.escape(token)}(?![a-z0-9_])") else null
         }
-        val compact = query.replace(Regex("[\\s_]"), "")
-        val numeric = compact.startsWith("0x") || compact.startsWith("0b") || compact.matches(Regex("[01]{16}|[01]{32}|[0-9a-f]{4}|[0-9a-f]{8}"))
-        val word = if (!numeric) null else when {
-            compact.startsWith("0x") -> compact.drop(2).toLongOrNull(16)
-            compact.startsWith("0b") -> compact.drop(2).toLongOrNull(2)
-            compact.length in listOf(16, 32) && compact.all { it in "01" } -> compact.toLongOrNull(2)
-            else -> compact.toLongOrNull(16)
-        }
-        if (numeric && (word == null || word !in 0..0xffffffffL)) return InstructionResults(emptyList(), "请输入 16 或 32 位指令编码（0x 十六进制 / 0b 二进制）。")
+        val parsed = InstructionInput.parse(input)
+        if (parsed.error != null) return InstructionResults(emptyList(), parsed.error, InstructionDiagnostic(InstructionDiagnosticKind.INPUT, parsed.error))
+        val word = parsed.word
         val parentTags = compiler?.tokens.orEmpty().filter { it in setOf("m", "a", "b", "c", "v") }.associateWith { compiler!!.associatedTags(setOf(it)) - setOf("i", "e", "f", "d", "zicsr") }
+        val available = mutableListOf<Pair<InstructionHit, Set<String>>>()
+        var fixedCandidate = false
         val hits = catalog.instructions.flatMap { instruction -> instruction.encodings.mapIndexedNotNull { index, encoding ->
             val tags = encoding.tags + parentTags.filterValues { tags -> tags.any { it in encoding.tags } }.keys
             val nameMatch = tokens.all { it in instruction.name.lowercase() }
             val description = "${instruction.summary} ${instruction.summaryEn} ${encoding.summary.orEmpty()} ${encoding.summaryEn.orEmpty()}".lowercase()
             val textMatch = tokens.all { token -> token in instruction.name.lowercase() ||
                 (descriptionPatterns[token]?.containsMatchIn(description) ?: (token in description)) }
-            if (!filter.accepts(encoding.xlens, encoding.privilege, instruction.namespace, tags)) null
-            else if (word != null && !encoding.matches(word, filter.xlen)) null
-            else if (word == null && !textMatch) null
-            else InstructionHit(instruction, encoding, index, word, when {
+            if (word != null && encoding.fixedMatches(word)) fixedCandidate = true
+            val category = when {
                 word != null -> InstructionMatchCategory.ENCODING
                 nameMatch -> InstructionMatchCategory.NAME
                 else -> InstructionMatchCategory.DESCRIPTION
-            })
+            }
+            val hit = InstructionHit(instruction, encoding, index, word, category)
+            val anyWidthMatch = if (word == null) textMatch else encoding.xlens.any { encoding.matches(word, it) }
+            if (anyWidthMatch) available += hit to tags
+            if (!anyWidthMatch || !filter.accepts(encoding.xlens, encoding.privilege, instruction.namespace, tags) ||
+                (word != null && !encoding.matches(word, filter.xlen))) null else hit
         } }.sortedWith(compareBy<InstructionHit> { it.category.ordinal }
             .thenBy { privilegeRank(it.encoding.privilege) }
             .thenBy { if (it.instruction.name == query) 0 else if (it.instruction.name.startsWith(query)) 1 else 2 }
             .thenBy { if (word != null) -java.lang.Long.bitCount(it.encoding.mask.hex()) else 0 }
             .thenBy { it.instruction.name }.thenBy { it.index })
-        return InstructionResults(hits)
+        if (hits.isNotEmpty()) return InstructionResults(hits)
+        if (available.isNotEmpty()) {
+            val candidates = available.map { (hit, tags) ->
+                val widths = hit.encoding.xlens.filter { word == null || hit.encoding.matches(word, it) }
+                val blocked = buildSet {
+                    if (filter.xlen !in widths) add(InstructionFilterDimension.WIDTH)
+                    if (filter.privilege != null && filter.privilege != normalizePrivilege(hit.encoding.privilege)) add(InstructionFilterDimension.PRIVILEGE)
+                    if (filter.namespace != null && filter.namespace != hit.instruction.namespace) add(InstructionFilterDimension.SOURCE)
+                    if (filter.extensions.isNotEmpty() && filter.extensions.none { it.lowercase() in tags }) add(InstructionFilterDimension.EXTENSION)
+                }
+                blocked to widths
+            }
+            val (blocked, widths) = candidates.minWith(compareBy<Pair<Set<InstructionFilterDimension>, List<Int>>> { it.first.size }
+                .thenBy { InstructionFilterDimension.WIDTH in it.first })
+            return InstructionResults(emptyList(), diagnostic = InstructionDiagnostic(InstructionDiagnosticKind.FILTERED,
+                "已收录的匹配项被${blocked.joinToString("、") { it.label }}筛选排除。", blocked,
+                if (filter.xlen !in widths) widths.first() else null))
+        }
+        return InstructionResults(emptyList(), diagnostic = if (word != null && fixedCandidate)
+            InstructionDiagnostic(InstructionDiagnosticKind.RESERVED, "匹配到编码模板，但操作数字段违反已收录的静态限制，属于该模板的保留编码。")
+        else InstructionDiagnostic(InstructionDiagnosticKind.UNKNOWN, if (word == null) "当前数据库未找到对应名称或描述。" else "当前数据库未收录匹配编码，无法据此判断该编码是否合法。"))
     }
 }
