@@ -22,6 +22,14 @@ keystore.properties
 !/docs/data-import.md
 !/docs/data-format.md
 !/docs/field-review.md
+!/docs/build.md
+!/docs/project-maintenance.md
+!/docs/images/
+/docs/images/*
+!/docs/images/bit-layout.png
+!/docs/images/field-details.png
+!/docs/images/filters.png
+!/docs/images/icon.svg
 
 # Retired local discovery material, unused by the official manual importer.
 /tools/discover_github_sources.py

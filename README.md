@@ -1,66 +1,73 @@
+<div align="center">
+
+<img src="docs/images/icon.svg" alt="ISAtlas 应用图标" width="112" height="112">
+
 # ISAtlas
 
-离线架构速查 Android 应用原型，当前应用版本 0.2.0，使用 Kotlin + Jetpack Compose，支持 Android 8.0 / API 26 及以上版本。
+**指令、寄存器与位字段，一搜即得**
 
-## 功能
+Android 上的离线架构速查工具，支持 RISC-V CSR 与字段查询。
 
-- 搜索 CSR 名称、编号、字段和描述，按类别、特权态及 CSR 编号排列。
-- 展示寄存器位布局，支持 RV32/RV64、横竖屏适配和拖拽选域。
-- 右侧筛选支持位宽、访问权限、扩展及数据来源；横屏使用双栏布局。
-- 从详情返回时保留列表位置。
-- 从独立 CSR JSON 文件加载离线目录，校验身份、字段及位布局。
+指令查询计划于 1.0.0 版本前支持。
 
-## 离线数据
+[功能预览](#功能预览) · [开发看板](https://github.com/users/noionion/projects/5) · [使用文档](#文档) · [问题反馈](https://github.com/noionion/ISAtlas/issues)
 
-仓库包含 381 个官方 ISA 手册来源 CSR 和 1 个保留的 T-head CSR，共 1,571 个字段。手册来源的 1,570 个字段均有中英文摘要，其中 1,327 个带枚举说明；应用默认显示中文，英文数据供后续 i18n 使用。
+</div>
 
-数据位于 `app/src/main/assets/`，构建和运行无需下载数据库：
+---
 
-- `riscv-catalog.json`：目录元数据及 `files` 文件名索引。
-- `csr/*.json`：每个文件存放一个完整的 CSR 定义。
-- `march-extensions.json`：扩展选项和前置依赖。
-- `THIRD_PARTY_NOTICES.txt`：第三方署名、修改说明及许可证。
+输入寄存器名称、地址或字段名，快速查看位布局、功能说明和取值含义。适合阅读底层代码、调试系统，以及学习 RISC-V 架构时随手查阅。
 
-官方手册通过 `upstream/riscv-isa-manual` 子模块固定到发布标签 `20250508`。11 个调试相关 CSR 的具体定义属于外部规范，仍为仅地址索引；平台相关布局不做推断。来源、转换与复核边界见 [数据导入](docs/data-import.md)、[字段复核](docs/field-review.md) 和 [数据格式](docs/data-format.md)。
+## 特性
 
-仅在需要再生成数据时初始化子模块，并运行 Python 3.10+ 标准库脚本：
+| | 功能 | 说明 |
+| --- | --- | --- |
+| 🔎 | 快速搜索 | 搜索名称、地址、字段和描述，支持 `mstatus`、`0x300`、`mstatus.MIE` 等查询 |
+| 🧩 | 位域一目了然 | 图形化展示寄存器布局，点击或拖拽选择字段，查看对应功能 |
+| 📖 | 取值有据可查 | 中文功能摘要、枚举值与访问规则，支持跳转到规范原文 |
+| 🎛️ | 按需筛选 | 按 RV32 / RV64、访问权限、扩展和数据来源筛选 |
+| 📱 | 横竖屏适配 | 横屏支持多列结果与更宽位图，返回列表保留浏览位置 |
+| 📦 | 离线使用 | 数据随应用提供，日常查询无需联网 |
 
-```powershell
-git submodule update --init upstream/riscv-isa-manual
-python tools/import_isa_manual.py
-python tools/review_manual_fields.py
-```
+## 功能预览
 
-来源版本、保留厂商文件指纹及许可证路径记录在 `tools/data-sources.lock.json`。生成的复核报告保存在 `docs/data/`；报告、临时截图和构建缓存不提交。
+<table>
+  <tr>
+    <th>寄存器位布局</th>
+    <th>字段说明与取值</th>
+    <th>筛选面板</th>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><img src="docs/images/bit-layout.png" alt="mstatus 位布局，显示字段位置、位宽和 WPRI 区域" height="420"></td>
+    <td align="center" valign="top"><img src="docs/images/field-details.png" alt="MIE 字段的中文说明、访问规则和 0/1 取值含义" height="420"></td>
+    <td align="center" valign="top"><img src="docs/images/filters.png" alt="按架构位宽、访问权限、ISA 扩展和数据来源筛选" height="420"></td>
+  </tr>
+</table>
 
-## 构建
+## 运行要求
 
-需要 JDK 21、Android SDK Platform 35、Build Tools 35.0.0。Gradle Wrapper 使用 8.11.1。
+| 项目 | 要求 |
+| --- | --- |
+| 系统版本 | Android 8.0 及以上（API 26） |
+| 支持架构 | RISC-V RV32 / RV64 |
+| 网络连接 | 离线查询无需联网；打开外部规范原文时需要联网 |
 
-通过 Android Studio 打开项目，或执行：
+## 开发计划
 
-```powershell
-./gradlew.bat :app:assembleDebug :app:lintDebug
-```
+后续功能与开发进度可在 [ISAtlas Roadmap](https://github.com/users/noionion/projects/5) 公开查看。功能建议与问题反馈请通过 [Issues](https://github.com/noionion/ISAtlas/issues) 提交。
 
-在本地 `local.properties` 中配置 `sdk.dir`，该文件不提交。APK 输出到 `app/build/outputs/apk/debug/app-debug.apk`。
+## 文档
 
-执行测试：
+| 文档 | 说明 |
+| --- | --- |
+| [构建指南](docs/build.md) | 从源码构建、安装与开发验证 |
+| [看板维护规则](docs/project-maintenance.md) | 功能规划、任务清单、状态流转与 Issue 协作 |
+| [数据来源](docs/data-import.md) | 规范版本、数据维护与转换方式 |
+| [覆盖范围](docs/field-review.md) | CSR 与字段的收录范围及复核说明 |
+| [数据格式](docs/data-format.md) | CSR JSON 结构与字段约定 |
 
-```powershell
-./gradlew.bat :core:test :app:connectedDebugAndroidTest
-python -m unittest discover -s tools -p "test_*csr*.py"
-```
+## 反馈与致谢
 
-## 结构
+欢迎通过 [Issues](https://github.com/noionion/ISAtlas/issues) 反馈问题或提出建议。数据问题请附上 CSR / 字段名称及规范出处，界面问题请附上复现步骤。
 
-```text
-app/       Android 界面、应用状态和偏好设置
-core/      数据模型、校验、搜索、位布局和单元测试
-gradle/    Gradle Wrapper
-tools/     CSR 存储、官方手册转换、字段说明、复核和来源锁定
-upstream/  固定版本的官方 ISA 手册子模块
-docs/      数据格式、来源转换与字段复核说明
-```
-
-Git 提交使用 Angular 风格的 `type(scope): summary`，例如 `feat(app): add register search`。
+感谢 [RISC-V ISA Manual](https://github.com/riscv/riscv-isa-manual) 与 [T-head Extension Specification](https://github.com/T-head-Semi/thead-extension-spec) 提供规范资料。第三方数据的署名与许可证见 [第三方声明](app/src/main/assets/THIRD_PARTY_NOTICES.txt)。
