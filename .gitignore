@@ -24,6 +24,7 @@ keystore.properties
 !/docs/field-review.md
 !/docs/build.md
 !/docs/project-maintenance.md
+!/docs/instruction-data.md
 !/docs/images/
 /docs/images/*
 !/docs/images/bit-layout.png
