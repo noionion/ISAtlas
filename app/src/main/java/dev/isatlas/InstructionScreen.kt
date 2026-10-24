@@ -113,7 +113,7 @@ fun InstructionDetail(state: AtlasState, hit: InstructionHit, onWidth: (Int) -> 
         item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text("${encoding?.length ?: "—"} bit | ${encoding?.privilege?.let(::normalizePrivilege) ?: "—"}", Modifier.weight(1f), color = MaterialTheme.colorScheme.primary)
-                listOf(32, 64).forEach { width -> FilterChip(state.xlen == width, { onWidth(width) }, label = { Text("RV$width") }) }
+                WidthPicker(state.xlen, onWidth)
             }
             Text(encoding?.summary ?: instruction.summary, style = MaterialTheme.typography.bodyMedium)
         }

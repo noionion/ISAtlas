@@ -163,7 +163,7 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
 }
 
 @Composable
-private fun WidthPicker(xlen: Int, onChange: (Int) -> Unit) {
+internal fun WidthPicker(xlen: Int, onChange: (Int) -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         listOf(32, 64).forEach { width ->
             FilterChip(selected = xlen == width, onClick = { onChange(width) }, label = { Text("RV$width") })
