@@ -100,7 +100,7 @@ internal fun UpdatePromptDialog(
     onInstall: () -> Unit,
 ) {
     val release = state.release ?: return
-    if (state.prompt == null) return
+    if (state.prompt == null || !state.hasUpdate) return
     val ready = state.stage == UpdateStage.READY
     AlertDialog(
         modifier = Modifier.testTag("update-dialog"),
@@ -109,6 +109,8 @@ internal fun UpdatePromptDialog(
         text = {
             Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState()).testTag("update-notes"),
                 verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                if (release.prerelease || dev.isatlas.core.AppVersion.parse(release.version)?.prerelease?.isNotEmpty() == true)
+                    Text("预览版发布", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
                 Text(if (ready) "安装包已校验，点击安装后提交更新；系统要求时再确认。" else
                     "下载在后台进行，可继续查询。${if (release.size > 0) "安装包约 ${"%.1f".format(release.size / 1048576.0)} MB。" else ""}",
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

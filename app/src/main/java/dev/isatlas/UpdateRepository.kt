@@ -19,6 +19,7 @@ import kotlinx.coroutines.sync.withLock
 internal enum class UpdateStage { IDLE, CHOOSING, DOWNLOADING, VERIFYING, READY, FAILED }
 internal enum class UpdatePrompt { RELEASE, INSTALL }
 internal data class UpdateState(
+    val track: UpdateTrack = UpdateTrack.STABLE,
     val release: AppRelease? = null,
     val checking: Boolean = false,
     val stage: UpdateStage = UpdateStage.IDLE,
@@ -30,8 +31,11 @@ internal data class UpdateState(
     val readyNotice: Boolean = false,
     val installation: InstallState = InstallState(),
 ) {
-    val hasUpdate get() = release != null
+    val hasUpdate get() = release?.let { track.accepts(it) || hasTransfer } == true
     val busy get() = stage in setOf(UpdateStage.CHOOSING, UpdateStage.DOWNLOADING, UpdateStage.VERIFYING)
+    val hasTransfer get() = busy || stage == UpdateStage.READY || installation.phase != InstallPhase.IDLE
+    val trackSummary get() = "${track.label} · ${track.description}" +
+        if (hasTransfer) "。已开始的下载或安装任务保持不变，通道对后续检查生效。" else ""
     val summary: String get() = when {
         checking -> "正在并行检查官方与镜像…"
         installation.phase == InstallPhase.PREPARING -> "正在准备安装更新…"
@@ -61,13 +65,15 @@ internal class UpdateRepository(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val transferLock = Mutex()
     private val current = installed.versionName.orEmpty()
-    private val cached = AppUpdates.restore(prefs.getString("release", null))?.takeIf(::newer)
-    private val mutable = MutableStateFlow(UpdateState(release = cached,
+    private val initialTrack = UpdateTrack.restore(prefs.getString("updateTrack", null), current)
+    private val cached = AppUpdates.restore(prefs.getString("release", null))?.takeIf { newer(it) && initialTrack.accepts(it) }
+    private val mutable = MutableStateFlow(UpdateState(track = initialTrack, release = cached,
         skipped = cached?.version == prefs.getString("skipped", null)))
     val state = mutable.asStateFlow()
     @Volatile private var foreground = false
     private var observer: Job? = null
     private var checkJob: Job? = null
+    private var checkGeneration = 0L
     private var manualCheckRequested = false
     private var lastAttempt = 0L
     private var promptedVersion: String? = null
@@ -128,25 +134,67 @@ internal class UpdateRepository(
 
     fun pause() { foreground = false; observer?.cancel(); observer = null }
 
+    fun selectTrack(track: UpdateTrack) {
+        if (track == state.value.track) {
+            // Persist an explicit choice even when it equals the inferred default.
+            prefs.edit { putString("updateTrack", track.name) }
+            return
+        }
+        checkGeneration++
+        checkJob?.cancel()
+        checkJob = null
+        manualCheckRequested = false
+        lastAttempt = 0L
+        val value = state.value
+        val eligible = value.release?.takeIf { newer(it) && track.accepts(it) }
+        prefs.edit {
+            putString("updateTrack", track.name)
+            remove("lastCheck")
+            if (eligible != null) putString("release", eligible.encode()) else remove("release")
+        }
+        if (value.hasTransfer) {
+            // A change in future eligibility must not cancel a user-confirmed transfer/session.
+            mutable.update { it.copy(track = track, checking = false, prompt = null) }
+            return
+        }
+        if (eligible == null) promptedVersion = null
+        mutable.update { it.copy(track = track, release = eligible, checking = false, stage = UpdateStage.IDLE,
+            message = null, prompt = null, readyNotice = false, progress = null, channel = null,
+            skipped = eligible?.version == prefs.getString("skipped", null)) }
+        check(manual = false)
+    }
+
     fun check(manual: Boolean) {
-        if (state.value.busy || state.value.stage == UpdateStage.READY) { if (manual) openPrompt(); return }
+        if (state.value.hasTransfer) { if (manual) openPrompt(); return }
         if (checkJob?.isActive == true) { manualCheckRequested = manualCheckRequested || manual; return }
         manualCheckRequested = manual
+        val track = state.value.track
+        val generation = ++checkGeneration
         lastAttempt = System.currentTimeMillis()
         mutable.update { it.copy(checking = true, message = null) }
         checkJob = scope.launch {
             try {
-                val release = client.check(current)
+                val release = client.check(current, track)
+                ensureActive()
+                if (generation != checkGeneration || state.value.track != track) return@launch
+                if (state.value.hasTransfer) {
+                    mutable.update { it.copy(checking = false) }
+                    return@launch
+                }
                 prefs.edit { putLong("lastCheck", System.currentTimeMillis()) }
                 // A stale mirror must not erase a previously known newer version.
-                val best = AppUpdates.newest(listOfNotNull(release, state.value.release))
-                if (best != null) prefs.edit { putString("release", best.encode()) }
+                val best = AppUpdates.newest(listOfNotNull(release, state.value.release).filter { track.accepts(it) && newer(it) })
+                prefs.edit { if (best != null) putString("release", best.encode()) else remove("release") }
                 mutable.update { it.copy(release = best, checking = false,
                     skipped = best?.version == prefs.getString("skipped", null),
-                    message = if (manualCheckRequested && best == null) "已是最新版本 $current" else null) }
+                    message = if (manualCheckRequested && best == null) {
+                        if (track == UpdateTrack.STABLE && AppVersion.parse(current)?.prerelease?.isNotEmpty() == true)
+                            "稳定版通道暂无高于 $current 的可升级版本" else "已是最新版本 $current"
+                    } else null) }
                 if (manualCheckRequested && best != null) openPrompt() else maybePrompt()
             } catch (cancelled: CancellationException) { throw cancelled
             } catch (_: Exception) {
+                if (generation != checkGeneration || state.value.track != track) return@launch
                 mutable.update { it.copy(checking = false, message = if (manualCheckRequested) "官方与镜像暂不可用，请检查网络后重试。" else null) }
             }
         }
@@ -163,6 +211,7 @@ internal class UpdateRepository(
     }
 
     fun openPrompt() {
+        if (!state.value.hasUpdate) return
         val release = state.value.release ?: return
         promptedVersion = release.version
         if (state.value.stage == UpdateStage.READY) readyAnnounced = true
@@ -179,6 +228,7 @@ internal class UpdateRepository(
     fun download() {
         if (state.value.busy || state.value.stage == UpdateStage.READY) return
         val release = state.value.release ?: return
+        if (!state.value.track.accepts(release)) return
         mutable.update { it.copy(stage = UpdateStage.CHOOSING, prompt = null, message = null, progress = null) }
         scope.launch {
             transferLock.withLock {

@@ -152,6 +152,7 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
             RaisedPage(state.showAbout, "关于 ISAtlas", "收起关于", { model.showAbout(false) },
                 modifier = if (state.showSources) Modifier.clearAndSetSemantics {} else Modifier) {
                 AboutScreen(state.pack, onShowSources = { model.showSources(true) }, update = update,
+                    onSelectTrack = updates::selectTrack,
                     onCheckUpdate = { updates.check(manual = true) })
             }
             RaisedPage(state.showSources, "数据源与许可", "返回关于", { model.showSources(false) }) {

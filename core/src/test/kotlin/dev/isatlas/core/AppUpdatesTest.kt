@@ -90,4 +90,41 @@ class AppUpdatesTest {
         assertTrue(UpdateChannels.all.all { it.url(url).startsWith("https://") })
         assertEquals("https://gh-proxy.com/$url", UpdateChannels.all.last().url(url))
     }
+    @Test fun `explicit track overrides installed version type`() {
+        val preview = release("v0.5.0-beta.1") { put("prerelease", true) }
+        assertEquals("0.5.0-beta.1", AppUpdates.decodeResponse(preview, "0.4.1", UpdateTrack.PREVIEW).single().version)
+        assertTrue(AppUpdates.decodeResponse(preview, "0.5.0-alpha.1", UpdateTrack.STABLE).isEmpty())
+    }
+    @Test fun `preview track includes stable versions and selects the newest semantic version`() {
+        val response = "[${release("v0.6.0-beta.1") { put("prerelease", true) }},${release("v0.5.0")},${release("v0.6.0")}]"
+        assertEquals("0.6.0", AppUpdates.newest(AppUpdates.decodeResponse(response, "0.4.1", UpdateTrack.PREVIEW))!!.version)
+        assertEquals("0.6.0", AppUpdates.newest(AppUpdates.decodeResponse(response, "0.4.1", UpdateTrack.STABLE))!!.version)
+    }
+    @Test fun `prerelease flag persists even when tag has no prerelease suffix`() {
+        val marked = release("v0.5.0") { put("prerelease", true) }
+        assertTrue(AppUpdates.decodeResponse(marked, "0.4.1", UpdateTrack.STABLE).isEmpty())
+        val result = AppUpdates.decodeResponse(marked, "0.4.1", UpdateTrack.PREVIEW).single()
+        assertTrue(result.prerelease)
+        assertEquals(result, AppUpdates.restore(result.encode()))
+        assertFalse(UpdateTrack.STABLE.accepts(AppUpdates.restore(result.encode())!!))
+        assertTrue(AppUpdates.decodeResponse(release("v0.5.0-beta.1"), "0.4.1", UpdateTrack.STABLE).isEmpty())
+    }
+    @Test fun `switching to stable cannot offer downgrades from an installed preview`() {
+        assertTrue(AppUpdates.decodeResponse(release("v0.4.1"), "0.5.0-beta.1", UpdateTrack.STABLE).isEmpty())
+        assertTrue(AppUpdates.decodeResponse(release("v0.4.1"), "0.5.0-beta.1", UpdateTrack.PREVIEW).isEmpty())
+        assertEquals("0.5.0", AppUpdates.decodeResponse(release("v0.5.0"), "0.5.0-beta.1", UpdateTrack.STABLE).single().version)
+    }
+    @Test fun `track migration preserves existing defaults but explicit preferences survive upgrades`() {
+        assertEquals(UpdateTrack.STABLE, UpdateTrack.restore(null, "0.4.1"))
+        assertEquals(UpdateTrack.PREVIEW, UpdateTrack.restore(null, "0.5.0-beta.1"))
+        assertEquals(UpdateTrack.STABLE, UpdateTrack.restore("STABLE", "0.5.0-beta.1"))
+        assertEquals(UpdateTrack.PREVIEW, UpdateTrack.restore("PREVIEW", "0.5.0"))
+        assertEquals(UpdateTrack.STABLE, UpdateTrack.restore("invalid", "0.5.0"))
+    }
+    @Test fun `legacy cached previews cannot enter the stable track`() {
+        val old = AppRelease("v0.5.0-beta.1", "0.5.0-beta.1", "", "${AppUpdates.REPOSITORY}/releases/download/v0.5.0-beta.1/ISAtlas-0.5.0-beta.1.apk", 123)
+        val restored = AppUpdates.restore(old.encode().replace(",\"prerelease\":true", ""))!!
+        assertFalse(UpdateTrack.STABLE.accepts(restored))
+        assertTrue(UpdateTrack.PREVIEW.accepts(restored))
+    }
 }

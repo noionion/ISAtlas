@@ -5,11 +5,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -21,11 +24,13 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.isatlas.core.DataPack
+import dev.isatlas.core.UpdateTrack
 
 private const val PROJECT_URL = "https://github.com/noionion/ISAtlas"
 
 @Composable
-internal fun AboutScreen(pack: DataPack?, onShowSources: () -> Unit, update: UpdateState, onCheckUpdate: () -> Unit) {
+internal fun AboutScreen(pack: DataPack?, onShowSources: () -> Unit, update: UpdateState,
+    onSelectTrack: (UpdateTrack) -> Unit = {}, onCheckUpdate: () -> Unit) {
     val context = LocalContext.current
     val version = remember(context) {
         runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }
@@ -34,6 +39,7 @@ internal fun AboutScreen(pack: DataPack?, onShowSources: () -> Unit, update: Upd
     val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val uriHandler = LocalUriHandler.current
     var linkError by remember { mutableStateOf(false) }
+    var showTrackPicker by rememberSaveable { mutableStateOf(false) }
     val openLink: (String) -> Unit = { url -> linkError = runCatching { uriHandler.openUri(url) }.isFailure }
 
     Box(Modifier.fillMaxSize().testTag("about-screen"), contentAlignment = Alignment.TopCenter) {
@@ -55,6 +61,7 @@ internal fun AboutScreen(pack: DataPack?, onShowSources: () -> Unit, update: Upd
             AboutRow("软件版本", version, tag = "about-app-version")
             AboutRow(if (update.stage == UpdateStage.READY) "安装更新" else "检查更新", subtitle = update.summary,
                 tag = "about-check-update", showBadge = update.hasUpdate, onClick = onCheckUpdate)
+            AboutRow("更新通道", subtitle = update.trackSummary, tag = "about-update-track", onClick = { showTrackPicker = true })
 
             // Database management belongs here; local import can extend this section later.
             AboutHeading("数据库")
@@ -68,6 +75,31 @@ internal fun AboutScreen(pack: DataPack?, onShowSources: () -> Unit, update: Upd
                 color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
         }
     }
+    if (showTrackPicker) AlertDialog(
+        onDismissRequest = { showTrackPicker = false },
+        title = { Text("更新通道") },
+        text = {
+            Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                UpdateTrack.entries.forEach { track ->
+                    Row(Modifier.fillMaxWidth().testTag("update-track-${track.name}")
+                        .selectable(selected = update.track == track, role = Role.RadioButton, onClick = {
+                            showTrackPicker = false
+                            onSelectTrack(track)
+                        }).padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        RadioButton(selected = update.track == track, onClick = null)
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text(track.label, style = MaterialTheme.typography.bodyLarge)
+                            Text(track.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                }
+                Text(if (update.hasTransfer) "已开始的下载或安装任务会继续，通道对后续检查生效。" else
+                    "选择后保存并检查可用更新，不会自动下载、安装或降级。", style = MaterialTheme.typography.bodySmall)
+            }
+        },
+        confirmButton = { TextButton(onClick = { showTrackPicker = false }) { Text("关闭") } },
+    )
 }
 
 @Composable

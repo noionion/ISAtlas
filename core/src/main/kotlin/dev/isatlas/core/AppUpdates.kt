@@ -42,9 +42,24 @@ data class AppRelease(
     val apkUrl: String,
     val size: Long,
     val sha256: String? = null,
+    val prerelease: Boolean = AppVersion.parse(version)?.prerelease?.isNotEmpty() == true,
 ) {
     val pageUrl get() = "https://github.com/noionion/ISAtlas/releases/tag/$tag"
     fun encode(): String = Json.encodeToString(this)
+}
+
+/** Release eligibility is independent of the GitHub/mirror transport channel. */
+enum class UpdateTrack(val label: String, val description: String) {
+    STABLE("稳定版", "仅接收正式发布版本"),
+    PREVIEW("预览版", "接收正式版及 alpha、beta、rc 等预发布版本");
+
+    fun accepts(release: AppRelease): Boolean = this == PREVIEW ||
+        (!release.prerelease && AppVersion.parse(release.version)?.prerelease?.isEmpty() == true)
+
+    companion object {
+        fun defaultFor(current: String) = if (AppVersion.parse(current)?.prerelease?.isNotEmpty() == true) PREVIEW else STABLE
+        fun restore(value: String?, current: String) = entries.firstOrNull { it.name == value } ?: defaultFor(current)
+    }
 }
 
 object AppUpdates {
@@ -67,7 +82,7 @@ object AppUpdates {
     }
 
     /** A successful response without a newer release is distinct from an unavailable source. */
-    fun decodeResponse(body: String, current: String): List<AppRelease> {
+    fun decodeResponse(body: String, current: String, track: UpdateTrack = UpdateTrack.defaultFor(current)): List<AppRelease> {
         val installed = requireNotNull(AppVersion.parse(current))
         val payload = json.parseToJsonElement(body)
         val entries = when (payload) {
@@ -81,7 +96,7 @@ object AppUpdates {
             val tag = obj["tag_name"]!!.jsonPrimitive.content
             val version = AppVersion.parse(tag) ?: return@mapNotNull null
             val pre = obj["prerelease"]?.jsonPrimitive?.booleanOrNull ?: true
-            if (installed.prerelease.isEmpty() && (pre || version.prerelease.isNotEmpty())) return@mapNotNull null
+            if (track == UpdateTrack.STABLE && (pre || version.prerelease.isNotEmpty())) return@mapNotNull null
             if (version <= installed) return@mapNotNull null
             val number = tag.removePrefix("v")
             val asset = obj["assets"]!!.jsonArray.map { it.jsonObject }.singleOrNull {
@@ -93,7 +108,7 @@ object AppUpdates {
                 it.removePrefix("sha256:")
             }
             AppRelease(tag, number, obj["body"]?.jsonPrimitive?.contentOrNull.orEmpty().take(64_000),
-                asset["browser_download_url"]!!.jsonPrimitive.content, asset["size"]!!.jsonPrimitive.long, digest)
+                asset["browser_download_url"]!!.jsonPrimitive.content, asset["size"]!!.jsonPrimitive.long, digest, pre)
                 .takeIf(::valid)
         }.getOrNull() }
     }

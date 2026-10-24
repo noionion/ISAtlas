@@ -7,12 +7,12 @@ import java.net.URL
 import kotlinx.coroutines.*
 
 internal class UpdateClient(private val read: (String) -> String = ::readReleaseResponse) {
-    suspend fun check(current: String): AppRelease? = coroutineScope {
-        val endpoint = if (AppVersion.parse(current)?.prerelease?.isNotEmpty() == true)
+    suspend fun check(current: String, track: UpdateTrack = UpdateTrack.defaultFor(current)): AppRelease? = coroutineScope {
+        val endpoint = if (track == UpdateTrack.PREVIEW)
             "${AppUpdates.API}?per_page=30" else "${AppUpdates.API}/latest"
         // Start all sources together so a blocked GitHub DNS cannot prevent a mirror check.
         val results = UpdateChannels.all.map { channel -> async(Dispatchers.IO) {
-            runCatching { AppUpdates.decodeResponse(read(channel.url(endpoint)), current) }
+            runCatching { AppUpdates.decodeResponse(read(channel.url(endpoint)), current, track) }
         } }.awaitAll()
         if (results.none { it.isSuccess }) throw IOException("官方与镜像暂不可用，请检查网络后重试。")
         AppUpdates.newest(results.flatMap { it.getOrDefault(emptyList()) })
