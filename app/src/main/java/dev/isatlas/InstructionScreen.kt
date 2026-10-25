@@ -60,6 +60,7 @@ internal fun InstructionResultsScreen(state: AtlasState, grid: LazyGridState, on
     val result = remember(state.instructions, state.query, state.xlen, state.privilege, state.namespace, state.extensions, state.compilerIsa) { state.instructionResults }
     val groups = remember(result) { result.groups }
     val explanations = remember(result) { InstructionCandidates.explanations(result.hits) }
+    val queryPattern = result.pattern
     var namesExpanded by rememberSaveable { mutableStateOf(true) }
     var descriptionsExpanded by rememberSaveable { mutableStateOf(true) }
     var encodingsExpanded by rememberSaveable { mutableStateOf(true) }
@@ -75,6 +76,11 @@ internal fun InstructionResultsScreen(state: AtlasState, grid: LazyGridState, on
         LazyVerticalGrid(columns = GridCells.Adaptive(300.dp), state = grid, modifier = Modifier.fillMaxSize().testTag("instruction-results"),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            if (queryPattern != null) item(key = "partial-pattern", span = { GridItemSpan(maxLineSpan) }) {
+                Text("部分编码 · ${queryPattern.notation} · ${queryPattern.knownBits}/${queryPattern.length} 位已知；? 为未知位，仅展示可补全的候选。",
+                    modifier = Modifier.testTag("instruction-partial-notice"), style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
             if (explanations.isNotEmpty()) item(key = "candidates", span = { GridItemSpan(maxLineSpan) }) {
                 var expanded by rememberSaveable(state.query) { mutableStateOf(false) }
                 Column {
@@ -180,6 +186,8 @@ private fun InstructionResultCard(state: AtlasState, hit: InstructionHit, onOpen
                     if (!assembly.complete) Text("操作数字段（汇编格式待补充）", style = MaterialTheme.typography.labelSmall)
                 }
             }
+            else if (hit.pattern != null) Text("部分编码匹配 · 操作数可能尚未确定", modifier = Modifier.testTag("partial-${hit.key}"),
+                color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelSmall)
             else Text("${hit.encoding.match} / ${hit.encoding.mask}", fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.labelSmall)
             if (hit.instruction.kind != "instruction") Text(if (hit.instruction.kind == "alias") "别名 → ${hit.instruction.aliasOf}" else "HINT", style = MaterialTheme.typography.labelSmall)
         }
@@ -194,12 +202,12 @@ fun InstructionDetail(state: AtlasState, hit: InstructionHit, onWidth: (Int) -> 
     var variantIndex by rememberSaveable(hit.key) { mutableIntStateOf(hit.index) }
     val variant = variants.find { it.index == variantIndex } ?: variants.firstOrNull()
     val encoding = variant?.value
-    val related = remember(state.instructions, hit.word, state.xlen, state.privilege, state.namespace, state.extensions, state.compilerIsa) {
-        hit.word?.let { word -> state.instructions?.let { catalog -> InstructionSearch.query(catalog, "0x${word.toString(16)}",
+    val related = remember(state.instructions, hit.encodingQuery, state.xlen, state.privilege, state.namespace, state.extensions, state.compilerIsa) {
+        hit.encodingQuery?.let { query -> state.instructions?.let { catalog -> InstructionSearch.query(catalog, query,
             CatalogFilter(state.xlen, state.privilege, state.namespace, state.extensions), state.compilerIsa).hits } }.orEmpty()
     }
-    val bases = remember(state.instructions, instruction.id, hit.word, state.xlen, state.privilege, state.extensions, state.compilerIsa) {
-        if (hit.word != null || instruction.aliasOf == null) emptyList() else state.instructions?.let { catalog ->
+    val bases = remember(state.instructions, instruction.id, hit.encodingQuery, state.xlen, state.privilege, state.extensions, state.compilerIsa) {
+        if (hit.encodingQuery != null || instruction.aliasOf == null) emptyList() else state.instructions?.let { catalog ->
             InstructionSearch.query(catalog, instruction.aliasOf.orEmpty(),
                 CatalogFilter(state.xlen, state.privilege, instruction.namespace, state.extensions), state.compilerIsa).hits.filter { it.instruction.name == instruction.aliasOf }
         }.orEmpty()
@@ -215,6 +223,11 @@ fun InstructionDetail(state: AtlasState, hit: InstructionHit, onWidth: (Int) -> 
                 WidthPicker(state.xlen, onWidth)
             }
             Text(encoding?.summary ?: instruction.summary, style = MaterialTheme.typography.bodyMedium)
+            hit.pattern?.let { pattern ->
+                Text("部分编码 · ${pattern.query}", modifier = Modifier.testTag("instruction-partial-query"),
+                    fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
+                Text("? 为未知位，待补全后才能确定完整机器码与汇编。", style = MaterialTheme.typography.bodySmall)
+            }
         }
         if (instruction.kind == "alias") item {
             Text("别名 → ${instruction.aliasOf}", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelMedium)
@@ -228,7 +241,7 @@ fun InstructionDetail(state: AtlasState, hit: InstructionHit, onWidth: (Int) -> 
             var expanded by rememberSaveable(hit.key) { mutableStateOf(false) }
             Column {
                 TextButton(onClick = { expanded = !expanded }, modifier = Modifier.testTag("instruction-related-toggle")) {
-                    Text(if (expanded) "收起同编码候选" else "同编码候选 · ${related.size}")
+                    Text(if (expanded) "收起候选" else "${if (hit.pattern != null) "部分编码候选" else "同编码候选"} · ${related.size}")
                 }
                 if (expanded) {
                     InstructionCandidates.explanations(related).forEach { Text(it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(bottom = 6.dp)) }
@@ -261,6 +274,13 @@ fun InstructionDetail(state: AtlasState, hit: InstructionHit, onWidth: (Int) -> 
             }
             item {
                 SelectionContainer { Text("match: ${encoding.match}\nmask:  ${encoding.mask}", fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall) }
+                hit.pattern?.let { pattern ->
+                    if (pattern.matches(encoding, state.xlen)) {
+                        Text("已知操作数与未确定项", style = MaterialTheme.typography.labelMedium)
+                        SelectionContainer { Text(pattern.operands(encoding).entries.joinToString("\n") { "${it.key} = ${it.value ?: "未确定"}" },
+                            modifier = Modifier.testTag("instruction-partial-operands"), style = MaterialTheme.typography.bodySmall) }
+                    } else Text("原部分编码不匹配当前位宽或编码变体。", style = MaterialTheme.typography.bodySmall)
+                }
                 val matched = hit.word?.takeIf { encoding.matches(it, state.xlen) }
                 if (matched != null) {
                     val address = InstructionCsr.address(encoding, matched)

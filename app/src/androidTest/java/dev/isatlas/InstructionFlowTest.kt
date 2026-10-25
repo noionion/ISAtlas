@@ -277,6 +277,63 @@ class InstructionFlowTest {
         compose.onNodeWithTag("app-title").assertTextEquals("vmsleu.vi")
     }
 
+    @Test fun partialHexKeepsUnknownOperandsAndSurvivesRecreation() {
+        compose.onNodeWithTag("search-input").performTextReplacement("00?50533")
+        compose.onNodeWithTag("instruction-partial-notice").assertTextContains("十六进制", substring = true).assertTextContains("28/32", substring = true)
+        compose.onNodeWithTag("inst-riscv/manual/inst/add:0").performClick()
+        compose.onNodeWithTag("instruction-partial-query").assertTextEquals("部分编码 · 0x00?50533")
+        compose.onNodeWithTag("instruction-partial-operands").performScrollTo()
+            .assertTextContains("rd = x10", substring = true).assertTextContains("rs1 = x10", substring = true)
+            .assertTextContains("rs2 = 未确定", substring = true)
+        compose.onNodeWithTag("instruction-assembly").assertDoesNotExist()
+        compose.onNodeWithText("复制汇编").assertDoesNotExist()
+        compose.runOnUiThread { compose.activity.recreate() }
+        compose.waitForIdle()
+        compose.onNodeWithTag("instruction-partial-operands").assertTextContains("rs2 = 未确定", substring = true)
+        compose.onNodeWithContentDescription("返回搜索").performClick()
+        compose.onNodeWithTag("search-input").assertTextContains("00?50533")
+    }
+
+    @Test fun partialCandidatesKeepPatternWhenSwitchingFromAliasToBase() {
+        compose.onNodeWithTag("search-input").performTextReplacement("0x0000?067")
+        compose.onNodeWithTag("instruction-results").performScrollToNode(hasTestTag("inst-riscv/manual/inst/ret:0"))
+        compose.onNodeWithTag("inst-riscv/manual/inst/ret:0").performClick()
+        compose.onNodeWithTag("instruction-related-toggle").performClick()
+        compose.onNodeWithTag("instruction-related-riscv/manual/inst/jalr:0").performScrollTo().performClick()
+        compose.onNodeWithTag("app-title").assertTextEquals("jalr")
+        compose.onNodeWithTag("instruction-partial-query").assertTextEquals("部分编码 · 0x0000?067")
+        compose.onNodeWithTag("instruction-partial-operands").performScrollTo().assertTextContains("rs1 = 未确定", substring = true)
+        compose.onNodeWithTag("instruction-assembly").assertDoesNotExist()
+    }
+
+    @Test fun partialBinaryLandscapeAndFilterRecovery() {
+        val binary = "00000000????01010000010100110011"
+        compose.runOnUiThread { compose.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE }
+        compose.waitForIdle()
+        compose.onNodeWithTag("search-input").performTextReplacement(binary)
+        compose.onNodeWithTag("instruction-partial-notice").assertTextContains("二进制", substring = true)
+        compose.onNodeWithContentDescription("筛选").performClick()
+        compose.onNodeWithTag("extension-search").performTextReplacement("zba")
+        compose.onNodeWithTag("extension-zba").performClick()
+        closeFilters()
+        compose.onNodeWithTag("instruction-results").performScrollToNode(hasTestTag("relax-instruction-filters"))
+        compose.onNodeWithTag("relax-instruction-filters").performClick()
+        compose.onNodeWithTag("instruction-results").performScrollToNode(hasTestTag("inst-riscv/manual/inst/add:0"))
+        compose.onNodeWithTag("inst-riscv/manual/inst/add:0").performClick()
+        compose.onNodeWithTag("instruction-partial-query").assertTextEquals("部分编码 · 0b$binary")
+    }
+
+    @Test fun partialPatternsExplainBroadInputsAndLengthConflicts() {
+        compose.onNodeWithTag("search-input").performTextReplacement("0x????????")
+        compose.onNodeWithText("已知位太少，请至少填写 7 个已知位，缩小部分编码查询范围。").assertIsDisplayed()
+        compose.onNodeWithTag("instruction-category-ENCODING").assertDoesNotExist()
+        compose.onNodeWithTag("search-input").performTextReplacement("0x000000?1")
+        compose.onNodeWithText("部分编码的已知低位与 32 位指令长度不符；请检查输入长度。").assertIsDisplayed()
+        compose.onNodeWithTag("search-input").performTextReplacement("0x00?0")
+        compose.onNodeWithTag("instruction-results").performScrollToNode(hasTestTag("inst-riscv/manual/inst/c.addi4spn:0"))
+        compose.onNodeWithTag("inst-riscv/manual/inst/c.addi4spn:0").assertIsDisplayed()
+    }
+
     @Test fun pseudoLandscapeAndRecreation() {
         compose.runOnUiThread { compose.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE }
         compose.waitForIdle()

@@ -20,6 +20,7 @@ data class AtlasState(
     val instructionPage: Int = 0,
     val selectedInstructionKey: String? = null,
     val selectedInstructionWord: Long? = null,
+    val selectedInstructionPattern: InstructionPattern? = null,
     val selectedPseudoId: String? = null,
     val abiRegisters: Boolean = true,
     val query: String = "",
@@ -36,7 +37,7 @@ data class AtlasState(
     val showSources: Boolean = false,
 ) {
     val instructionResults get() = instructions?.let { InstructionSearch.query(it, query, CatalogFilter(xlen, privilege, namespace, compilerIsa?.associatedTags(extensions) ?: extensions), compilerIsa) } ?: InstructionResults(emptyList())
-    val selectedInstruction get() = selectedInstructionKey?.let { key -> instructions?.instructions?.firstNotNullOfOrNull { instruction -> instruction.encodings.mapIndexed { index, encoding -> InstructionHit(instruction, encoding, index, selectedInstructionWord) }.find { it.key == key } } }
+    val selectedInstruction get() = selectedInstructionKey?.let { key -> instructions?.instructions?.firstNotNullOfOrNull { instruction -> instruction.encodings.mapIndexed { index, encoding -> InstructionHit(instruction, encoding, index, selectedInstructionWord, pattern = selectedInstructionPattern) }.find { it.key == key } } }
     val selectedPseudo get() = instructions?.pseudos?.find { it.id == selectedPseudoId }
     val selected get() = pack?.registers?.find { it.id == selectedId }
     val results get() = pack?.let { Search.query(it, query, xlen, privilege, namespace,
@@ -49,6 +50,7 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
         instructionPage = saved["instructionPage"] ?: 0,
         selectedInstructionKey = saved["selectedInstructionKey"],
         selectedInstructionWord = saved["selectedInstructionWord"],
+        selectedInstructionPattern = saved.get<String>("selectedInstructionPattern")?.let { InstructionInput.parse(it).pattern },
         selectedPseudoId = saved["selectedPseudoId"],
         abiRegisters = prefs.getBoolean("abiRegisters", true),
         query = saved["query"] ?: "",
@@ -120,19 +122,21 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
     private fun selectInstruction(hit: InstructionHit, keepPseudo: Boolean) {
         saved["selectedInstructionKey"] = hit.key
         saved["selectedInstructionWord"] = hit.word
+        saved["selectedInstructionPattern"] = hit.pattern?.query
         saved["selectedId"] = null
         saved["selectedField"] = null
         if (!keepPseudo) saved["selectedPseudoId"] = null
-        mutable.update { it.copy(selectedInstructionKey = hit.key, selectedInstructionWord = hit.word, selectedId = null, selectedField = null,
+        mutable.update { it.copy(selectedInstructionKey = hit.key, selectedInstructionWord = hit.word, selectedInstructionPattern = hit.pattern, selectedId = null, selectedField = null,
             selectedPseudoId = if (keepPseudo) it.selectedPseudoId else null) }
     }
     fun openPseudo(hit: InstructionPseudoHit) {
         saved["selectedPseudoId"] = hit.key
         saved["selectedInstructionKey"] = null
         saved["selectedInstructionWord"] = null
+        saved["selectedInstructionPattern"] = null
         saved["selectedId"] = null
         saved["selectedField"] = null
-        mutable.update { it.copy(selectedPseudoId = hit.key, selectedInstructionKey = null, selectedInstructionWord = null, selectedId = null, selectedField = null) }
+        mutable.update { it.copy(selectedPseudoId = hit.key, selectedInstructionKey = null, selectedInstructionWord = null, selectedInstructionPattern = null, selectedId = null, selectedField = null) }
     }
     fun abiRegisters(value: Boolean) {
         prefs.edit().putBoolean("abiRegisters", value).apply()
@@ -153,16 +157,18 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
         }
         if (mutable.value.selectedInstructionKey != null && mutable.value.selectedPseudoId != null) {
             saved["selectedInstructionWord"] = null
+            saved["selectedInstructionPattern"] = null
             saved["selectedInstructionKey"] = null
-            mutable.update { it.copy(selectedInstructionKey = null, selectedInstructionWord = null) }
+            mutable.update { it.copy(selectedInstructionKey = null, selectedInstructionWord = null, selectedInstructionPattern = null) }
             return
         }
         saved["selectedPseudoId"] = null
         saved["selectedInstructionWord"] = null
+        saved["selectedInstructionPattern"] = null
         saved["selectedInstructionKey"] = null
         saved["selectedId"] = null
         saved["selectedField"] = null
-        mutable.update { it.copy(selectedId = null, selectedField = null, selectedInstructionKey = null, selectedInstructionWord = null, selectedPseudoId = null) }
+        mutable.update { it.copy(selectedId = null, selectedField = null, selectedInstructionKey = null, selectedInstructionWord = null, selectedInstructionPattern = null, selectedPseudoId = null) }
     }
     fun showAbout(value: Boolean) {
         saved["showAbout"] = value

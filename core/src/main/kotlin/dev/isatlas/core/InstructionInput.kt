@@ -2,11 +2,33 @@ package dev.isatlas.core
 
 import java.util.Locale
 
-data class InstructionInput(val word: Long? = null, val error: String? = null) {
+data class InstructionInput(val word: Long? = null, val error: String? = null, val pattern: InstructionPattern? = null) {
     companion object {
         fun parse(input: String): InstructionInput {
             val text = input.trim().lowercase(Locale.ROOT).replace(Regex("[\\s_]"), "")
             val prefixed = text.startsWith("0x") || text.startsWith("0b")
+            if ('?' in text) {
+                val digits = if (prefixed) text.drop(2) else text
+                val binary = text.startsWith("0b") || (!prefixed && digits.length in listOf(16, 32) && digits.all { it in "01?" })
+                val alphabet = if (binary) "01?" else "0123456789abcdef?"
+                if (digits.any { it !in alphabet }) return InstructionInput(error = "部分编码仅支持 0x 十六进制或 0b 二进制，使用 ? 表示未知位。")
+                if (digits.length !in if (binary) listOf(16, 32) else listOf(4, 8))
+                    return InstructionInput(error = "含 ? 的编码需要完整长度：4 / 8 位十六进制或 16 / 32 位二进制。")
+                val step = if (binary) 1 else 4
+                var value = 0L
+                var mask = 0L
+                digits.forEach { digit ->
+                    value = value shl step
+                    mask = mask shl step
+                    if (digit != '?') { value = value or digit.digitToInt(if (binary) 2 else 16).toLong(); mask = mask or ((1L shl step) - 1) }
+                }
+                val length = digits.length * step
+                if (mask and 3L == 3L && ((length == 16 && value and 3L == 3L) || (length == 32 && value and 3L != 3L)))
+                    return InstructionInput(error = "部分编码的已知低位与 $length 位指令长度不符；请检查输入长度。")
+                if (length == 32 && mask and 31L == 31L && value and 31L == 31L)
+                    return InstructionInput(error = "已知低位指示长度超过 32 位，当前仅支持 16 / 32 位指令。")
+                return InstructionInput(pattern = InstructionPattern(value, mask, length, if (binary) 2 else 16))
+            }
             val binary = text.startsWith("0b") || (!prefixed && text.length in listOf(16, 32) && text.all { it in "01" })
             val numeric = prefixed || text.firstOrNull()?.isDigit() == true || text.matches(Regex("[a-f0-9]{4}|[a-f0-9]{8}"))
             if (!numeric) return InstructionInput()
@@ -25,7 +47,7 @@ data class InstructionInput(val word: Long? = null, val error: String? = null) {
 }
 
 enum class InstructionFilterDimension(val label: String) { WIDTH("位宽"), PRIVILEGE("权限"), EXTENSION("扩展"), SOURCE("来源") }
-enum class InstructionDiagnosticKind { INPUT, FILTERED, RESERVED, UNKNOWN }
+enum class InstructionDiagnosticKind { INPUT, FILTERED, RESERVED, UNKNOWN, TOO_BROAD }
 data class InstructionDiagnostic(val kind: InstructionDiagnosticKind, val message: String,
     val clear: Set<InstructionFilterDimension> = emptySet(), val suggestedXlen: Int? = null)
 

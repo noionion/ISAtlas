@@ -115,11 +115,12 @@ data class InstructionCatalog(val instructions: List<InstructionDefinition>, val
 private fun String.hex() = removePrefix("0x").toLong(16)
 enum class InstructionMatchCategory(val label: String) { NAME("指令名"), DESCRIPTION("描述相关"), ENCODING("编码匹配") }
 data class InstructionHit(val instruction: InstructionDefinition, val encoding: InstructionEncoding, val index: Int, val word: Long? = null,
-    val category: InstructionMatchCategory = InstructionMatchCategory.NAME) {
+    val category: InstructionMatchCategory = InstructionMatchCategory.NAME, val pattern: InstructionPattern? = null) {
     val key get() = "${instruction.id}:$index"
+    val encodingQuery get() = pattern?.query ?: word?.let { "0x${it.toString(16)}" }
 }
 data class InstructionResults(val hits: List<InstructionHit>, val error: String? = null, val diagnostic: InstructionDiagnostic? = null,
-    val pseudoHits: List<InstructionPseudoHit> = emptyList(), val input: String = "") {
+    val pseudoHits: List<InstructionPseudoHit> = emptyList(), val input: String = "", val pattern: InstructionPattern? = null) {
     /** Group only the presentation; retain every encoding and source, in search priority order. */
     val groups: List<InstructionResultGroup> get() {
         val machine = hits.groupBy { it.category to it.instruction.name }.map { (identity, variants) ->
@@ -146,10 +147,13 @@ data class InstructionResultGroup(val category: InstructionMatchCategory, val na
 /** Explain available candidates without assuming the user's complete ISA or runtime state. */
 object InstructionCandidates {
     fun explanations(hits: List<InstructionHit>): List<String> = buildList {
-        if (hits.size < 2 || hits.any { it.word == null } || hits.map { it.word }.distinct().size != 1) return@buildList
+        if (hits.size < 2 || hits.any { it.encodingQuery == null } || hits.map { it.encodingQuery }.distinct().size != 1) return@buildList
+        val partial = hits.first().pattern != null
+        if (partial) add("各候选均可满足已知位与静态编码限制；不同候选可能对应不同的完整机器码。")
         hits.filter { it.instruction.kind == "alias" }.forEach { alias ->
             if (hits.any { it.instruction.namespace == alias.instruction.namespace && it.instruction.name == alias.instruction.aliasOf })
-                add("${alias.instruction.name} 是 ${alias.instruction.aliasOf} 的别名；两者表示同一编码的不同写法。")
+                add(if (partial) "${alias.instruction.name} 是 ${alias.instruction.aliasOf} 的别名，仍需满足该别名的固定字段与操作数约束。"
+                    else "${alias.instruction.name} 是 ${alias.instruction.aliasOf} 的别名；两者表示同一编码的不同写法。")
         }
         if (hits.map { it.instruction.namespace }.distinct().size > 1)
             add("匹配到多个数据来源；所有来源候选均保留，请分别核对扩展和语义。")
@@ -171,9 +175,14 @@ object InstructionSearch {
         val parsed = InstructionInput.parse(input)
         if (parsed.error != null) return InstructionResults(emptyList(), parsed.error, InstructionDiagnostic(InstructionDiagnosticKind.INPUT, parsed.error))
         val word = parsed.word
+        val pattern = parsed.pattern
+        val encoded = word != null || pattern != null
+        if (pattern != null && pattern.knownBits < if (pattern.length == 16) 5 else 7)
+            return InstructionResults(emptyList(), pattern = pattern, diagnostic = InstructionDiagnostic(InstructionDiagnosticKind.TOO_BROAD,
+                "已知位太少，请至少填写 ${if (pattern.length == 16) 5 else 7} 个已知位，缩小部分编码查询范围。"))
         val selectedExtensions = compiler?.associatedTags(filter.extensions) ?: filter.extensions.map { it.lowercase() }.toSet()
         val effectiveFilter = filter.copy(extensions = selectedExtensions)
-        val pseudoAvailable = if (word != null) emptyList() else catalog.pseudos.mapNotNull { pseudo ->
+        val pseudoAvailable = if (encoded) emptyList() else catalog.pseudos.mapNotNull { pseudo ->
             val name = pseudo.name.lowercase(Locale.ROOT)
             val nameMatch = tokens.all { it in name }
             val description = "${pseudo.summary} ${pseudo.summaryEn}".lowercase(Locale.ROOT)
@@ -193,27 +202,40 @@ object InstructionSearch {
             val textMatch = tokens.all { token -> token in instruction.name.lowercase(Locale.ROOT) ||
                 (descriptionPatterns[token]?.containsMatchIn(description) ?: (token in description)) }
             if (word != null && encoding.fixedMatches(word)) fixedCandidate = true
+            if (pattern != null && pattern.fixedMatches(encoding)) fixedCandidate = true
             val category = when {
-                word != null -> InstructionMatchCategory.ENCODING
+                encoded -> InstructionMatchCategory.ENCODING
                 nameMatch -> InstructionMatchCategory.NAME
                 else -> InstructionMatchCategory.DESCRIPTION
             }
-            val hit = InstructionHit(instruction, encoding, index, word, category)
-            val anyWidthMatch = if (word == null) textMatch else encoding.xlens.any { encoding.matches(word, it) }
+            val hit = InstructionHit(instruction, encoding, index, word, category, pattern)
+            fun matches(xlen: Int) = when {
+                pattern != null -> pattern.matches(encoding, xlen)
+                word != null -> encoding.matches(word, xlen)
+                else -> textMatch
+            }
+            val anyWidthMatch = encoding.xlens.any(::matches)
             if (anyWidthMatch) available += hit to tags
             if (!anyWidthMatch || !effectiveFilter.accepts(encoding.xlens, encoding.privilege, instruction.namespace, tags) ||
                 !encoding.supportsExtensions(selectedExtensions) ||
-                (word != null && !encoding.matches(word, filter.xlen))) null else hit
+                (encoded && !matches(filter.xlen))) null else hit
         } }.sortedWith(compareBy<InstructionHit> { it.category.ordinal }
-            .thenBy { if (word == null && it.instruction.name.lowercase(Locale.ROOT) == query) 0 else 1 }
+            .thenBy { if (!encoded && it.instruction.name.lowercase(Locale.ROOT) == query) 0 else 1 }
             .thenBy { privilegeRank(it.encoding.privilege) }
             .thenBy { if (it.instruction.name.startsWith(query)) 0 else 1 }
-            .thenBy { if (word != null) -java.lang.Long.bitCount(it.encoding.mask.hex()) else 0 }
+            .thenBy { if (encoded) -java.lang.Long.bitCount(it.encoding.mask.hex()) else 0 }
             .thenBy { it.instruction.name }.thenBy { it.index })
-        if (hits.isNotEmpty() || pseudoHits.isNotEmpty()) return InstructionResults(hits, pseudoHits = pseudoHits, input = query)
+        if (pattern != null && hits.map { it.instruction.name }.distinct().size > 100)
+            return InstructionResults(emptyList(), pattern = pattern, diagnostic = InstructionDiagnostic(InstructionDiagnosticKind.TOO_BROAD,
+                "匹配范围过宽，超过 100 个指令名称；请补充已知位或选择扩展、权限等筛选。"))
+        if (hits.isNotEmpty() || pseudoHits.isNotEmpty()) return InstructionResults(hits, pseudoHits = pseudoHits, input = query, pattern = pattern)
         if (available.isNotEmpty() || pseudoAvailable.isNotEmpty()) {
             val candidates = available.map { (hit, tags) ->
-                val widths = hit.encoding.xlens.filter { word == null || hit.encoding.matches(word, it) }
+                val widths = hit.encoding.xlens.filter { when {
+                    pattern != null -> pattern.matches(hit.encoding, it)
+                    word != null -> hit.encoding.matches(word, it)
+                    else -> true
+                } }
                 val blocked = buildSet {
                     if (filter.xlen !in widths) add(InstructionFilterDimension.WIDTH)
                     if (filter.privilege != null && filter.privilege != normalizePrivilege(hit.encoding.privilege)) add(InstructionFilterDimension.PRIVILEGE)
@@ -232,12 +254,13 @@ object InstructionSearch {
             }
             val (blocked, widths) = candidates.minWith(compareBy<Pair<Set<InstructionFilterDimension>, List<Int>>> { it.first.size }
                 .thenBy { InstructionFilterDimension.WIDTH in it.first })
-            return InstructionResults(emptyList(), diagnostic = InstructionDiagnostic(InstructionDiagnosticKind.FILTERED,
+            return InstructionResults(emptyList(), pattern = pattern, diagnostic = InstructionDiagnostic(InstructionDiagnosticKind.FILTERED,
                 "已收录的匹配项被${blocked.joinToString("、") { it.label }}筛选排除。", blocked,
                 if (filter.xlen !in widths) widths.first() else null))
         }
-        return InstructionResults(emptyList(), diagnostic = if (word != null && fixedCandidate)
-            InstructionDiagnostic(InstructionDiagnosticKind.RESERVED, "匹配到编码模板，但操作数字段违反已收录的静态限制，属于该模板的保留编码。")
-        else InstructionDiagnostic(InstructionDiagnosticKind.UNKNOWN, if (word == null) "当前数据库未找到对应名称或描述。" else "当前数据库未收录匹配编码，无法据此判断该编码是否合法。"))
+        return InstructionResults(emptyList(), pattern = pattern, diagnostic = if (encoded && fixedCandidate)
+            InstructionDiagnostic(InstructionDiagnosticKind.RESERVED, if (pattern != null) "已知位与已收录模板的静态限制冲突，无法补全为这些模板的有效编码。"
+                else "匹配到编码模板，但操作数字段违反已收录的静态限制，属于该模板的保留编码。")
+        else InstructionDiagnostic(InstructionDiagnosticKind.UNKNOWN, if (!encoded) "当前数据库未找到对应名称或描述。" else "当前数据库未收录匹配编码，无法据此判断该编码是否合法。"))
     }
 }
