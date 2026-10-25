@@ -36,12 +36,17 @@ data class InstructionPattern(val value: Long, val knownMask: Long, val length: 
     }
 }
 
+/** Choose an independent example satisfying the same static restrictions as partial searches. */
+internal fun instructionExampleWord(encoding: InstructionEncoding, xlen: Int, preferred: Long): Long? =
+    PatternCompletion(encoding, xlen, preferred).complete(0, 0)
+
 /** A small bit constraint solver; it branches only on static restrictions, never all unknown operands. */
-private class PatternCompletion(encoding: InstructionEncoding, xlen: Int) {
+private class PatternCompletion(encoding: InstructionEncoding, xlen: Int, private val preferred: Long = 0) {
     private data class Clause(val ones: Long, val zeros: Long)
     private data class Choices(val mask: Long, val values: List<Long>)
     private val fixedMask = encoding.mask.removePrefix("0x").toLong(16)
     private val fixedValue = encoding.match.removePrefix("0x").toLong(16)
+    private val wordMask = (1L shl encoding.length) - 1
     private val clauses = mutableListOf<Clause>()
     private val choices = mutableListOf<Choices>()
     private var supported = true
@@ -89,12 +94,14 @@ private class PatternCompletion(encoding: InstructionEncoding, xlen: Int) {
         }
     }
 
-    fun exists(value: Long, known: Long): Boolean {
-        if (!supported || (value xor fixedValue) and known and fixedMask != 0L) return false
+    fun exists(value: Long, known: Long): Boolean = complete(value, known) != null
+
+    fun complete(value: Long, known: Long): Long? {
+        if (!supported || (value xor fixedValue) and known and fixedMask != 0L) return null
         return solve((value and known) or fixedValue, known or fixedMask)
     }
 
-    private fun solve(initialValue: Long, initialMask: Long): Boolean {
+    private fun solve(initialValue: Long, initialMask: Long): Long? {
         var value = initialValue
         var known = initialMask
         var shortest: Long
@@ -104,7 +111,7 @@ private class PatternCompletion(encoding: InstructionEncoding, xlen: Int) {
             for (clause in clauses) {
                 if ((value and known and clause.ones) != 0L || (value.inv() and known and clause.zeros) != 0L) continue
                 val remaining = (clause.ones or clause.zeros) and known.inv()
-                if (remaining == 0L) return false
+                if (remaining == 0L) return null
                 if (java.lang.Long.bitCount(remaining) == 1) {
                     if (clause.ones and remaining != 0L) value = value or remaining
                     known = known or remaining
@@ -113,7 +120,7 @@ private class PatternCompletion(encoding: InstructionEncoding, xlen: Int) {
             }
             for (choice in choices) {
                 val possible = choice.values.filter { (it xor value) and known and choice.mask == 0L }
-                if (possible.isEmpty()) return false
+                if (possible.isEmpty()) return null
                 if (possible.size == 1 && known and choice.mask != choice.mask) {
                     value = (value and choice.mask.inv()) or possible.single()
                     known = known or choice.mask
@@ -124,12 +131,16 @@ private class PatternCompletion(encoding: InstructionEncoding, xlen: Int) {
         val branch = choices.filter { known and it.mask != it.mask }.minByOrNull { choice ->
             choice.values.count { (it xor value) and known and choice.mask == 0L }
         }
-        if (branch != null) return branch.values.any { candidate ->
-            (candidate xor value) and known and branch.mask == 0L &&
-                solve((value and branch.mask.inv()) or candidate, known or branch.mask)
+        if (branch != null) {
+            for (candidate in branch.values.sortedBy { java.lang.Long.bitCount((it xor preferred) and branch.mask) }) {
+                if ((candidate xor value) and known and branch.mask != 0L) continue
+                solve((value and branch.mask.inv()) or candidate, known or branch.mask)?.let { return it }
+            }
+            return null
         }
-        if (shortest == 0L) return true
+        if (shortest == 0L) return (value and known) or (preferred and known.inv() and wordMask)
         val bit = java.lang.Long.lowestOneBit(shortest)
-        return solve(value and bit.inv(), known or bit) || solve(value or bit, known or bit)
+        val preferredValue = (value and bit.inv()) or (preferred and bit)
+        return solve(preferredValue, known or bit) ?: solve(preferredValue xor bit, known or bit)
     }
 }

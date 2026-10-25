@@ -35,6 +35,40 @@ class InstructionFlowTest {
         compose.onNodeWithTag("register-diagram").assertIsDisplayed()
         compose.onNodeWithContentDescription("返回搜索").performClick()
     }
+
+    @Test fun nameLookupShowsConcreteExampleAndCopiesIt() {
+        compose.onNodeWithTag("search-input").performTextReplacement("add")
+        compose.onNodeWithTag("inst-riscv/manual/inst/add:0").performClick()
+        compose.onNodeWithTag("instruction-example-copy").performScrollTo().performClick()
+        compose.onNodeWithTag("instruction-example-code").assertTextContains("add ", substring = true)
+        compose.runOnUiThread {
+            val clipboard = compose.activity.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            val copied = clipboard.primaryClip!!.getItemAt(0).text.toString()
+            org.junit.Assert.assertTrue(copied.startsWith("add "))
+            org.junit.Assert.assertTrue(copied.contains("= 8"))
+        }
+    }
+
+    @Test fun partialLookupExampleDoesNotReplaceUnknownOperands() {
+        compose.onNodeWithTag("search-input").performTextReplacement("0x00?50533")
+        compose.onNodeWithTag("inst-riscv/manual/inst/add:0").performClick()
+        compose.onNodeWithTag("instruction-example-code").performScrollTo().assertTextContains("add ", substring = true)
+        compose.onNodeWithText("独立示例，与上方查询编码无关。").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithTag("instruction-partial-operands").performScrollTo().assertTextContains("rs2 = 未确定", substring = true)
+        compose.onNodeWithTag("instruction-assembly").assertDoesNotExist()
+    }
+
+    @Test fun examplesRemainReadableInLandscapeAndPseudoDetails() {
+        compose.runOnUiThread { compose.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE }
+        compose.waitForIdle()
+        compose.onNodeWithTag("search-input").performTextReplacement("c.addi4spn")
+        compose.onNodeWithTag("inst-riscv/manual/inst/c.addi4spn:0").performClick()
+        compose.onNodeWithTag("instruction-example-code").performScrollTo().assertTextContains("c.addi4spn ", substring = true)
+        compose.onNodeWithContentDescription("返回搜索").performClick()
+        compose.onNodeWithTag("search-input").performTextReplacement("call")
+        compose.onNodeWithTag("pseudo-riscv/manual/pseudo/call").performClick()
+        compose.onNodeWithTag("instruction-example-code").performScrollTo().assertTextEquals("call target")
+    }
     @Test fun swipePagesAndSharePermissionFilter() {
         compose.onNodeWithTag("search-input").performTextReplacement("mret")
         compose.onNodeWithContentDescription("筛选").performClick()

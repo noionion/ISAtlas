@@ -57,6 +57,9 @@ internal fun PseudoInstructionDetail(state: AtlasState, instruction: Instruction
             Text(instruction.requirements, color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelMedium)
         }
         item { Text(instruction.notes, style = MaterialTheme.typography.bodySmall) }
+        if (state.xlen in instruction.xlens) InstructionExamples.create(instruction)?.let { example ->
+            item { InstructionExampleCard(example) }
+        }
         if (state.xlen !in instruction.xlens) item { Text("此条目不适用于 RV${state.xlen}。") }
         else instruction.expansions.forEachIndexed { index, expansion ->
             item(key = "expansion-$index") {

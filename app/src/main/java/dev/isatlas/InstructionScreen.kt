@@ -310,6 +310,10 @@ fun InstructionDetail(state: AtlasState, hit: InstructionHit, onWidth: (Int) -> 
                 } else if (hit.word != null) Text("原机器码不匹配当前位宽或编码变体。", style = MaterialTheme.typography.bodySmall)
 
             }
+            val example = InstructionExamples.create(instruction, encoding, state.xlen, state.abiRegisters)
+            if (example != null) item {
+                InstructionExampleCard(example, independent = hit.encodingQuery != null)
+            }
             if (encoding.contextRules.isNotEmpty() || encoding.constraints.isNotEmpty()) item {
                 var expanded by rememberSaveable(hit.key, variant?.index) { mutableStateOf(false) }
                 TextButton(onClick = { expanded = !expanded }) { Text(if (expanded) "收起执行条件" else "执行条件与限制") }
