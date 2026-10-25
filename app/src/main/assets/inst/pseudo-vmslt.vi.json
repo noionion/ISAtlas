@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/pseudo/vmslt.vi",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "vmslt.vi",
+  "kind": "pseudo",
+  "summary": "逐元素比较 va <s i，将结果写入掩码。",
+  "summaryEn": "Compare va < i using signed ordering and write mask bits.",
+  "xlens": [
+    32,
+    64
+  ],
+  "privilege": "U",
+  "requires": [
+    [
+      "V"
+    ],
+    [
+      "Zve32x"
+    ]
+  ],
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "v-st-ext.adoc",
+      "lineStart": 2721,
+      "lineEnd": 2753,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/v-st-ext.adoc#L2721-L2753",
+      "sha256": "edde00405c1bb702cd3465017c0296bb17ad919cc415e7f4a9800b085c031a92",
+      "method": "immediate-comparison-transformation"
+    }
+  ],
+  "notes": "展开使用 i-1，必须满足基础指令的 5 位符号扩展立即数编码；这里保留符号变换，不生成机器码。有符号 i 的有效范围为 -15..16。",
+  "notesEn": "The expansion uses i-1 and must fit the base instruction's five-bit sign-extended immediate. This reference does not generate code. The effective signed i range is -15..16.",
+  "expansions": [
+    {
+      "syntax": "vmslt.vi vd, va, i, vm",
+      "condition": "将立即数 i 减一后使用基础比较指令",
+      "conditionEn": "Use the base comparison with immediate i-1",
+      "steps": [
+        {
+          "name": "vmsle.vi",
+          "assembly": "vmsle.vi vd, va, i-1, vm"
+        }
+      ],
+      "clobbers": []
+    }
+  ]
+}

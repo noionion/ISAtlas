@@ -25,6 +25,16 @@ object InstructionAssembly {
         fun line(args: List<String>, mnemonic: String = name) = AssemblyRendering(mnemonic + if (args.isEmpty()) "" else " " + args.joinToString(", "))
         fun value(key: String) = operands.getValue(key)
         fun reg(number: Int) = register("x$number", abi)
+        hit.instruction.assemblyOperands?.let { order ->
+            val args = order.mapNotNull { token -> when {
+                token == "vm" -> if (number("vm") == 0L) "v0.t" else null
+                token == "csr" -> csrName ?: "0x${number("csr")!!.toString(16).padStart(3, '0')}"
+                token.startsWith("pc:") -> number(token.removePrefix("pc:"))!!.let { "." + if (it < 0) it.toString() else "+$it" }
+                token.startsWith("(") -> "(${value(token.trim('(', ')'))})"
+                else -> value(token)
+            } }
+            return line(args)
+        }
         if ("constantIndex" in raw) {
             val constants = listOf("-1.0", "min", "0.0000152587890625", "0.000030517578125", "0.00390625", "0.0078125", "0.0625", "0.125",
                 "0.25", "0.3125", "0.375", "0.4375", "0.5", "0.625", "0.75", "0.875", "1.0", "1.25", "1.5", "1.75", "2.0", "2.5", "3.0", "4.0", "8.0", "16.0", "128.0", "256.0", "32768.0", "65536.0", "inf", "nan")

@@ -46,7 +46,7 @@ class InstructionGroupingTest {
         assertEquals(all.hits.map { it.key }.toSet(), all.groups.flatMap { it.hits }.map { it.key }.toSet())
         assertEquals(all.hits.size, all.groups.sumOf { it.hits.size })
         assertEquals(all.groups.size, all.groups.map { it.key }.distinct().size)
-        assertEquals(all.groups.map { privilegeRank(it.hits.first().encoding.privilege) }.sorted(), all.groups.map { privilegeRank(it.hits.first().encoding.privilege) })
+        assertEquals(all.groups.map { it.privilegeOrder }.sorted(), all.groups.map { it.privilegeOrder })
     }
     @Test fun `multiple sources remain explicit variants rather than overwritten records`() {
         val original = search("add").hits.single { it.instruction.name == "add" }

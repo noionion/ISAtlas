@@ -36,4 +36,5 @@ object InstructionCsr {
             (namespace == null || it.namespace.ifBlank { pack.namespace } == namespace) }
             .sortedWith(compareBy<RegisterDefinition> { it.namespace.ifBlank { pack.namespace } }.thenBy { it.name }.thenBy { it.id })
     fun address(encoding: InstructionEncoding, word: Long): Int? = encoding.operands(word)["csr"]?.toIntOrNull()
+        ?: encoding.fields.firstOrNull { it.name == "csr" && it.value != null }?.value?.toInt()
 }

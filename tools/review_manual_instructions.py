@@ -49,7 +49,7 @@ def bilingual(a):
 
 
 def check_instruction(a,filename,cache):
-    allowed={"schemaVersion","id","architecture","namespace","name","summary","summaryEn","kind","aliasOf","sourceRevision","license","semanticSources","encodings"}
+    allowed={"schemaVersion","id","architecture","namespace","name","summary","summaryEn","kind","aliasOf","assemblyOperands","sourceRevision","license","semanticSources","encodings"}
     require(set(a)<=allowed,"Unexpected instruction metadata")
     n=a["name"]
     require(re.fullmatch("[a-z][a-z0-9.]*",n),"Invalid mnemonic")
@@ -64,7 +64,7 @@ def check_instruction(a,filename,cache):
         source_check(s,cache)
     fields_count=0
     for v in a["encodings"]:
-        require(set(v)<={"length","xlens","requires","mask","match","fields","constraints","sources","sourceSynopsis","summary","summaryEn","registerFile","privilege","encodingConstraints","contextRules"},"Unexpected variant fields")
+        require(set(v)<={"length","xlens","requires","mask","match","fields","constraints","sources","sourceSynopsis","summary","summaryEn","registerFile","privilege","encodingConstraints","contextRules","operandRelations"},"Unexpected variant fields")
         bits=v["length"]
         require(bits in {16,32} and v["xlens"] in [[32],[64],[32,64]],"Invalid instruction length/XLEN")
         require(isinstance(v["requires"],list) and v["requires"],"Missing requirements")
@@ -108,6 +108,17 @@ def check_instruction(a,filename,cache):
                 if "values" in f:
                     require(all(k.isdecimal() and int(k)<1<<(hi-lo+1) and isinstance(x,str) and x for k,x in f["values"].items()),"Invalid value enumeration")
         require(occupied==(1<<bits)-1 and fixed==mask and actual==match,"Mask/match is not exactly derived from fields")
+        operands = {f.get("operand") for f in v["fields"] if "operand" in f}
+        for relation in v.get("operandRelations", []):
+            require(set(relation) == {"left", "right", "operator"} and relation["operator"] == "eq", "Invalid operand relation")
+            require(relation["left"] in operands and relation["right"] in operands, "Unknown relation operand")
+            classes = [next(f.get("registerClass") for f in v["fields"] if f.get("operand") == relation[side]) for side in ["left", "right"]]
+            require(classes[0] in {"integer", "float", "vector"} and classes[0] == classes[1], "Relation must compare the same register file")
+        if "assemblyOperands" in a:
+            require(a["kind"] == "alias" and isinstance(a["assemblyOperands"], list), "Unexpected assembly operand override")
+            for token in a["assemblyOperands"]:
+                key = token.removeprefix("pc:").strip("()")
+                require(key in operands, "Unknown assembly operand: " + token)
         require(mask&3==3 and (match&3!=3 if bits==16 else match&3==3),"Wrong instruction parcel length")
         if bits==32:
             require(mask&127==127 and (match&31)!=31,"Missing opcode or long-instruction encoding")
@@ -146,6 +157,12 @@ def matches(v,word,xlen):
             continue
         present=word&int(c["mask"],16) in c["values"]
         if present!=(c["operator"]=="in"):
+            return False
+    for relation in v.get("operandRelations", []):
+        def register(name):
+            f = next(item for item in v["fields"] if item.get("operand") == name)
+            return (word >> f["lsb"]) & ((1 << (f["msb"] - f["lsb"] + 1)) - 1)
+        if relation["operator"] != "eq" or register(relation["left"]) != register(relation["right"]):
             return False
     return True
 
@@ -191,6 +208,7 @@ def reviewed_overlaps(records):
 
 def review(write_report=True):
     catalog=json.loads((ASSETS/"riscv-instructions.json").read_text(encoding="utf-8"))
+    require(catalog["schemaVersion"] == 2 and set(catalog["requiredFeatures"]) == {"operand-relations-v1", "alias-assembly-v1", "pseudo-references-v1"}, "Missing required alias reader features")
     names=catalog["files"]
     require(len(names)==len(set(names)) and names==sorted(names),"Duplicate or unsorted file index")
     require(set(names)=={p.name for p in (ASSETS/"inst").glob('manual-*.json')},"Unindexed or missing instruction files")
@@ -216,7 +234,17 @@ def review(write_report=True):
             for v in a["encodings"]:
                 require(any(int(v["mask"],16)&int(b["mask"],16)==int(b["mask"],16) and int(v["match"],16)&int(b["mask"],16)==int(b["match"],16) for b in target["encodings"]),"Alias is not a specialization of its base")
     overlaps=reviewed_overlaps(records)
+    from manual_pseudoinstructions import review_assets
+    pseudo_review = review_assets(ASSETS, {entry["name"]: entry for entry in records.values()})
+    from manual_pseudo_coverage import review_coverage
+    from manual_pseudoinstructions import build as build_pseudos
+    named = {entry["name"]: entry for entry in records.values()}
+    coverage = review_coverage(named, build_pseudos(named), write_report=write_report)
     report={"sourceRevision":REVISION,"instructions":len(names),"encodings":sum(len(a["encodings"]) for a in records.values()),"encodingFields":fields_total,"sourceFilesVerified":len(cache),"dataSha256":digest.hexdigest(),"errors":[],"overlaps":overlaps,"records":rows}
+    report["pseudoinstructions"] = pseudo_review["pseudoinstructions"]
+    report["pseudoExpansions"] = pseudo_review["expansions"]
+    report["pseudoNamedFormsReviewed"] = coverage["namedForms"]
+    report["pseudoSourceMentionsReviewed"] = coverage["mentionsReviewed"]
     if write_report:
         path=ROOT/"docs/data/instruction-review.json"
         path.parent.mkdir(parents=True,exist_ok=True)

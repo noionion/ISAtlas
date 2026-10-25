@@ -403,7 +403,9 @@ def aliases():
         ("ret","jalr",{(31,20):0,(11,7):0,(19,15):1},"rv32.adoc"),
     ]
     for name,base,replacements,path in recipes:
-        src=source_for(path,r"\b"+re.escape(name)+r"\b","manual-pseudoinstruction")
+        needle = {"not": r"pseudoinstruction NOT", "j": r"Plain unconditional jumps \(assembler pseudoinstruction J\)",
+                  "zext.w": r"zext.w _rd_, _rs1_ &#8594;"}.get(name, r"\b"+re.escape(name)+r"\b")
+        src=source_for(path,needle,"manual-pseudoinstruction")
         v=change(INSTRUCTIONS[base]["encodings"][0],replacements,source=src)
         add(name,v,src)
         INSTRUCTIONS[name]["kind"]="alias"
@@ -521,6 +523,8 @@ def build():
     finalize()
     from instruction_context import add_context
     add_context(INSTRUCTIONS,source_for)
+    from manual_aliases import add_aliases
+    add_aliases(INSTRUCTIONS, source_for)
     return INSTRUCTIONS
 
 
@@ -537,9 +541,18 @@ def write():
         inst["encodings"].sort(key=lambda v:(v["length"],v["xlens"],v["match"],v["requires"]))
         (INST/filename).write_text(json.dumps(inst,ensure_ascii=False,indent=2)+"\n",encoding="utf-8", newline="\n")
     hashes={filename:hashlib.sha256((INST/filename).read_bytes()).hexdigest() for filename in files}
-    catalog = {"schemaVersion":1,"id":"riscv-instruction-catalog","architecture":"riscv","namespace":"manual",
-        "version":"0.1.0","title":"RISC-V 指令离线数据库","source":{"title":"RISC-V ISA Manual 20250508","revision":REVISION,"url":REPOSITORY,"license":"CC-BY-4.0"},
-        "directory":"inst","files":files,"fileHashes":hashes}
+    from manual_pseudoinstructions import build as build_pseudos, review as review_pseudos
+    pseudos = build_pseudos(INSTRUCTIONS)
+    review_pseudos(pseudos, INSTRUCTIONS)
+    pseudo_files = []
+    for entry in sorted(pseudos, key=lambda item: item["name"]):
+        filename = f"pseudo-{entry['name']}.json"
+        pseudo_files.append(filename)
+        (INST/filename).write_text(json.dumps(entry,ensure_ascii=False,indent=2)+"\n",encoding="utf-8",newline="\n")
+    pseudo_hashes = {filename:hashlib.sha256((INST/filename).read_bytes()).hexdigest() for filename in pseudo_files}
+    catalog = {"schemaVersion":2,"requiredFeatures":["operand-relations-v1","alias-assembly-v1","pseudo-references-v1"],"id":"riscv-instruction-catalog","architecture":"riscv","namespace":"manual",
+        "version":"0.2.0","title":"RISC-V 指令离线数据库","source":{"title":"RISC-V ISA Manual 20250508","revision":REVISION,"url":REPOSITORY,"license":"CC-BY-4.0"},
+        "directory":"inst","files":files,"fileHashes":hashes,"pseudoFiles":pseudo_files,"pseudoFileHashes":pseudo_hashes}
     CATALOG.write_text(json.dumps(catalog,ensure_ascii=False,indent=2)+"\n",encoding="utf-8", newline="\n")
     REPORT.parent.mkdir(parents=True,exist_ok=True)
     REPORT.write_text(json.dumps({"revision":REVISION,"instructions":len(names),"encodings":sum(len(x["encodings"]) for x in INSTRUCTIONS.values()),"diagnostics":DIAGNOSTICS},ensure_ascii=False,indent=2)+"\n",encoding="utf-8", newline="\n")

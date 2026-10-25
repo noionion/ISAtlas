@@ -60,7 +60,8 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
     val update by updates.state.collectAsStateWithLifecycle()
     val selected = state.selected
     val selectedInstruction = state.selectedInstruction
-    val detailOpen = selected != null || selectedInstruction != null
+    val selectedPseudo = state.selectedPseudo
+    val detailOpen = selected != null || selectedInstruction != null || selectedPseudo != null
     val landscapeHome = !detailOpen && LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val drawer = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -104,14 +105,18 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
                         windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
                         title = {
                             Row(Modifier.fillMaxWidth().testTag("home-app-bar"), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                                Text(selected?.name ?: selectedInstruction?.instruction?.name ?: "ISAtlas", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold,
+                                Text(selected?.name ?: selectedInstruction?.instruction?.name ?: selectedPseudo?.name ?: "ISAtlas", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold,
                                     modifier = Modifier.testTag("app-title"), maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 if (landscapeHome) SearchInput(state.query, model::query, Modifier.weight(1f, fill = false).widthIn(max = 480.dp), compact = true)
                             }
                         },
                         navigationIcon = {
                             if (detailOpen) IconButton(onClick = model::close) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, if (selected != null && selectedInstruction != null) "返回指令" else "返回搜索")
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, when {
+                                    selected != null && selectedInstruction != null -> "返回指令"
+                                    selectedInstruction != null && selectedPseudo != null -> "返回伪指令"
+                                    else -> "返回搜索"
+                                })
                             }
                         },
                         actions = {
@@ -126,7 +131,7 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
                 },
             ) { insets ->
                 Box(Modifier.fillMaxSize().padding(insets)) {
-                    screenStates.SaveableStateProvider(selected?.id ?: selectedInstruction?.key ?: "search") {
+                    screenStates.SaveableStateProvider(selected?.id ?: selectedInstruction?.key ?: selectedPseudo?.id ?: "search") {
                         when {
                             state.loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
                             state.error != null -> Column(Modifier.align(Alignment.Center).padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -134,7 +139,8 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
                                 Button(onClick = model::load) { Text("重试") }
                             }
                             selected != null -> key(selected.id) { RegisterDetail(state, selected, model::xlen) }
-                            selectedInstruction != null -> InstructionDetail(state, selectedInstruction, model::xlen, model::abiRegisters, { model.open(it) }, model::openInstruction)
+                            selectedInstruction != null -> InstructionDetail(state, selectedInstruction, model::xlen, model::abiRegisters, { model.open(it) }, model::openPseudoBase)
+                            selectedPseudo != null -> PseudoInstructionDetail(state, selectedPseudo, model::xlen, model::openPseudoBase)
                             else -> CatalogSearchScreen(state, model, searchGrid, instructionGrid, showSearch = !landscapeHome,
                                 expanded = mapOf(SearchCategory.CSR to csrExpanded, SearchCategory.FIELD to fieldsExpanded, SearchCategory.DESCRIPTION to descriptionsExpanded),
                                 onToggle = { category -> when (category) {

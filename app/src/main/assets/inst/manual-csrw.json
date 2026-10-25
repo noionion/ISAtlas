@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/csrw",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "csrw",
+  "summary": "将 rs1 写入 CSR，不读取旧值。",
+  "summaryEn": "Write rs1 to a CSR without reading its old value.",
+  "kind": "alias",
+  "aliasOf": "csrrw",
+  "assemblyOperands": [
+    "csr",
+    "rs1"
+  ],
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "zicsr.adoc",
+      "lineStart": 165,
+      "lineEnd": 168,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zicsr.adoc#L165-L168",
+      "sha256": "662260aa06dac78e671ace801a3ecca93bfe4beccbc8a3ce4d3adacfce860b69",
+      "method": "documented-assembler-alias"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zicsr"
+        ]
+      ],
+      "mask": "0x00007fff",
+      "match": "0x00001073",
+      "fields": [
+        {
+          "name": "csr",
+          "msb": 31,
+          "lsb": 20,
+          "operand": "csr"
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "001",
+          "msb": 14,
+          "lsb": 12,
+          "value": 1
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "value": 0
+        },
+        {
+          "name": "1110011",
+          "msb": 6,
+          "lsb": 0,
+          "value": 115
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "rv-32-64g.adoc",
+          "lineStart": 147,
+          "lineEnd": 147,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv-32-64g.adoc#L147-L147",
+          "sha256": "b88b3ed6ae0583cb6779d2e7913ed261a2a3efdedc4c53e5612c1df8c28ca16c",
+          "method": "printed-bit-table"
+        },
+        {
+          "path": "zicsr.adoc",
+          "lineStart": 165,
+          "lineEnd": 168,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zicsr.adoc#L165-L168",
+          "sha256": "662260aa06dac78e671ace801a3ecca93bfe4beccbc8a3ce4d3adacfce860b69",
+          "method": "documented-assembler-alias"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "csr.access",
+          "category": "csr",
+          "summary": "CSR 的存在性、最低权限、只读编码、读写抑制及虚拟化拦截共同决定访问结果。",
+          "summaryEn": "CSR existence, privilege, read-only encoding, read/write suppression and virtualization govern access.",
+          "check": "external",
+          "source": {
+            "path": "zicsr.adoc",
+            "lineStart": 29,
+            "lineEnd": 34,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zicsr.adoc#L29-L34",
+            "sha256": "293c2db6f441481321ca2cba30d57d2eb918ff708640e3a3d567e59c03fc5e7b",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

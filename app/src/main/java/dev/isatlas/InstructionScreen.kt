@@ -48,13 +48,15 @@ fun CatalogSearchScreen(state: AtlasState, model: AppViewModel, csrGrid: LazyGri
         }
         HorizontalPager(state = pager, modifier = Modifier.weight(1f).testTag("catalog-pager")) { page ->
             if (page == 0) SearchScreen(state, model, csrGrid, false, expanded, onToggle, onOpen)
-            else InstructionResultsScreen(state, instGrid, model::relaxInstructionFilters) { keyboard?.hide(); model.openInstruction(it) }
+            else InstructionResultsScreen(state, instGrid, model::relaxInstructionFilters,
+                onPseudo = { keyboard?.hide(); model.openPseudo(it) }) { keyboard?.hide(); model.openInstruction(it) }
         }
     }
 }
 
 @Composable
-internal fun InstructionResultsScreen(state: AtlasState, grid: LazyGridState, onRelax: (InstructionDiagnostic) -> Unit, onOpen: (InstructionHit) -> Unit) {
+internal fun InstructionResultsScreen(state: AtlasState, grid: LazyGridState, onRelax: (InstructionDiagnostic) -> Unit,
+    onPseudo: (InstructionPseudoHit) -> Unit, onOpen: (InstructionHit) -> Unit) {
     val result = remember(state.instructions, state.query, state.xlen, state.privilege, state.namespace, state.extensions, state.compilerIsa) { state.instructionResults }
     val groups = remember(result) { result.groups }
     val explanations = remember(result) { InstructionCandidates.explanations(result.hits) }
@@ -64,7 +66,9 @@ internal fun InstructionResultsScreen(state: AtlasState, grid: LazyGridState, on
     var expandedVariants by rememberSaveable { mutableStateOf(emptyList<String>()) }
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("${groups.size} 个结果 · ${result.hits.size} 个变体", Modifier.weight(1f), style = MaterialTheme.typography.labelMedium)
+            Text("${groups.size} 个结果" + (if (result.hits.isNotEmpty()) " · ${result.hits.size} 个变体" else "") +
+                (if (result.pseudoHits.isEmpty()) "" else " · ${result.pseudoHits.size} 个伪指令"),
+                Modifier.weight(1f), style = MaterialTheme.typography.labelMedium)
             Text("RV${state.xlen} · ${state.privilege ?: "全部权限"}" + if (state.extensions.isEmpty()) "" else " · 扩展 ${state.extensions.size}",
                 style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
         }
@@ -80,7 +84,7 @@ internal fun InstructionResultsScreen(state: AtlasState, grid: LazyGridState, on
                     if (expanded) explanations.forEach { Text(it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(bottom = 6.dp)) }
                 }
             }
-            if (result.hits.isEmpty()) item(span = { GridItemSpan(maxLineSpan) }) {
+            if (groups.isEmpty()) item(span = { GridItemSpan(maxLineSpan) }) {
                 Column(Modifier.fillMaxWidth().padding(24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("当前数据范围内没有匹配项", fontWeight = FontWeight.Bold)
                     Text(result.diagnostic?.message ?: result.error ?: "请调整关键词或筛选条件。", style = MaterialTheme.typography.bodyMedium)
@@ -116,7 +120,10 @@ internal fun InstructionResultsScreen(state: AtlasState, grid: LazyGridState, on
                         }
                     }
                     if (expanded) items(matchingGroups, key = { it.key }) { group ->
-                        if (group.hits.size == 1) InstructionResultCard(state, group.hits.single(), onOpen)
+                        if (group.size == 1) {
+                            if (group.hits.isNotEmpty()) InstructionResultCard(state, group.hits.single(), onOpen)
+                            else PseudoInstructionCard(group.pseudoHits.single(), onPseudo)
+                        }
                         else {
                             val showVariants = group.key in expandedVariants
                             ElevatedCard(Modifier.testTag("inst-group-${group.key}")) {
@@ -131,7 +138,7 @@ internal fun InstructionResultsScreen(state: AtlasState, grid: LazyGridState, on
                                                 style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                                             Icon(if (showVariants) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null)
                                         }
-                                        Text("${group.hits.size} 个编码变体 · ${group.hits.map { it.instruction.namespace }.distinct().size} 个来源",
+                                        Text("${group.size} 个候选 · ${(group.hits.map { it.instruction.namespace } + group.pseudoHits.map { it.instruction.namespace }).distinct().size} 个来源",
                                             style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
                                         Text(if (showVariants) "点击变体查看详情" else "展开查看各变体的扩展、编码与语义", style = MaterialTheme.typography.bodySmall)
                                     }
@@ -139,6 +146,10 @@ internal fun InstructionResultsScreen(state: AtlasState, grid: LazyGridState, on
                                 if (showVariants) group.hits.forEach { hit ->
                                     HorizontalDivider()
                                     InstructionResultCard(state, hit, onOpen)
+                                }
+                                if (showVariants) group.pseudoHits.forEach { hit ->
+                                    HorizontalDivider()
+                                    PseudoInstructionCard(hit, onPseudo)
                                 }
                             }
                         }

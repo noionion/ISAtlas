@@ -204,4 +204,91 @@ class InstructionFlowTest {
         compose.onNodeWithContentDescription("返回搜索").performClick()
         compose.onNodeWithTag("search-input").assertTextContains("0x00b50553")
     }
+
+    @Test fun pseudoCallCopyAndBaseRoundTrip() {
+        compose.onNodeWithTag("search-input").performTextReplacement("call")
+        compose.onNodeWithTag("pseudo-riscv/manual/pseudo/call").assertIsDisplayed().performClick()
+        compose.onNodeWithTag("pseudo-instruction-detail").assertIsDisplayed()
+        compose.onNodeWithTag("register-diagram").assertDoesNotExist()
+        compose.onNodeWithTag("pseudo-sequence-0").assertTextEquals("auipc ra, imm20\njalr ra, imm12(ra)")
+        compose.onNodeWithTag("pseudo-copy-0").performScrollTo().performClick()
+        compose.runOnUiThread {
+            val clipboard = compose.activity.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            org.junit.Assert.assertEquals("auipc ra, imm20\njalr ra, imm12(ra)", clipboard.primaryClip!!.getItemAt(0).text.toString())
+        }
+        compose.onNodeWithTag("pseudo-base-riscv/manual/inst/auipc:0").performScrollTo().performClick()
+        compose.onNodeWithTag("app-title").assertTextEquals("auipc")
+        compose.runOnUiThread { compose.activity.recreate() }
+        compose.waitForIdle()
+        compose.onNodeWithContentDescription("返回伪指令").performClick()
+        compose.onNodeWithTag("app-title").assertTextEquals("call")
+        compose.onNodeWithTag("pseudo-base-riscv/manual/inst/auipc:0").assertIsDisplayed()
+        compose.onNodeWithContentDescription("返回搜索").performClick()
+        compose.onNodeWithTag("search-input").assertTextContains("call")
+        compose.onNodeWithTag("pseudo-riscv/manual/pseudo/call").assertIsDisplayed()
+    }
+
+    @Test fun pseudoVectorConditionsAndExtensionRecovery() {
+        compose.onNodeWithTag("search-input").performTextReplacement("vmsge.vx")
+        compose.onNodeWithContentDescription("筛选").performClick()
+        compose.onNodeWithTag("extension-search").performTextReplacement("zba")
+        compose.onNodeWithTag("extension-zba").performClick()
+        closeFilters()
+        compose.onNodeWithText("已收录的匹配项被扩展筛选排除。").assertIsDisplayed()
+        compose.onNodeWithTag("relax-instruction-filters").performClick()
+        compose.onNodeWithTag("pseudo-riscv/manual/pseudo/vmsge.vx").performClick()
+        compose.onNodeWithTag("pseudo-sequence-2").performScrollTo().assertTextEquals("vmslt.vx vt, va, x\nvmandn.mm vd, vd, vt")
+        compose.onNodeWithTag("pseudo-sequence-3").performScrollTo().assertTextEquals("vmslt.vx vt, va, x\nvmandn.mm vt, v0, vt\nvmandn.mm vd, vd, v0\nvmor.mm vd, vt, vd")
+        compose.onNodeWithTag("register-diagram").assertDoesNotExist()
+    }
+
+    @Test fun csrAliasAssemblyAndNavigation() {
+        compose.onNodeWithTag("search-input").performTextReplacement("0x30002573")
+        compose.onNodeWithTag("instruction-results").performScrollToNode(hasTestTag("inst-riscv/manual/inst/csrr:0"))
+        compose.onNodeWithTag("inst-riscv/manual/inst/csrr:0").performClick()
+        compose.onNodeWithTag("register-names-abi").performScrollTo().performClick()
+        compose.onNodeWithTag("instruction-assembly").assertTextEquals("csrr a0, mstatus")
+        compose.onNodeWithText("mstatus · manual ↗").performScrollTo().performClick()
+        compose.onNodeWithTag("app-title").assertTextEquals("mstatus")
+        compose.onNodeWithContentDescription("返回指令").performClick()
+        compose.onNodeWithTag("instruction-assembly").assertTextEquals("csrr a0, mstatus")
+    }
+
+    @Test fun floatingAliasRendersOnlyItsTwoAssemblyOperands() {
+        compose.onNodeWithTag("search-input").performTextReplacement("0x20b59553")
+        compose.onNodeWithTag("inst-variants-ENCODING:fneg.s").performClick()
+        compose.onNodeWithTag("instruction-results").performScrollToNode(hasTestTag("inst-riscv/manual/inst/fneg.s:0"))
+        compose.onNodeWithTag("inst-riscv/manual/inst/fneg.s:0").performClick()
+        compose.onNodeWithTag("register-names-number").performScrollTo().performClick()
+        compose.onNodeWithTag("instruction-assembly").assertTextEquals("fneg.s f10, f11")
+    }
+
+    @Test fun mentionOnlyAndSymbolicImmediateReferences() {
+        compose.onNodeWithTag("search-input").performTextReplacement("li")
+        compose.onNodeWithTag("pseudo-riscv/manual/pseudo/li").performClick()
+        compose.onNodeWithText("仅名称参考 · 手册未给出完整展开").assertIsDisplayed()
+        compose.onNodeWithTag("register-diagram").assertDoesNotExist()
+        compose.onNodeWithTag("pseudo-copy-0").assertDoesNotExist()
+        compose.onNodeWithContentDescription("返回搜索").performClick()
+        compose.onNodeWithTag("search-input").performTextReplacement("vmsltu.vi")
+        compose.onNodeWithTag("pseudo-riscv/manual/pseudo/vmsltu.vi").performClick()
+        compose.onNodeWithTag("pseudo-sequence-0").assertTextEquals("vmsleu.vi vd, va, i-1, vm")
+        compose.onNodeWithTag("pseudo-base-riscv/manual/inst/vmsleu.vi:0").performScrollTo().performClick()
+        compose.onNodeWithTag("app-title").assertTextEquals("vmsleu.vi")
+    }
+
+    @Test fun pseudoLandscapeAndRecreation() {
+        compose.runOnUiThread { compose.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE }
+        compose.waitForIdle()
+        compose.onNodeWithTag("search-input").performTextReplacement("tail")
+        compose.onNodeWithTag("pseudo-riscv/manual/pseudo/tail").performClick()
+        compose.onNodeWithTag("pseudo-sequence-0").performScrollTo().assertTextEquals("auipc x7, imm20\njalr x0, x7")
+        compose.runOnUiThread { compose.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
+        compose.waitForIdle()
+        compose.onNodeWithTag("app-title").assertTextEquals("tail")
+        compose.onNodeWithTag("pseudo-instruction-detail").assertIsDisplayed()
+        compose.onNodeWithContentDescription("返回搜索").performClick()
+        compose.onNodeWithTag("catalog-tab-INST").assertIsSelected()
+        compose.onNodeWithTag("search-input").assertTextContains("tail")
+    }
 }

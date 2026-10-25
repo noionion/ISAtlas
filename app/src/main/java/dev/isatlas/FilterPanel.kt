@@ -49,7 +49,8 @@ fun FilterPanel(state: AtlasState, model: AppViewModel) {
     val extensionGrid = rememberLazyGridState()
     LaunchedEffect(extensionQuery) { extensionGrid.scrollToItem(0) }
     val catalogOptions = remember(state.compilerIsa, state.pack, state.instructions) {
-        val tags = state.instructions?.instructions.orEmpty().flatMap { it.encodings }.flatMap { it.tags }.toSet()
+        val tags = (state.instructions?.instructions.orEmpty().flatMap { it.encodings }.flatMap { it.tags } +
+            state.instructions?.pseudos.orEmpty().flatMap { it.tags }).toSet()
         (state.pack?.let { state.compilerIsa?.catalogOptions(it) }.orEmpty() + state.compilerIsa?.tokens.orEmpty().filter { token ->
             token in tags
         }).distinct()
@@ -101,7 +102,8 @@ fun FilterPanel(state: AtlasState, model: AppViewModel) {
     val sources: @Composable ColumnScope.() -> Unit = {
             Text("数据来源", style = MaterialTheme.typography.labelLarge)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(0.dp)) {
-                val namespaces = (state.pack?.registers.orEmpty().map { it.namespace.ifBlank { state.pack!!.namespace } } + state.instructions?.instructions.orEmpty().map { it.namespace }).distinct().sorted()
+                val namespaces = (state.pack?.registers.orEmpty().map { it.namespace.ifBlank { state.pack!!.namespace } } +
+                    state.instructions?.instructions.orEmpty().map { it.namespace } + state.instructions?.pseudos.orEmpty().map { it.namespace }).distinct().sorted()
                 (listOf<Pair<String?, String>>(null to "全部") + namespaces.map { value ->
                     value to when (value) { "manual" -> "ISA 手册"; "thead" -> "玄铁"; else -> value }
                 }).forEach { (value, label) ->

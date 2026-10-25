@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/c.sext.w",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "c.sext.w",
+  "summary": "X(rd) = sext32(X(rd))",
+  "summaryEn": "X(rd) = sext32(X(rd))",
+  "kind": "alias",
+  "aliasOf": "c.addiw",
+  "assemblyOperands": [
+    "rd/rs1"
+  ],
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "zc.adoc",
+      "lineStart": 138,
+      "lineEnd": 138,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zc.adoc#L138-L138",
+      "sha256": "9f54ea9ea68da5d8c227e2e44108eb7440d230a87fafec7dab8310915ad191ea",
+      "method": "documented-assembler-alias"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 16,
+      "xlens": [
+        64
+      ],
+      "requires": [
+        [
+          "C"
+        ],
+        [
+          "Zca"
+        ]
+      ],
+      "mask": "0xf07f",
+      "match": "0x2001",
+      "fields": [
+        {
+          "name": "001",
+          "msb": 15,
+          "lsb": 13,
+          "value": 1
+        },
+        {
+          "name": "imm[5]",
+          "msb": 12,
+          "lsb": 12,
+          "value": 0
+        },
+        {
+          "name": "rs1/rd≠0",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd/rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "imm[4:0]",
+          "msb": 6,
+          "lsb": 2,
+          "value": 0
+        },
+        {
+          "name": "01",
+          "msb": 1,
+          "lsb": 0,
+          "value": 1
+        }
+      ],
+      "constraints": [
+        "Printed operand restrictions: ['text', 'C.ADDIW', ':math', [':sub', '(RV64; RES, rd=0)']]"
+      ],
+      "sources": [
+        {
+          "path": "images/bytefield/rvc-instr-quad1.edn",
+          "lineStart": 31,
+          "lineEnd": 36,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/rvc-instr-quad1.edn#L31-L36",
+          "sha256": "b99e2eabea15843b4218aa0bee26d5750312437eff4c3f18c644e8472ad67479",
+          "method": "bytefield-printed-bits"
+        },
+        {
+          "path": "zc.adoc",
+          "lineStart": 138,
+          "lineEnd": 138,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zc.adoc#L138-L138",
+          "sha256": "9f54ea9ea68da5d8c227e2e44108eb7440d230a87fafec7dab8310915ad191ea",
+          "method": "documented-assembler-alias"
+        }
+      ],
+      "encodingConstraints": [
+        {
+          "mask": "0xf80",
+          "operator": "notIn",
+          "values": [
+            0
+          ],
+          "reason": "rd/rs1=0 belongs to another encoding or is reserved"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

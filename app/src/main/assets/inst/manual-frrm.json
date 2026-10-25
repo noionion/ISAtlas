@@ -1,0 +1,287 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/inst/frrm",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "frrm",
+  "summary": "读取 frm 到整数寄存器 rd。",
+  "summaryEn": "Read frm into integer register rd.",
+  "kind": "alias",
+  "aliasOf": "csrrs",
+  "assemblyOperands": [
+    "rd"
+  ],
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "f-st-ext.adoc",
+      "lineStart": 99,
+      "lineEnd": 107,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/f-st-ext.adoc#L99-L107",
+      "sha256": "37b710867a8bf15096d715faee894218fe9cbd94681c68801fbf54d191c13416",
+      "method": "documented-assembler-alias"
+    },
+    {
+      "path": "zfinx.adoc",
+      "lineStart": 42,
+      "lineEnd": 42,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zfinx.adoc#L42-L42",
+      "sha256": "31fac13199f96e09d455c2ef4352edfdf71172ec97e412e65a4117499c87e834",
+      "method": "integer-fp-control-registers"
+    },
+    {
+      "path": "priv-csrs.adoc",
+      "lineStart": 143,
+      "lineEnd": 154,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc#L143-L154",
+      "sha256": "f5538bf30cd9b2ffbd2a9bb15c34f0bc6cd99cb0a7c5d37a3ce026c5d3a8a782",
+      "method": "floating-csr-addresses"
+    }
+  ],
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "F"
+        ]
+      ],
+      "mask": "0xfffff07f",
+      "match": "0x00202073",
+      "fields": [
+        {
+          "name": "csr",
+          "msb": 31,
+          "lsb": 20,
+          "value": 2
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "value": 0
+        },
+        {
+          "name": "010",
+          "msb": 14,
+          "lsb": 12,
+          "value": 2
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "1110011",
+          "msb": 6,
+          "lsb": 0,
+          "value": 115
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "rv-32-64g.adoc",
+          "lineStart": 148,
+          "lineEnd": 148,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv-32-64g.adoc#L148-L148",
+          "sha256": "2e16e9e4eefe1af9713186cbc156e171617a7ec2fa6db81108910745f77455d0",
+          "method": "printed-bit-table"
+        },
+        {
+          "path": "f-st-ext.adoc",
+          "lineStart": 99,
+          "lineEnd": 107,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/f-st-ext.adoc#L99-L107",
+          "sha256": "37b710867a8bf15096d715faee894218fe9cbd94681c68801fbf54d191c13416",
+          "method": "documented-assembler-alias"
+        },
+        {
+          "path": "zfinx.adoc",
+          "lineStart": 42,
+          "lineEnd": 42,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zfinx.adoc#L42-L42",
+          "sha256": "31fac13199f96e09d455c2ef4352edfdf71172ec97e412e65a4117499c87e834",
+          "method": "integer-fp-control-registers"
+        },
+        {
+          "path": "priv-csrs.adoc",
+          "lineStart": 143,
+          "lineEnd": 154,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc#L143-L154",
+          "sha256": "f5538bf30cd9b2ffbd2a9bb15c34f0bc6cd99cb0a7c5d37a3ce026c5d3a8a782",
+          "method": "floating-csr-addresses"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "csr.access",
+          "category": "csr",
+          "summary": "CSR 的存在性、最低权限、只读编码、读写抑制及虚拟化拦截共同决定访问结果。",
+          "summaryEn": "CSR existence, privilege, read-only encoding, read/write suppression and virtualization govern access.",
+          "check": "external",
+          "source": {
+            "path": "zicsr.adoc",
+            "lineStart": 29,
+            "lineEnd": 34,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zicsr.adoc#L29-L34",
+            "sha256": "293c2db6f441481321ca2cba30d57d2eb918ff708640e3a3d567e59c03fc5e7b",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "fp.state",
+          "category": "state",
+          "summary": "浮点状态、相关精度支持及虚拟化控制仍需满足当前执行环境。",
+          "summaryEn": "FP state, supported precisions and virtualization controls must permit execution.",
+          "check": "fp-state",
+          "source": {
+            "path": "machine.adoc",
+            "lineStart": 818,
+            "lineEnd": 831,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc#L818-L831",
+            "sha256": "376b8df6c556180e025b17026c19ec3bb089db1e2535f28c6cb9356b0d7fa92f",
+            "method": "context-rule"
+          }
+        }
+      ]
+    },
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "Zfinx"
+        ]
+      ],
+      "mask": "0xfffff07f",
+      "match": "0x00202073",
+      "fields": [
+        {
+          "name": "csr",
+          "msb": 31,
+          "lsb": 20,
+          "value": 2
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "value": 0
+        },
+        {
+          "name": "010",
+          "msb": 14,
+          "lsb": 12,
+          "value": 2
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "1110011",
+          "msb": 6,
+          "lsb": 0,
+          "value": 115
+        }
+      ],
+      "constraints": [],
+      "sources": [
+        {
+          "path": "rv-32-64g.adoc",
+          "lineStart": 148,
+          "lineEnd": 148,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv-32-64g.adoc#L148-L148",
+          "sha256": "2e16e9e4eefe1af9713186cbc156e171617a7ec2fa6db81108910745f77455d0",
+          "method": "printed-bit-table"
+        },
+        {
+          "path": "f-st-ext.adoc",
+          "lineStart": 99,
+          "lineEnd": 107,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/f-st-ext.adoc#L99-L107",
+          "sha256": "37b710867a8bf15096d715faee894218fe9cbd94681c68801fbf54d191c13416",
+          "method": "documented-assembler-alias"
+        },
+        {
+          "path": "zfinx.adoc",
+          "lineStart": 42,
+          "lineEnd": 42,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zfinx.adoc#L42-L42",
+          "sha256": "31fac13199f96e09d455c2ef4352edfdf71172ec97e412e65a4117499c87e834",
+          "method": "integer-fp-control-registers"
+        },
+        {
+          "path": "priv-csrs.adoc",
+          "lineStart": 143,
+          "lineEnd": 154,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc#L143-L154",
+          "sha256": "f5538bf30cd9b2ffbd2a9bb15c34f0bc6cd99cb0a7c5d37a3ce026c5d3a8a782",
+          "method": "floating-csr-addresses"
+        }
+      ],
+      "contextRules": [
+        {
+          "id": "base.e.registers",
+          "category": "registers",
+          "summary": "E 基础架构只允许 x0–x15；浮点与向量寄存器不受此编号限制。",
+          "summaryEn": "An E base permits only x0–x15; FP/vector register numbers are independent.",
+          "check": "e-registers",
+          "source": {
+            "path": "rv32e.adoc",
+            "lineStart": 36,
+            "lineEnd": 37,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32e.adoc#L36-L37",
+            "sha256": "b0ef4d9371f9df16d2ae6e03a9ae08183762cb981fe36ddd71ca55207f1495dd",
+            "method": "context-rule"
+          }
+        },
+        {
+          "id": "csr.access",
+          "category": "csr",
+          "summary": "CSR 的存在性、最低权限、只读编码、读写抑制及虚拟化拦截共同决定访问结果。",
+          "summaryEn": "CSR existence, privilege, read-only encoding, read/write suppression and virtualization govern access.",
+          "check": "external",
+          "source": {
+            "path": "zicsr.adoc",
+            "lineStart": 29,
+            "lineEnd": 34,
+            "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/zicsr.adoc#L29-L34",
+            "sha256": "293c2db6f441481321ca2cba30d57d2eb918ff708640e3a3d567e59c03fc5e7b",
+            "method": "context-rule"
+          }
+        }
+      ]
+    }
+  ]
+}

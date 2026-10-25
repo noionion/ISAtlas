@@ -12,10 +12,10 @@
   "semanticSources": [
     {
       "path": "rv32.adoc",
-      "lineStart": 139,
-      "lineEnd": 142,
-      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L139-L142",
-      "sha256": "3e888927b0fd153a2885895d8e62cefb454926c73e582c5bccb9cf19c2163029",
+      "lineStart": 320,
+      "lineEnd": 320,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L320-L320",
+      "sha256": "5c3c80884e76062f61d305f40ddf9b6643ad53c973724199ea5afbc9f56e7304",
       "method": "manual-pseudoinstruction"
     }
   ],
@@ -88,10 +88,10 @@
       "sources": [
         {
           "path": "rv32.adoc",
-          "lineStart": 139,
-          "lineEnd": 142,
-          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L139-L142",
-          "sha256": "3e888927b0fd153a2885895d8e62cefb454926c73e582c5bccb9cf19c2163029",
+          "lineStart": 320,
+          "lineEnd": 320,
+          "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/rv32.adoc#L320-L320",
+          "sha256": "5c3c80884e76062f61d305f40ddf9b6643ad53c973724199ea5afbc9f56e7304",
           "method": "manual-pseudoinstruction"
         }
       ],

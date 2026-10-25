@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/pseudo/la",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "la",
+  "kind": "pseudo",
+  "summary": "获取符号地址（手册示例名称）。",
+  "summaryEn": "Obtain a symbol address (name used in a manual example).",
+  "referenceStatus": "example",
+  "xlens": [
+    32,
+    64
+  ],
+  "privilege": "U",
+  "requires": [
+    [
+      "E"
+    ],
+    [
+      "I"
+    ]
+  ],
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "machine.adoc",
+      "lineStart": 2340,
+      "lineEnd": 2343,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc#L2340-L2343",
+      "sha256": "bfea4ca8b23cfb204e8e3937e876cbd8dc2c189fe21c1aabe8907b7e38fb9556",
+      "method": "mentioned-name-only"
+    }
+  ],
+  "notes": "手册示例用 la 获取 mtimecmp 地址，未定义通用的代码模型、PIC、重定位或链接器松弛规则；不从示例推定唯一展开或编码。",
+  "notesEn": "The example uses la for the mtimecmp address but does not define general code-model, PIC, relocation or linker-relaxation rules. No unique sequence or encoding is inferred.",
+  "expansions": []
+}

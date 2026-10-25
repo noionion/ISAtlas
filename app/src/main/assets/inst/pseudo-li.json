@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/pseudo/li",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "li",
+  "kind": "pseudo",
+  "summary": "将立即数装入整数寄存器（手册示例名称）。",
+  "summaryEn": "Load an immediate into an integer register (name used in manual examples).",
+  "referenceStatus": "example",
+  "xlens": [
+    32,
+    64
+  ],
+  "privilege": "U",
+  "requires": [
+    [
+      "E"
+    ],
+    [
+      "I"
+    ]
+  ],
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "a-st-ext.adoc",
+      "lineStart": 250,
+      "lineEnd": 254,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/a-st-ext.adoc#L250-L254",
+      "sha256": "12718e3b2e0777f873995961c6dc56fe5754dba19c351bdaed5986fd9fcfd74d",
+      "method": "mentioned-name-only"
+    }
+  ],
+  "notes": "手册示例使用 li 设置整数值，但未给出针对任意常量和 XLEN 的完整汇编器展开规则；此处仅保留名称和来源，不猜测指令序列。",
+  "notesEn": "The manual uses li to set integer values but does not define a complete assembler expansion for arbitrary constants and XLENs. This entry records the name and source without guessing a sequence.",
+  "expansions": []
+}

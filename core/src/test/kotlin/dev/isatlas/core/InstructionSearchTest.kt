@@ -13,8 +13,8 @@ class InstructionSearchTest {
         InstructionSearch.query(catalog, query, CatalogFilter(width, privilege, namespace, extensions), compiler)
 
     @Test fun `all installed instruction files load with their hashes`() {
-        assertEquals(1215, catalog.instructions.size)
-        assertEquals(1323, catalog.instructions.sumOf { it.encodings.size })
+        assertEquals(1287, catalog.instructions.size)
+        assertEquals(1410, catalog.instructions.sumOf { it.encodings.size })
         assertTrue(catalog.instructions.all { it.summary.isNotBlank() && it.summaryEn.isNotBlank() })
     }
     @Test fun `hex binary and spaced binary decode the same operands`() {

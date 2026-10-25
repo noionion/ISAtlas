@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "id": "riscv/manual/pseudo/call",
+  "architecture": "riscv",
+  "namespace": "manual",
+  "name": "call",
+  "kind": "pseudo",
+  "summary": "调用目标过程并保存返回地址。",
+  "summaryEn": "Call a procedure and save the return address.",
+  "xlens": [
+    32,
+    64
+  ],
+  "privilege": "U",
+  "requires": [
+    [
+      "E"
+    ],
+    [
+      "I"
+    ]
+  ],
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "semanticSources": [
+    {
+      "path": "unpriv-cfi.adoc",
+      "lineStart": 184,
+      "lineEnd": 202,
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/unpriv-cfi.adoc#L184-L202",
+      "sha256": "62b4fb9c6b42c5e317a38c7fe9f93bd548be1ebb53862f1d41a47b53611f2181",
+      "method": "manual-pseudoinstruction-expansion"
+    }
+  ],
+  "notes": "手册中的序列示例，最终序列及立即数由汇编器、目标地址和重定位决定，不在此生成机器码。ra 表示链接寄存器 x1 或 x5；语义直接调用的地址必须来自目标符号的 PC 相对或绝对偏移。",
+  "notesEn": "Manual sequence examples only: the assembler, target and relocations determine the final sequence and immediates. No machine code is generated here. ra denotes link register x1 or x5; a semantically direct call must derive its address from a PC-relative or absolute symbol offset.",
+  "expansions": [
+    {
+      "syntax": "call offset",
+      "condition": "PC 相对地址示例",
+      "conditionEn": "PC-relative address example",
+      "steps": [
+        {
+          "name": "auipc",
+          "assembly": "auipc ra, imm20"
+        },
+        {
+          "name": "jalr",
+          "assembly": "jalr ra, imm12(ra)"
+        }
+      ],
+      "clobbers": [
+        "ra"
+      ]
+    },
+    {
+      "syntax": "call offset",
+      "condition": "绝对地址示例",
+      "conditionEn": "Absolute address example",
+      "steps": [
+        {
+          "name": "lui",
+          "assembly": "lui ra, imm20"
+        },
+        {
+          "name": "jalr",
+          "assembly": "jalr ra, imm12(ra)"
+        }
+      ],
+      "clobbers": [
+        "ra"
+      ]
+    }
+  ]
+}

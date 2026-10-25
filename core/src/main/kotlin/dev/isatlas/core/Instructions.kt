@@ -22,12 +22,13 @@ fun privilegeRank(mode: String) = listOf("M", "S", "H", "VS", "U", "D").indexOf(
     val registerOffset: Int = 0, val registerMap: List<Int>? = null, val registerClass: String? = null,
     val values: Map<String, String> = emptyMap())
 @Serializable data class EncodingConstraint(val mask: String, val operator: String, val values: List<Long>, val xlens: List<Int> = listOf(32, 64))
+@Serializable data class OperandRelation(val left: String, val right: String, val operator: String)
 @Serializable data class InstructionContext(val summary: String, val summaryEn: String)
 @Serializable data class InstructionEncoding(val length: Int, val xlens: List<Int>, val requires: List<List<String>>,
     val mask: String, val match: String, val fields: List<InstructionField>, val privilege: String = "U",
     val summary: String? = null, val summaryEn: String? = null, val constraints: List<String> = emptyList(),
     val encodingConstraints: List<EncodingConstraint> = emptyList(), val contextRules: List<InstructionContext> = emptyList(),
-    val sources: List<InstructionSource> = emptyList()) {
+    val sources: List<InstructionSource> = emptyList(), val operandRelations: List<OperandRelation> = emptyList()) {
     val tags get() = requires.flatten().map { it.lowercase() }.toSet()
     val requirements get() = requires.joinToString(" / ") { it.joinToString(" + ") }
     /** Alternative groups are OR; capabilities within one group are AND. */
@@ -37,7 +38,9 @@ fun privilegeRank(mode: String) = listOf("M", "S", "H", "VS", "U", "D").indexOf(
     fun matches(word: Long, xlen: Int): Boolean = fixedMatches(word) && encodingConstraints.filter { xlen in it.xlens }.all {
             val value = word and it.mask.hex()
             when (it.operator) { "notIn" -> value !in it.values; "in" -> value in it.values; else -> false }
-        }
+        } && (operandRelations.isEmpty() || operands(word).let { values -> operandRelations.all {
+            it.operator == "eq" && values[it.left] != null && values[it.left] == values[it.right]
+        } })
     fun operands(word: Long): Map<String, String> = fields.filter { it.operand != null }.groupBy { it.operand!! }.mapValues { (_, pieces) ->
         var value = 0L
         var highest = 0
@@ -59,13 +62,19 @@ fun privilegeRank(mode: String) = listOf("M", "S", "H", "VS", "U", "D").indexOf(
 @Serializable data class InstructionDefinition(val schemaVersion: Int, val id: String, val namespace: String,
     val name: String, val summary: String, val summaryEn: String, val kind: String,
     val aliasOf: String? = null, val sourceRevision: String, val license: String,
-    val encodings: List<InstructionEncoding>, val semanticSources: List<InstructionSource> = emptyList())
-data class InstructionCatalog(val instructions: List<InstructionDefinition>, val version: String) {
+    val encodings: List<InstructionEncoding>, val semanticSources: List<InstructionSource> = emptyList(),
+    val assemblyOperands: List<String>? = null)
+data class InstructionCatalog(val instructions: List<InstructionDefinition>, val version: String,
+    val pseudos: List<InstructionPseudo> = emptyList()) {
     companion object {
         private val json = Json { ignoreUnknownKeys = true }
         fun decodeFiles(manifest: String, read: (String) -> String): InstructionCatalog {
             val root = json.parseToJsonElement(manifest).jsonObject
-            require(root.getValue("schemaVersion").jsonPrimitive.int == 1)
+            val schema = root.getValue("schemaVersion").jsonPrimitive.int
+            require(schema in setOf(1, 2))
+            val features = root["requiredFeatures"]?.jsonArray?.map { it.jsonPrimitive.content }.orEmpty().toSet()
+            require(features.all { it in setOf("operand-relations-v1", "alias-assembly-v1", "pseudo-references-v1") })
+            if (schema == 2) require(features.isNotEmpty())
             val files = root.getValue("files").jsonArray.map { it.jsonPrimitive.content }
             require(files.isNotEmpty() && files.distinct().size == files.size)
             val entries = files.map { file ->
@@ -79,7 +88,27 @@ data class InstructionCatalog(val instructions: List<InstructionDefinition>, val
                 }
             }
             require(entries.map { it.id }.distinct().size == entries.size)
-            return InstructionCatalog(entries, root.getValue("version").jsonPrimitive.content)
+            if (entries.any { it.encodings.any { encoding -> encoding.operandRelations.isNotEmpty() } })
+                require(schema == 2 && "operand-relations-v1" in features)
+            if (entries.any { it.assemblyOperands != null }) require(schema == 2 && "alias-assembly-v1" in features)
+            val pseudoFiles = root["pseudoFiles"]?.jsonArray?.map { it.jsonPrimitive.content }.orEmpty()
+            require(pseudoFiles.distinct().size == pseudoFiles.size && pseudoFiles.none { it in files })
+            val pseudos = pseudoFiles.map { file ->
+                require(file.matches(Regex("[a-z0-9][a-z0-9._-]*\\.json")))
+                val text = read(file)
+                val hash = MessageDigest.getInstance("SHA-256").digest(text.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
+                require(hash == root.getValue("pseudoFileHashes").jsonObject.getValue(file).jsonPrimitive.content) { "Pseudo hash mismatch: $file" }
+                require("encodings" !in json.parseToJsonElement(text).jsonObject)
+                json.decodeFromString<InstructionPseudo>(text).also { pseudo ->
+                    require(pseudo.referenceStatus in setOf("defined", "example", "historical"))
+                    require(pseudo.schemaVersion == 1 && pseudo.kind == "pseudo" && (pseudo.expansions.isNotEmpty() || pseudo.referenceOnly))
+                    require(pseudo.xlens.isNotEmpty() && pseudo.xlens.all { it in listOf(32, 64) } && (pseudo.requires.isNotEmpty() || pseudo.referenceStatus == "historical"))
+                    require(pseudo.requires.all { it.isNotEmpty() } && pseudo.semanticSources.isNotEmpty())
+                    require(pseudo.expansions.all { it.steps.isNotEmpty() && it.steps.all { step -> step.assembly.isNotBlank() && entries.any { entry -> entry.name == step.name && entry.namespace == pseudo.namespace } } })
+                }
+            }
+            require((entries.map { it.id } + pseudos.map { it.id }).distinct().size == entries.size + pseudos.size)
+            return InstructionCatalog(entries, root.getValue("version").jsonPrimitive.content, pseudos)
         }
     }
 }
@@ -89,14 +118,29 @@ data class InstructionHit(val instruction: InstructionDefinition, val encoding: 
     val category: InstructionMatchCategory = InstructionMatchCategory.NAME) {
     val key get() = "${instruction.id}:$index"
 }
-data class InstructionResults(val hits: List<InstructionHit>, val error: String? = null, val diagnostic: InstructionDiagnostic? = null) {
+data class InstructionResults(val hits: List<InstructionHit>, val error: String? = null, val diagnostic: InstructionDiagnostic? = null,
+    val pseudoHits: List<InstructionPseudoHit> = emptyList(), val input: String = "") {
     /** Group only the presentation; retain every encoding and source, in search priority order. */
-    val groups get() = hits.groupBy { it.category to it.instruction.name }.map { (identity, variants) ->
-        InstructionResultGroup(identity.first, identity.second, variants)
+    val groups: List<InstructionResultGroup> get() {
+        val machine = hits.groupBy { it.category to it.instruction.name }.map { (identity, variants) ->
+            InstructionResultGroup(identity.first, identity.second, variants)
+        }
+        if (pseudoHits.isEmpty()) return machine
+        val references = pseudoHits.groupBy { it.category to it.instruction.name }.map { (identity, variants) ->
+            InstructionResultGroup(identity.first, identity.second, emptyList(), variants)
+        }
+        return (machine + references).groupBy { it.category to it.name }.map { (identity, groups) ->
+            InstructionResultGroup(identity.first, identity.second, groups.flatMap { it.hits }, groups.flatMap { it.pseudoHits })
+        }.sortedWith(compareBy<InstructionResultGroup> { it.category.ordinal }
+            .thenBy { if (it.name.equals(input.trim(), ignoreCase = true)) 0 else 1 }
+            .thenBy { it.privilegeOrder }.thenBy { if (it.name.startsWith(input.trim(), ignoreCase = true)) 0 else 1 }.thenBy { it.name })
     }
 }
-data class InstructionResultGroup(val category: InstructionMatchCategory, val name: String, val hits: List<InstructionHit>) {
+data class InstructionResultGroup(val category: InstructionMatchCategory, val name: String, val hits: List<InstructionHit>,
+    val pseudoHits: List<InstructionPseudoHit> = emptyList()) {
     val key get() = "${category.name}:$name"
+    val size get() = hits.size + pseudoHits.size
+    val privilegeOrder get() = (hits.map { privilegeRank(it.encoding.privilege) } + pseudoHits.map { privilegeRank(it.instruction.privilege) }).min()
 }
 
 /** Explain available candidates without assuming the user's complete ISA or runtime state. */
@@ -129,6 +173,16 @@ object InstructionSearch {
         val word = parsed.word
         val selectedExtensions = compiler?.associatedTags(filter.extensions) ?: filter.extensions.map { it.lowercase() }.toSet()
         val effectiveFilter = filter.copy(extensions = selectedExtensions)
+        val pseudoAvailable = if (word != null) emptyList() else catalog.pseudos.mapNotNull { pseudo ->
+            val name = pseudo.name.lowercase(Locale.ROOT)
+            val nameMatch = tokens.all { it in name }
+            val description = "${pseudo.summary} ${pseudo.summaryEn}".lowercase(Locale.ROOT)
+            if (!tokens.all { token -> token in name || (descriptionPatterns[token]?.containsMatchIn(description) ?: (token in description)) }) null
+            else InstructionPseudoHit(pseudo, if (nameMatch) InstructionMatchCategory.NAME else InstructionMatchCategory.DESCRIPTION)
+        }
+        val pseudoHits = pseudoAvailable.filter { hit -> hit.instruction.let { pseudo ->
+            effectiveFilter.accepts(pseudo.xlens, pseudo.privilege, pseudo.namespace, pseudo.tags) && pseudo.supportsExtensions(selectedExtensions)
+        } }
         val parentTags = compiler?.tokens.orEmpty().filter { it in setOf("m", "a", "b", "c", "v") }.associateWith { compiler!!.associatedTags(setOf(it)) - setOf("i", "e", "f", "d", "zicsr") }
         val available = mutableListOf<Pair<InstructionHit, Set<String>>>()
         var fixedCandidate = false
@@ -156,8 +210,8 @@ object InstructionSearch {
             .thenBy { if (it.instruction.name.startsWith(query)) 0 else 1 }
             .thenBy { if (word != null) -java.lang.Long.bitCount(it.encoding.mask.hex()) else 0 }
             .thenBy { it.instruction.name }.thenBy { it.index })
-        if (hits.isNotEmpty()) return InstructionResults(hits)
-        if (available.isNotEmpty()) {
+        if (hits.isNotEmpty() || pseudoHits.isNotEmpty()) return InstructionResults(hits, pseudoHits = pseudoHits, input = query)
+        if (available.isNotEmpty() || pseudoAvailable.isNotEmpty()) {
             val candidates = available.map { (hit, tags) ->
                 val widths = hit.encoding.xlens.filter { word == null || hit.encoding.matches(word, it) }
                 val blocked = buildSet {
@@ -167,6 +221,14 @@ object InstructionSearch {
                     if (selectedExtensions.isNotEmpty() && (selectedExtensions.none { it in tags } || !hit.encoding.supportsExtensions(selectedExtensions))) add(InstructionFilterDimension.EXTENSION)
                 }
                 blocked to widths
+            } + pseudoAvailable.map { hit ->
+                val pseudo = hit.instruction
+                buildSet {
+                    if (filter.xlen !in pseudo.xlens) add(InstructionFilterDimension.WIDTH)
+                    if (filter.privilege != null && filter.privilege != normalizePrivilege(pseudo.privilege)) add(InstructionFilterDimension.PRIVILEGE)
+                    if (filter.namespace != null && filter.namespace != pseudo.namespace) add(InstructionFilterDimension.SOURCE)
+                    if (selectedExtensions.isNotEmpty() && !pseudo.supportsExtensions(selectedExtensions)) add(InstructionFilterDimension.EXTENSION)
+                } to pseudo.xlens
             }
             val (blocked, widths) = candidates.minWith(compareBy<Pair<Set<InstructionFilterDimension>, List<Int>>> { it.first.size }
                 .thenBy { InstructionFilterDimension.WIDTH in it.first })

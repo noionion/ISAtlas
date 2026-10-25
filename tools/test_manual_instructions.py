@@ -25,7 +25,7 @@ class ManualInstructionTests(unittest.TestCase):
         self.assertEqual([],report['errors'])
         self.assertGreaterEqual(report['instructions'],1200)
         self.assertGreater(report['encodingFields'],8000)
-        self.assertEqual(68,len(report['overlaps']))
+        self.assertEqual(163,len(report['overlaps']))
 
     def test_fixed_machine_words_from_manual_formats(self):
         # Words are specified independently of the generator; operands are zero
@@ -115,8 +115,8 @@ class ManualInstructionTests(unittest.TestCase):
 
     def test_context_scan_covers_every_variant_and_register_assignment(self):
         report=scan_catalog(write_report=False)
-        self.assertEqual(1323,report['encodingVariants'])
-        self.assertEqual(2497,report['xlenWitnesses'])
+        self.assertEqual(1410,report['encodingVariants'])
+        self.assertEqual(2670,report['xlenWitnesses'])
         self.assertGreater(report['registerAssignmentsChecked'],50000)
         self.assertGreater(report['reservedBitAssignmentsRejected'],500)
         self.assertEqual([],report['errors'])
