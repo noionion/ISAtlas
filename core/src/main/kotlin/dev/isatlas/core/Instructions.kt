@@ -3,6 +3,7 @@ package dev.isatlas.core
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import java.security.MessageDigest
+import java.util.Locale
 
 /** Shared catalog filtering; instructions additionally validate complete requirement groups. */
 data class CatalogFilter(val xlen: Int, val privilege: String? = null, val namespace: String? = null,
@@ -83,15 +84,41 @@ data class InstructionCatalog(val instructions: List<InstructionDefinition>, val
     }
 }
 private fun String.hex() = removePrefix("0x").toLong(16)
-enum class InstructionMatchCategory { NAME, DESCRIPTION, ENCODING }
+enum class InstructionMatchCategory(val label: String) { NAME("指令名"), DESCRIPTION("描述相关"), ENCODING("编码匹配") }
 data class InstructionHit(val instruction: InstructionDefinition, val encoding: InstructionEncoding, val index: Int, val word: Long? = null,
     val category: InstructionMatchCategory = InstructionMatchCategory.NAME) {
     val key get() = "${instruction.id}:$index"
 }
-data class InstructionResults(val hits: List<InstructionHit>, val error: String? = null, val diagnostic: InstructionDiagnostic? = null)
+data class InstructionResults(val hits: List<InstructionHit>, val error: String? = null, val diagnostic: InstructionDiagnostic? = null) {
+    /** Group only the presentation; retain every encoding and source, in search priority order. */
+    val groups get() = hits.groupBy { it.category to it.instruction.name }.map { (identity, variants) ->
+        InstructionResultGroup(identity.first, identity.second, variants)
+    }
+}
+data class InstructionResultGroup(val category: InstructionMatchCategory, val name: String, val hits: List<InstructionHit>) {
+    val key get() = "${category.name}:$name"
+}
+
+/** Explain available candidates without assuming the user's complete ISA or runtime state. */
+object InstructionCandidates {
+    fun explanations(hits: List<InstructionHit>): List<String> = buildList {
+        if (hits.size < 2 || hits.any { it.word == null } || hits.map { it.word }.distinct().size != 1) return@buildList
+        hits.filter { it.instruction.kind == "alias" }.forEach { alias ->
+            if (hits.any { it.instruction.namespace == alias.instruction.namespace && it.instruction.name == alias.instruction.aliasOf })
+                add("${alias.instruction.name} 是 ${alias.instruction.aliasOf} 的别名；两者表示同一编码的不同写法。")
+        }
+        if (hits.map { it.instruction.namespace }.distinct().size > 1)
+            add("匹配到多个数据来源；所有来源候选均保留，请分别核对扩展和语义。")
+        if (hits.map { it.encoding.requires.map { group -> group.map { it.lowercase(Locale.ROOT) }.sorted() }.sortedBy { it.joinToString() } }.distinct().size > 1)
+            add("候选的扩展要求不同，可能复用同一编码空间；请按目标 ISA 选择，当前筛选不代表完整 ISA 配置。")
+        if (hits.any { it.instruction.kind == "hint" })
+            add("包含 HINT 候选；提示用途及其与其他候选的区别请查看各自说明。")
+        add("编码匹配不能唯一确认执行行为，仍需核对各候选的执行条件与运行状态。")
+    }.distinct()
+}
 object InstructionSearch {
     fun query(catalog: InstructionCatalog, input: String, filter: CatalogFilter, compiler: CompilerIsaOptions? = null): InstructionResults {
-        val query = input.trim().lowercase()
+        val query = input.trim().lowercase(Locale.ROOT)
         val tokens = query.split(Regex("\\s+")).filter { it.isNotBlank() }
         // Mnemonics support fragments (ret -> mret); English prose matches whole words.
         val descriptionPatterns = tokens.associateWith { token ->
@@ -107,9 +134,9 @@ object InstructionSearch {
         var fixedCandidate = false
         val hits = catalog.instructions.flatMap { instruction -> instruction.encodings.mapIndexedNotNull { index, encoding ->
             val tags = encoding.tags + parentTags.filterValues { tags -> tags.any { it in encoding.tags } }.keys
-            val nameMatch = tokens.all { it in instruction.name.lowercase() }
+            val nameMatch = tokens.all { it in instruction.name.lowercase(Locale.ROOT) }
             val description = "${instruction.summary} ${instruction.summaryEn} ${encoding.summary.orEmpty()} ${encoding.summaryEn.orEmpty()}".lowercase()
-            val textMatch = tokens.all { token -> token in instruction.name.lowercase() ||
+            val textMatch = tokens.all { token -> token in instruction.name.lowercase(Locale.ROOT) ||
                 (descriptionPatterns[token]?.containsMatchIn(description) ?: (token in description)) }
             if (word != null && encoding.fixedMatches(word)) fixedCandidate = true
             val category = when {
@@ -124,8 +151,9 @@ object InstructionSearch {
                 !encoding.supportsExtensions(selectedExtensions) ||
                 (word != null && !encoding.matches(word, filter.xlen))) null else hit
         } }.sortedWith(compareBy<InstructionHit> { it.category.ordinal }
+            .thenBy { if (word == null && it.instruction.name.lowercase(Locale.ROOT) == query) 0 else 1 }
             .thenBy { privilegeRank(it.encoding.privilege) }
-            .thenBy { if (it.instruction.name == query) 0 else if (it.instruction.name.startsWith(query)) 1 else 2 }
+            .thenBy { if (it.instruction.name.startsWith(query)) 0 else 1 }
             .thenBy { if (word != null) -java.lang.Long.bitCount(it.encoding.mask.hex()) else 0 }
             .thenBy { it.instruction.name }.thenBy { it.index })
         if (hits.isNotEmpty()) return InstructionResults(hits)
