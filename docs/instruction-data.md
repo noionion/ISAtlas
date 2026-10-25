@@ -125,6 +125,8 @@ python -m unittest discover -s tools -p 'test_manual*.py'
 
 首页搜索框下方提供 CSR / INST 分页，可点击标签或左右滑动切换；两页共用搜索词、RV32/RV64、执行权限、扩展和来源筛选，并分别保留列表位置。扩展选项保留自动关联前置项的规则。CSR 多选匹配任一关联项；INST 需要完整满足至少一组 `requires` 条件（组内 AND、组间 OR），不能仅凭某个关联扩展就显示需要额外扩展的指令。不选择扩展时展示全部候选；筛选不等同于完整运行环境合法性检查。
 
+扩展依赖由 `tools/manual_extension_dependencies.py` 维护，`tools/build_march_dependencies.py` 可单独重建 `march-extensions.json`；CSR 导入也复用同一份规则。当前覆盖标量浮点、整数寄存器浮点、Zve/V、向量半精度/BF16、向量密码套件及 Zvl 长度层级，来源为固定版本手册的 `zfa.adoc`、`zfh.adoc`、`zfinx.adoc`、`v-st-ext.adoc`、`bfloat16.adoc` 和 `vector-crypto.adoc`。按必需能力及包含的子集展开，不按名字前缀推断：例如 Zvfh 选择 Zve32f、Zfhmin 并间接选择 F，不强制完整 V；Zfinx 不选择 F；Zvl 长度声明本身不选择 V 或 Zve。互斥项、XLEN 限制和运行条件仍不属于这份依赖图的求解范围。
+
 INST 支持名称与中英文简短描述搜索，以及 `0x` 十六进制、`0b` 二进制编码反查；无前缀时支持 4 / 8 位十六进制和 16 / 32 位二进制，允许空格和下划线分组。名称匹配排在描述匹配之前，英文描述按完整单词匹配；完整指令名命中优先置顶，其他结果在各类内部按 M、S、H（含 HS）、VS、U、D 权限顺序排列；编码反查保留别名、HINT 和扩展重叠候选，并检查当前 XLEN 的静态编码限制。
 
 指令名与描述相关结果分为纵向排列的可折叠分类，默认展开，空分类不显示；没有任何结果时才显示无匹配提示。直接输入 ret 时，完整名称 ret 排在最前，mret、sret 等片段命中和描述相关结果继续保留。不提供独立的精确搜索按钮、菜单或等号前缀语法；全部查询统一使用当前筛选与无结果诊断。

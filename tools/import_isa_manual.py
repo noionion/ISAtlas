@@ -14,6 +14,7 @@ import subprocess
 
 from csr_storage import read_catalog, write_catalog, catalog_sha256
 from manual_field_semantics import enrich
+from manual_extension_dependencies import dependencies
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "app/src/main/assets"
@@ -574,11 +575,8 @@ def run():
         (licenses / "Apache-2.0.txt").write_text((ROOT / "tools/licenses/thead-Apache-2.0.txt").read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
     options_path = ASSETS / "march-extensions.json"
     options = json.loads(options_path.read_text(encoding="utf-8"))
-    # Keep the compiler vocabulary; replace old UDB-derived relationships with
-    # a small, explicit set of requirements described by this manual.
-    options["dependencies"] = {"f": ["zicsr"], "d": ["f"], "q": ["d"], "s": ["u"], "h": ["i", "s"],
-                               "v": ["d", "zicsr"], "g": ["i", "m", "a", "f", "d", "zicsr", "zifencei"],
-                               "zicfiss": ["zicsr", "zimop"], "zicfilp": ["zicsr"]}
+    # Keep the compiler vocabulary and the reviewed manual capability graph.
+    options["dependencies"] = dependencies(options["tokens"])
     options["dependencySource"] = f"{REPOSITORY}/tree/{REVISION}/src"
     options["dependencyScope"] = "Explicitly adapted mandatory prerequisites only; not a complete ISA configuration solver."
     # Retain the existing JSON schema: the scope belongs in the local report.

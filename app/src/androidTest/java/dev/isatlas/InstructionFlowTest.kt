@@ -85,6 +85,23 @@ class InstructionFlowTest {
         compose.onNodeWithTag("catalog-tab-INST").assertIsSelected()
         compose.onNodeWithTag("inst-riscv/manual/inst/mret:0").assertIsDisplayed()
     }
+
+    @Test fun vectorFloatingDependenciesSelectFWithoutForcingFullV() {
+        compose.onNodeWithContentDescription("筛选").performClick()
+        compose.onNodeWithTag("extension-search").performScrollTo().performTextReplacement("zvfh")
+        compose.onNodeWithTag("extension-zvfh").performClick().assertIsSelected()
+        compose.onNodeWithTag("extension-search").performTextReplacement("zve32f")
+        compose.onNodeWithTag("extension-zve32f").assertIsSelected()
+        compose.onNodeWithTag("extension-search").performTextReplacement("f")
+        compose.onNodeWithTag("extension-f").assertIsSelected().performClick().assertIsSelected()
+        compose.onNodeWithTag("extension-search").performTextReplacement("v")
+        compose.onNodeWithTag("extension-v").assertIsNotSelected()
+        compose.onNodeWithTag("extension-search").performTextReplacement("zvfh")
+        compose.onNodeWithTag("extension-zvfh").performClick().assertIsNotSelected()
+        compose.onNodeWithTag("extension-search").performTextReplacement("f")
+        compose.onNodeWithTag("extension-f").assertIsNotSelected()
+        closeFilters()
+    }
     @Test fun landscapeAndInstructionExtensions() {
         compose.runOnUiThread { compose.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE }
         compose.waitForIdle()

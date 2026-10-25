@@ -98,7 +98,9 @@ class InstructionPatternTest {
         val broad = search(vectorOpcode)
         assertEquals(InstructionDiagnosticKind.TOO_BROAD, broad.diagnostic?.kind)
         assertTrue(broad.hits.isEmpty())
-        assertNotEquals(InstructionDiagnosticKind.TOO_BROAD, search(vectorOpcode, CatalogFilter(64, extensions = setOf("zvkned"))).diagnostic?.kind)
+        // Crypto also enables its Zve32x prerequisites, so a bare vector opcode is still broad.
+        assertEquals(InstructionDiagnosticKind.TOO_BROAD, search(vectorOpcode, CatalogFilter(64, extensions = setOf("zvkned"))).diagnostic?.kind)
+        assertNotEquals(InstructionDiagnosticKind.TOO_BROAD, search("0xa2????77", CatalogFilter(64, extensions = setOf("zvkned"))).diagnostic?.kind)
     }
 
     @Test fun `all fully known patterns agree with the existing matcher across every variant`() {

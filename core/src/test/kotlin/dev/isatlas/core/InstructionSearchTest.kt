@@ -57,6 +57,13 @@ class InstructionSearchTest {
     @Test fun `bad numeric input is explained and never silently truncated`() {
         listOf("0xzz", "0x100000000", "0b102").forEach { assertNotNull(search(it).error) }
     }
+
+    @Test fun `vector dependencies enable their base instructions without unrelated capabilities`() {
+        assertTrue(search("vadd.vv", extensions = setOf("zvkned")).hits.any { it.instruction.name == "vadd.vv" })
+        assertTrue(search("vfadd.vv", extensions = setOf("zvkned")).hits.isEmpty())
+        assertTrue(search("fadd.s", extensions = setOf("zvfh")).hits.any { it.instruction.name == "fadd.s" })
+        assertTrue(search("vfadd.vv", extensions = setOf("zvfh")).hits.any { it.instruction.name == "vfadd.vv" })
+    }
     @Test fun `compressed shadow stack needs both extensions while mop remains searchable`() {
         listOf("6081", "0x6081", "0b0110000010000001").forEach { input ->
             val mop = search(input, extensions = setOf("zcmop")).hits.map { it.instruction.name }

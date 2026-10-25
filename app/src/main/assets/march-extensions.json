@@ -205,10 +205,6 @@
       "i",
       "s"
     ],
-    "v": [
-      "d",
-      "zicsr"
-    ],
     "g": [
       "i",
       "m",
@@ -224,6 +220,159 @@
     ],
     "zicfilp": [
       "zicsr"
+    ],
+    "zfa": [
+      "f"
+    ],
+    "zfbfmin": [
+      "f"
+    ],
+    "zfh": [
+      "zfhmin"
+    ],
+    "zfhmin": [
+      "f"
+    ],
+    "zfinx": [
+      "zicsr"
+    ],
+    "zdinx": [
+      "zfinx"
+    ],
+    "zhinx": [
+      "zhinxmin"
+    ],
+    "zhinxmin": [
+      "zfinx"
+    ],
+    "zve32x": [
+      "zicsr",
+      "zvl32b"
+    ],
+    "zve32f": [
+      "zve32x",
+      "f"
+    ],
+    "zve64x": [
+      "zve32x",
+      "zvl64b"
+    ],
+    "zve64f": [
+      "zve32f",
+      "zve64x"
+    ],
+    "zve64d": [
+      "zve64f",
+      "d"
+    ],
+    "v": [
+      "zve64d",
+      "zvl128b"
+    ],
+    "zvfhmin": [
+      "zve32f"
+    ],
+    "zvfh": [
+      "zvfhmin",
+      "zfhmin"
+    ],
+    "zvfbfmin": [
+      "zve32f"
+    ],
+    "zvfbfwma": [
+      "zvfbfmin",
+      "zfbfmin"
+    ],
+    "zvbb": [
+      "zvkb"
+    ],
+    "zvkb": [
+      "zve32x"
+    ],
+    "zvbc": [
+      "zve64x"
+    ],
+    "zvkg": [
+      "zve32x"
+    ],
+    "zvkned": [
+      "zve32x"
+    ],
+    "zvknha": [
+      "zve32x"
+    ],
+    "zvknhb": [
+      "zve64x"
+    ],
+    "zvksed": [
+      "zve32x"
+    ],
+    "zvksh": [
+      "zve32x"
+    ],
+    "zvkt": [
+      "zve32x"
+    ],
+    "zvkn": [
+      "zvkned",
+      "zvknhb",
+      "zvkb",
+      "zvkt"
+    ],
+    "zvknc": [
+      "zvkn",
+      "zvbc"
+    ],
+    "zvkng": [
+      "zvkn",
+      "zvkg"
+    ],
+    "zvks": [
+      "zvksed",
+      "zvksh",
+      "zvkb",
+      "zvkt"
+    ],
+    "zvksc": [
+      "zvks",
+      "zvbc"
+    ],
+    "zvksg": [
+      "zvks",
+      "zvkg"
+    ],
+    "zvl64b": [
+      "zvl32b"
+    ],
+    "zvl128b": [
+      "zvl64b"
+    ],
+    "zvl256b": [
+      "zvl128b"
+    ],
+    "zvl512b": [
+      "zvl256b"
+    ],
+    "zvl1024b": [
+      "zvl512b"
+    ],
+    "zvl2048b": [
+      "zvl1024b"
+    ],
+    "zvl4096b": [
+      "zvl2048b"
+    ],
+    "zvl8192b": [
+      "zvl4096b"
+    ],
+    "zvl16384b": [
+      "zvl8192b"
+    ],
+    "zvl32768b": [
+      "zvl16384b"
+    ],
+    "zvl65536b": [
+      "zvl32768b"
     ]
   },
   "dependencySource": "https://github.com/riscv/riscv-isa-manual/tree/584390d9d872835b1bc45ab9ea946b56db3ad485/src"
