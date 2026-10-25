@@ -134,7 +134,7 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
                                 Button(onClick = model::load) { Text("重试") }
                             }
                             selected != null -> key(selected.id) { RegisterDetail(state, selected, model::xlen) }
-                            selectedInstruction != null -> InstructionDetail(state, selectedInstruction, model::xlen, model::abiRegisters, { model.open(it) })
+                            selectedInstruction != null -> InstructionDetail(state, selectedInstruction, model::xlen, model::abiRegisters, { model.open(it) }, model::openInstruction)
                             else -> CatalogSearchScreen(state, model, searchGrid, instructionGrid, showSearch = !landscapeHome,
                                 expanded = mapOf(SearchCategory.CSR to csrExpanded, SearchCategory.FIELD to fieldsExpanded, SearchCategory.DESCRIPTION to descriptionsExpanded),
                                 onToggle = { category -> when (category) {

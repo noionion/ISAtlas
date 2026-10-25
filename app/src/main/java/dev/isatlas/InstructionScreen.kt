@@ -8,6 +8,9 @@ import androidx.compose.foundation.pager.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -21,6 +24,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import dev.isatlas.core.*
 import kotlinx.coroutines.launch
@@ -49,17 +54,32 @@ fun CatalogSearchScreen(state: AtlasState, model: AppViewModel, csrGrid: LazyGri
 }
 
 @Composable
-private fun InstructionResultsScreen(state: AtlasState, grid: LazyGridState, onRelax: (InstructionDiagnostic) -> Unit, onOpen: (InstructionHit) -> Unit) {
+internal fun InstructionResultsScreen(state: AtlasState, grid: LazyGridState, onRelax: (InstructionDiagnostic) -> Unit, onOpen: (InstructionHit) -> Unit) {
     val result = remember(state.instructions, state.query, state.xlen, state.privilege, state.namespace, state.extensions, state.compilerIsa) { state.instructionResults }
+    val groups = remember(result) { result.groups }
+    val explanations = remember(result) { InstructionCandidates.explanations(result.hits) }
+    var namesExpanded by rememberSaveable { mutableStateOf(true) }
+    var descriptionsExpanded by rememberSaveable { mutableStateOf(true) }
+    var encodingsExpanded by rememberSaveable { mutableStateOf(true) }
+    var expandedVariants by rememberSaveable { mutableStateOf(emptyList<String>()) }
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("${result.hits.size} 个编码变体", style = MaterialTheme.typography.labelMedium)
+            Text("${groups.size} 个结果 · ${result.hits.size} 个变体", Modifier.weight(1f), style = MaterialTheme.typography.labelMedium)
             Text("RV${state.xlen} · ${state.privilege ?: "全部权限"}" + if (state.extensions.isEmpty()) "" else " · 扩展 ${state.extensions.size}",
                 style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
         }
         LazyVerticalGrid(columns = GridCells.Adaptive(300.dp), state = grid, modifier = Modifier.fillMaxSize().testTag("instruction-results"),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            if (explanations.isNotEmpty()) item(key = "candidates", span = { GridItemSpan(maxLineSpan) }) {
+                var expanded by rememberSaveable(state.query) { mutableStateOf(false) }
+                Column {
+                    TextButton(onClick = { expanded = !expanded }, modifier = Modifier.testTag("instruction-candidate-explanation")) {
+                        Text(if (expanded) "收起多候选说明" else "为什么有多个候选？")
+                    }
+                    if (expanded) explanations.forEach { Text(it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(bottom = 6.dp)) }
+                }
+            }
             if (result.hits.isEmpty()) item(span = { GridItemSpan(maxLineSpan) }) {
                 Column(Modifier.fillMaxWidth().padding(24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("当前数据范围内没有匹配项", fontWeight = FontWeight.Bold)
@@ -71,26 +91,57 @@ private fun InstructionResultsScreen(state: AtlasState, grid: LazyGridState, onR
                     }
                 }
             }
-            items(result.hits, key = { it.key }) { hit ->
-                ElevatedCard(onClick = { onOpen(hit) }, modifier = Modifier.testTag("inst-${hit.key}")) {
-                    Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Text(hit.instruction.name, Modifier.weight(1f), fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                            Text("${normalizePrivilege(hit.encoding.privilege)} · ${hit.encoding.length} bit", style = MaterialTheme.typography.labelSmall)
-                        }
-                        Text(hit.encoding.summary ?: hit.instruction.summary, maxLines = 2, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
-                        if (hit.category == InstructionMatchCategory.DESCRIPTION) Text("描述匹配", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(hit.encoding.requirements, maxLines = 2, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelSmall)
-                        if (hit.word != null) {
-                            val address = InstructionCsr.address(hit.encoding, hit.word!!)
-                            val csrs = address?.let { state.pack?.let { pack -> InstructionCsr.resolve(pack, it, state.xlen, state.namespace) } }.orEmpty()
-                            InstructionAssembly.render(hit, state.abiRegisters, csrs.singleOrNull()?.name, state.xlen)?.let { assembly ->
-                                Text(assembly.text, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
-                                if (!assembly.complete) Text("操作数字段（汇编格式待补充）", style = MaterialTheme.typography.labelSmall)
+            InstructionMatchCategory.entries.forEach { category ->
+                val matchingGroups = groups.filter { it.category == category }
+                if (matchingGroups.isNotEmpty()) {
+                    val expanded = when (category) {
+                        InstructionMatchCategory.NAME -> namesExpanded
+                        InstructionMatchCategory.DESCRIPTION -> descriptionsExpanded
+                        InstructionMatchCategory.ENCODING -> encodingsExpanded
+                    }
+                    item(key = "category-${category.name}", span = { GridItemSpan(maxLineSpan) }) {
+                        Surface(onClick = { when (category) {
+                            InstructionMatchCategory.NAME -> namesExpanded = !namesExpanded
+                            InstructionMatchCategory.DESCRIPTION -> descriptionsExpanded = !descriptionsExpanded
+                            InstructionMatchCategory.ENCODING -> encodingsExpanded = !encodingsExpanded
+                        } }, color = MaterialTheme.colorScheme.surfaceContainerHigh, shape = MaterialTheme.shapes.medium,
+                            modifier = Modifier.fillMaxWidth().testTag("instruction-category-${category.name}").semantics {
+                                stateDescription = if (expanded) "已展开" else "已收起"
+                            }) {
+                            Row(Modifier.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Text(category.label, Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+                                Text(matchingGroups.size.toString(), style = MaterialTheme.typography.labelMedium)
+                                Icon(if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null, Modifier.size(24.dp))
                             }
                         }
-                        else Text("${hit.encoding.match} / ${hit.encoding.mask}", fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.labelSmall)
-                        if (hit.instruction.kind != "instruction") Text(if (hit.instruction.kind == "alias") "别名 → ${hit.instruction.aliasOf}" else "HINT", style = MaterialTheme.typography.labelSmall)
+                    }
+                    if (expanded) items(matchingGroups, key = { it.key }) { group ->
+                        if (group.hits.size == 1) InstructionResultCard(state, group.hits.single(), onOpen)
+                        else {
+                            val showVariants = group.key in expandedVariants
+                            ElevatedCard(Modifier.testTag("inst-group-${group.key}")) {
+                                Surface(onClick = { expandedVariants = if (showVariants) expandedVariants - group.key else expandedVariants + group.key },
+                                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                                    modifier = Modifier.fillMaxWidth().testTag("inst-variants-${group.key}").semantics {
+                                        stateDescription = if (showVariants) "已展开" else "已收起"
+                                    }) {
+                                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(group.name, Modifier.weight(1f), fontFamily = FontFamily.Monospace,
+                                                style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                            Icon(if (showVariants) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null)
+                                        }
+                                        Text("${group.hits.size} 个编码变体 · ${group.hits.map { it.instruction.namespace }.distinct().size} 个来源",
+                                            style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                                        Text(if (showVariants) "点击变体查看详情" else "展开查看各变体的扩展、编码与语义", style = MaterialTheme.typography.bodySmall)
+                                    }
+                                }
+                                if (showVariants) group.hits.forEach { hit ->
+                                    HorizontalDivider()
+                                    InstructionResultCard(state, hit, onOpen)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -99,12 +150,49 @@ private fun InstructionResultsScreen(state: AtlasState, grid: LazyGridState, onR
 }
 
 @Composable
-fun InstructionDetail(state: AtlasState, hit: InstructionHit, onWidth: (Int) -> Unit, onAbi: (Boolean) -> Unit, onCsr: (String) -> Unit) {
+private fun InstructionResultCard(state: AtlasState, hit: InstructionHit, onOpen: (InstructionHit) -> Unit) {
+    ElevatedCard(onClick = { onOpen(hit) }, modifier = Modifier.fillMaxWidth().testTag("inst-${hit.key}")) {
+        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(hit.instruction.name, Modifier.weight(1f), fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text("${normalizePrivilege(hit.encoding.privilege)} · ${hit.encoding.length} bit", style = MaterialTheme.typography.labelSmall)
+            }
+            Text(hit.encoding.summary ?: hit.instruction.summary, maxLines = 2, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
+            if (hit.category == InstructionMatchCategory.DESCRIPTION) Text("描述匹配", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(hit.encoding.requirements, maxLines = 2, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelSmall)
+            Text(hit.instruction.namespace, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (hit.word != null) {
+                val address = InstructionCsr.address(hit.encoding, hit.word!!)
+                val csrs = address?.let { state.pack?.let { pack -> InstructionCsr.resolve(pack, it, state.xlen, state.namespace) } }.orEmpty()
+                InstructionAssembly.render(hit, state.abiRegisters, csrs.singleOrNull()?.name, state.xlen)?.let { assembly ->
+                    Text(assembly.text, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
+                    if (!assembly.complete) Text("操作数字段（汇编格式待补充）", style = MaterialTheme.typography.labelSmall)
+                }
+            }
+            else Text("${hit.encoding.match} / ${hit.encoding.mask}", fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.labelSmall)
+            if (hit.instruction.kind != "instruction") Text(if (hit.instruction.kind == "alias") "别名 → ${hit.instruction.aliasOf}" else "HINT", style = MaterialTheme.typography.labelSmall)
+        }
+    }
+}
+
+@Composable
+fun InstructionDetail(state: AtlasState, hit: InstructionHit, onWidth: (Int) -> Unit, onAbi: (Boolean) -> Unit, onCsr: (String) -> Unit,
+    onRelated: (InstructionHit) -> Unit = {}) {
     val instruction = hit.instruction
     val variants = instruction.encodings.withIndex().filter { state.xlen in it.value.xlens }
     var variantIndex by rememberSaveable(hit.key) { mutableIntStateOf(hit.index) }
     val variant = variants.find { it.index == variantIndex } ?: variants.firstOrNull()
     val encoding = variant?.value
+    val related = remember(state.instructions, hit.word, state.xlen, state.privilege, state.namespace, state.extensions, state.compilerIsa) {
+        hit.word?.let { word -> state.instructions?.let { catalog -> InstructionSearch.query(catalog, "0x${word.toString(16)}",
+            CatalogFilter(state.xlen, state.privilege, state.namespace, state.extensions), state.compilerIsa).hits } }.orEmpty()
+    }
+    val bases = remember(state.instructions, instruction.id, hit.word, state.xlen, state.privilege, state.extensions, state.compilerIsa) {
+        if (hit.word != null || instruction.aliasOf == null) emptyList() else state.instructions?.let { catalog ->
+            InstructionSearch.query(catalog, instruction.aliasOf.orEmpty(),
+                CatalogFilter(state.xlen, state.privilege, instruction.namespace, state.extensions), state.compilerIsa).hits.filter { it.instruction.name == instruction.aliasOf }
+        }.orEmpty()
+    }
     var selectedField by rememberSaveable(hit.key, variant?.index) { mutableStateOf<String?>(null) }
     val clipboard = LocalClipboardManager.current
     val uri = LocalUriHandler.current
@@ -116,6 +204,33 @@ fun InstructionDetail(state: AtlasState, hit: InstructionHit, onWidth: (Int) -> 
                 WidthPicker(state.xlen, onWidth)
             }
             Text(encoding?.summary ?: instruction.summary, style = MaterialTheme.typography.bodyMedium)
+        }
+        if (instruction.kind == "alias") item {
+            Text("别名 → ${instruction.aliasOf}", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelMedium)
+            bases.forEach { base ->
+                TextButton(onClick = { onRelated(base) }, modifier = Modifier.testTag("instruction-base-${base.key}")) {
+                    Text("查看 ${base.instruction.name} · ${base.encoding.requirements}")
+                }
+            }
+        }
+        if (related.size > 1) item {
+            var expanded by rememberSaveable(hit.key) { mutableStateOf(false) }
+            Column {
+                TextButton(onClick = { expanded = !expanded }, modifier = Modifier.testTag("instruction-related-toggle")) {
+                    Text(if (expanded) "收起同编码候选" else "同编码候选 · ${related.size}")
+                }
+                if (expanded) {
+                    InstructionCandidates.explanations(related).forEach { Text(it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(bottom = 6.dp)) }
+                    related.forEach { candidate ->
+                        TextButton(onClick = {
+                            if (candidate.instruction.id == instruction.id) variantIndex = candidate.index else onRelated(candidate)
+                        }, enabled = candidate.key != "${instruction.id}:${variant?.index}",
+                            modifier = Modifier.testTag("instruction-related-${candidate.key}")) {
+                            Text("${candidate.instruction.name} · ${candidate.encoding.requirements} · ${candidate.instruction.namespace}")
+                        }
+                    }
+                }
+            }
         }
         if (encoding == null) item { Text("此指令不适用于 RV${state.xlen}。") }
         else {

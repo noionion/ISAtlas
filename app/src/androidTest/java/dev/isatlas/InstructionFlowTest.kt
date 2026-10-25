@@ -121,4 +121,87 @@ class InstructionFlowTest {
         compose.onNodeWithTag("inst-riscv/manual/inst/c.sspush:0").assertIsDisplayed()
         compose.onNodeWithTag("inst-riscv/manual/inst/c.mop.1:0").assertIsDisplayed()
     }
+
+    @Test fun completeNameFirstCategoriesAndEmptyResults() {
+        compose.onNodeWithTag("search-input").performTextReplacement("ret")
+        compose.onNodeWithTag("instruction-search-options").assertDoesNotExist()
+        compose.onNodeWithTag("instruction-exact-name").assertDoesNotExist()
+        compose.onNodeWithTag("search-input").assertTextContains("ret")
+        compose.onNodeWithTag("inst-riscv/manual/inst/ret:0").assertIsDisplayed()
+
+        compose.onNodeWithTag("instruction-category-DESCRIPTION").assertDoesNotExist()
+        compose.onNodeWithTag("instruction-category-NAME").performClick()
+        compose.onNodeWithTag("inst-riscv/manual/inst/ret:0").assertDoesNotExist()
+        compose.runOnUiThread { compose.activity.recreate() }
+        compose.waitForIdle()
+        compose.onNodeWithTag("instruction-category-NAME").assert(SemanticsMatcher.expectValue(androidx.compose.ui.semantics.SemanticsProperties.StateDescription, "已收起")).performClick()
+        compose.onNodeWithTag("inst-riscv/manual/inst/ret:0").performClick()
+        compose.onNodeWithTag("instruction-base-riscv/manual/inst/jalr:0").performScrollTo().performClick()
+        compose.onNodeWithTag("app-title").assertTextEquals("jalr")
+        compose.onNodeWithContentDescription("返回搜索").performClick()
+        compose.onNodeWithTag("search-input").assertTextContains("ret")
+        compose.onNodeWithTag("search-input").performTextReplacement("no.such.instruction")
+        compose.onNodeWithText("当前数据范围内没有匹配项").assertIsDisplayed()
+        compose.onNodeWithTag("instruction-category-NAME").assertDoesNotExist()
+        compose.onNodeWithTag("instruction-category-DESCRIPTION").assertDoesNotExist()
+    }
+
+    @Test fun sameNameVariantsExpandAndSurviveDetailReturn() {
+        compose.onNodeWithTag("search-input").performTextReplacement("fadd.s")
+        compose.onNodeWithTag("inst-group-NAME:fadd.s").assertIsDisplayed()
+        compose.onNodeWithTag("inst-riscv/manual/inst/fadd.s:0").assertDoesNotExist()
+        compose.onNodeWithTag("inst-variants-NAME:fadd.s").performClick()
+        compose.onNodeWithTag("instruction-results").performScrollToNode(hasTestTag("inst-riscv/manual/inst/fadd.s:1"))
+        compose.onNodeWithTag("inst-riscv/manual/inst/fadd.s:1").performClick()
+        compose.onNodeWithTag("app-title").assertTextEquals("fadd.s")
+        compose.onNodeWithContentDescription("返回搜索").performClick()
+        compose.onNodeWithTag("inst-riscv/manual/inst/fadd.s:1").assertIsDisplayed()
+        compose.onNodeWithTag("instruction-results").performScrollToNode(hasTestTag("inst-variants-NAME:fadd.s"))
+        compose.onNodeWithTag("inst-variants-NAME:fadd.s").performClick()
+        compose.onNodeWithTag("inst-riscv/manual/inst/fadd.s:1").assertDoesNotExist()
+    }
+
+    @Test fun reverseLookupExplainsAndLinksAliasWithoutDroppingWord() {
+        compose.onNodeWithTag("search-input").performTextReplacement("0x00008067")
+        compose.onNodeWithTag("instruction-candidate-explanation").performClick()
+        compose.onNodeWithText("ret 是 jalr 的别名；两者表示同一编码的不同写法。").assertIsDisplayed()
+        compose.onNodeWithTag("instruction-results").performScrollToNode(hasTestTag("inst-riscv/manual/inst/ret:0"))
+        compose.onNodeWithTag("inst-riscv/manual/inst/ret:0").performClick()
+        compose.onNodeWithTag("instruction-related-toggle").performClick()
+        compose.onNodeWithTag("instruction-related-riscv/manual/inst/jalr:0").performScrollTo().performClick()
+        compose.onNodeWithTag("app-title").assertTextEquals("jalr")
+        compose.onNodeWithTag("register-names-number").performScrollTo().performClick()
+        compose.onNodeWithTag("instruction-assembly").assertTextEquals("jalr x0, 0(x1)")
+        compose.onNodeWithContentDescription("返回搜索").performClick()
+        compose.onNodeWithTag("search-input").assertTextContains("0x00008067")
+    }
+
+    @Test fun descriptionCategoryAndLandscapeGroups() {
+        compose.onNodeWithTag("search-input").performTextReplacement("and")
+        compose.onNodeWithTag("instruction-category-NAME").performClick()
+        compose.onNodeWithTag("instruction-category-DESCRIPTION").assertIsDisplayed().performClick()
+        compose.runOnUiThread { compose.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE }
+        compose.waitForIdle()
+        compose.onNodeWithTag("instruction-category-NAME").assert(SemanticsMatcher.expectValue(androidx.compose.ui.semantics.SemanticsProperties.StateDescription, "已收起"))
+        compose.onNodeWithTag("instruction-category-DESCRIPTION").assert(SemanticsMatcher.expectValue(androidx.compose.ui.semantics.SemanticsProperties.StateDescription, "已收起"))
+        compose.onNodeWithTag("search-input").performTextReplacement("fadd.s")
+        compose.onNodeWithTag("instruction-search-options").assertDoesNotExist()
+        compose.onNodeWithTag("instruction-category-NAME").performClick()
+        compose.onNodeWithTag("inst-variants-NAME:fadd.s").performClick()
+        compose.onNodeWithTag("instruction-results").performScrollToNode(hasTestTag("inst-riscv/manual/inst/fadd.s:0"))
+        compose.onNodeWithTag("inst-riscv/manual/inst/fadd.s:0").assertIsDisplayed().performClick()
+        compose.onNodeWithTag("register-diagram").assertIsDisplayed()
+    }
+
+    @Test fun sameMnemonicCandidateChangesEncodingInPlace() {
+        compose.onNodeWithTag("search-input").performTextReplacement("0x00b50553")
+        compose.onNodeWithTag("inst-variants-ENCODING:fadd.s").performClick()
+        compose.onNodeWithTag("inst-riscv/manual/inst/fadd.s:0").performClick()
+        compose.onNodeWithTag("instruction-related-toggle").performClick()
+        compose.onNodeWithTag("instruction-related-riscv/manual/inst/fadd.s:0").assertIsNotEnabled()
+        compose.onNodeWithTag("instruction-related-riscv/manual/inst/fadd.s:1").performClick().assertIsNotEnabled()
+        compose.onNodeWithTag("instruction-related-riscv/manual/inst/fadd.s:0").performClick().assertIsNotEnabled()
+        compose.onNodeWithContentDescription("返回搜索").performClick()
+        compose.onNodeWithTag("search-input").assertTextContains("0x00b50553")
+    }
 }
