@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-internal enum class UpdateStage { IDLE, CHOOSING, DOWNLOADING, VERIFYING, READY, FAILED }
+internal enum class UpdateStage { IDLE, CHOOSING, DOWNLOADING, PAUSED, VERIFYING, READY, FAILED }
 internal enum class UpdatePrompt { RELEASE, INSTALL }
 internal data class UpdateState(
     val track: UpdateTrack = UpdateTrack.STABLE,
@@ -30,20 +30,23 @@ internal data class UpdateState(
     val skipped: Boolean = false,
     val readyNotice: Boolean = false,
     val installation: InstallState = InstallState(),
+    val downloadControlPending: Boolean = false,
 ) {
     val hasUpdate get() = release?.let { track.accepts(it) || hasTransfer } == true
     val busy get() = stage in setOf(UpdateStage.CHOOSING, UpdateStage.DOWNLOADING, UpdateStage.VERIFYING)
-    val hasTransfer get() = busy || stage == UpdateStage.READY || installation.phase != InstallPhase.IDLE
+    val hasTransfer get() = busy || stage == UpdateStage.PAUSED || stage == UpdateStage.READY || installation.phase != InstallPhase.IDLE
     val trackSummary get() = "${track.label} · ${track.description}" +
         if (hasTransfer) "。已开始的下载或安装任务保持不变，通道对后续检查生效。" else ""
     val summary: String get() = when {
         checking -> "正在并行检查官方与镜像…"
+        downloadControlPending -> "正在停止下载…"
         installation.phase == InstallPhase.PREPARING -> "正在准备安装更新…"
         installation.phase == InstallPhase.SUBMITTED -> "已提交系统安装，可继续查询"
         installation.phase == InstallPhase.CONFIRMATION -> "更新需要系统确认，点击继续安装"
         installation.message != null -> installation.message
         stage == UpdateStage.CHOOSING -> "正在选择可用下载渠道…"
         stage == UpdateStage.DOWNLOADING -> "后台下载中${progress?.let { " · $it%" }.orEmpty()}${channel?.let { " · $it" }.orEmpty()}"
+        stage == UpdateStage.PAUSED -> "下载已暂停，点击继续下载"
         stage == UpdateStage.VERIFYING -> "下载完成，正在校验安装包…"
         stage == UpdateStage.READY -> "${release?.version} 已下载，点击安装"
         message != null -> message
@@ -73,6 +76,7 @@ internal class UpdateRepository(
     @Volatile private var foreground = false
     private var observer: Job? = null
     private var checkJob: Job? = null
+    private var transferJob: Job? = null
     private var checkGeneration = 0L
     private var manualCheckRequested = false
     private var lastAttempt = 0L
@@ -86,7 +90,7 @@ internal class UpdateRepository(
             installer.state.collect { installation ->
                 if (installation.completed) {
                     val id = prefs.getLong("downloadId", -1)
-                    prefs.edit { remove("release"); remove("downloadId"); remove("taskRelease") }
+                    prefs.edit { remove("release"); remove("downloadId"); remove("taskRelease"); remove("downloadPaused") }
                     if (id != -1L) scope.launch(Dispatchers.IO) { runCatching { downloads.remove(id) } }
                     mutable.update { it.copy(release = null, stage = UpdateStage.IDLE, readyNotice = false, prompt = null,
                         installation = installation, message = "更新已安装") }
@@ -100,12 +104,13 @@ internal class UpdateRepository(
                     }) }
             }
         }
-        if (prefs.getLong("downloadId", -1) != -1L) {
+        if (prefs.getLong("downloadId", -1) != -1L || prefs.getBoolean("downloadPaused", false)) {
             val task = AppUpdates.restore(prefs.getString("taskRelease", null))?.takeIf(::newer)
-            if (task != null) mutable.update { it.copy(release = task, stage = UpdateStage.DOWNLOADING) }
+            if (task != null) mutable.update { it.copy(release = task,
+                stage = if (prefs.getBoolean("downloadPaused", false)) UpdateStage.PAUSED else UpdateStage.DOWNLOADING) }
             else {
                 val obsoleteId = prefs.getLong("downloadId", -1)
-                prefs.edit { remove("downloadId"); remove("taskRelease") }
+                prefs.edit { remove("downloadId"); remove("taskRelease"); remove("downloadPaused") }
                 scope.launch(Dispatchers.IO) { runCatching { downloads.remove(obsoleteId) } }
             }
         }
@@ -122,7 +127,7 @@ internal class UpdateRepository(
             installer.reconcile()
             refreshDownload()
             maybePrompt()
-            if (!state.value.busy && state.value.stage != UpdateStage.READY &&
+            if (!state.value.hasTransfer &&
                 System.currentTimeMillis() - prefs.getLong("lastCheck", 0) >= 6 * 60 * 60 * 1000L &&
                 System.currentTimeMillis() - lastAttempt >= 5 * 60 * 1000L) check(false)
             while (isActive) {
@@ -206,7 +211,7 @@ internal class UpdateRepository(
         if (value.stage == UpdateStage.READY && !readyAnnounced) {
             readyAnnounced = true
             mutable.update { it.copy(readyNotice = true) }
-        } else if (!value.busy && value.stage != UpdateStage.READY && !value.skipped &&
+        } else if (!value.hasTransfer && !value.skipped &&
             value.release != null && promptedVersion != value.release.version) openPrompt()
     }
 
@@ -226,23 +231,89 @@ internal class UpdateRepository(
     }
 
     fun download() {
-        if (state.value.busy || state.value.stage == UpdateStage.READY) return
+        if (state.value.hasTransfer || state.value.downloadControlPending) return
         val release = state.value.release ?: return
         if (!state.value.track.accepts(release)) return
-        mutable.update { it.copy(stage = UpdateStage.CHOOSING, prompt = null, message = null, progress = null) }
-        scope.launch {
+        prefs.edit {
+            putString("taskRelease", release.encode())
+            remove("downloadPaused"); remove("channelOrder"); remove("channelPosition")
+        }
+        startTransfer(release, closePrompt = true)
+    }
+
+    fun toggleDownloadPause() {
+        if (state.value.downloadControlPending) return
+        if (state.value.stage == UpdateStage.PAUSED) {
+            val release = state.value.release ?: return
+            prefs.edit { remove("downloadPaused") }
+            startTransfer(release, closePrompt = false)
+        } else if (state.value.stage in setOf(UpdateStage.CHOOSING, UpdateStage.DOWNLOADING)) stopTransfer(paused = true)
+    }
+
+    fun cancelDownload() {
+        if (!state.value.downloadControlPending && (state.value.busy || state.value.stage == UpdateStage.PAUSED)) stopTransfer(paused = false)
+    }
+
+    private fun startTransfer(release: AppRelease, closePrompt: Boolean) {
+        mutable.update { it.copy(stage = UpdateStage.CHOOSING, prompt = if (closePrompt) null else it.prompt,
+            message = null, progress = null, readyNotice = false) }
+        transferJob = scope.launch {
             transferLock.withLock {
                 try {
-                    val order = client.downloadOrder(release)
+                    val savedOrder = prefs.getString("channelOrder", null)?.split(',')?.mapNotNull(String::toIntOrNull)
+                        ?.filter { it in UpdateChannels.all.indices }.orEmpty()
+                    val order = savedOrder.ifEmpty { client.downloadOrder(release) }
+                    ensureActive()
+                    val position = prefs.getInt("channelPosition", 0).coerceIn(order.indices)
                     prefs.edit {
                         putString("taskRelease", release.encode())
                         putString("channelOrder", order.joinToString(","))
-                        putInt("channelPosition", 0)
+                        putInt("channelPosition", position)
                     }
                     readyAnnounced = false
-                    enqueue(release, order.first())
+                    enqueue(release, order[position])
                 } catch (cancelled: CancellationException) { throw cancelled
                 } catch (_: Exception) { fail("官方与镜像下载渠道暂不可用，请重试。") }
+            }
+        }
+    }
+
+    private fun stopTransfer(paused: Boolean) {
+        mutable.update { it.copy(downloadControlPending = true) }
+        val pendingTransfer = transferJob
+        pendingTransfer?.cancel()
+        scope.launch {
+            pendingTransfer?.join()
+            transferLock.withLock {
+                try {
+                    // Completion can win a pause request; preserve the already verified APK.
+                    if (paused && state.value.stage == UpdateStage.READY) return@withLock
+                    val release = state.value.release
+                    withContext(Dispatchers.IO) {
+                        val id = prefs.getLong("downloadId", -1)
+                        if (id != -1L) downloads.remove(id)
+                        if (release != null) {
+                            val file = apkFile(release)
+                            check(!file.exists() || file.delete()) { "Unable to remove partial download" }
+                        }
+                    }
+                    prefs.edit {
+                        remove("downloadId")
+                        if (paused) putBoolean("downloadPaused", true)
+                        else { remove("downloadPaused"); remove("taskRelease"); remove("channelOrder"); remove("channelPosition") }
+                    }
+                    val eligible = release?.takeIf { state.value.track.accepts(it) }
+                    if (!paused) prefs.edit { if (eligible == null) remove("release") else putString("release", eligible.encode()) }
+                    mutable.update { it.copy(stage = if (paused) UpdateStage.PAUSED else UpdateStage.IDLE,
+                        release = if (paused) release else eligible, prompt = if (paused) it.prompt else null,
+                        progress = null, channel = null, readyNotice = false, message = if (paused) null else "下载已取消") }
+                } catch (cancelled: CancellationException) { throw cancelled
+                } catch (_: Exception) {
+                    mutable.update { it.copy(stage = if (prefs.getLong("downloadId", -1) == -1L) UpdateStage.FAILED else it.stage,
+                        message = "无法停止下载，请稍后重试。") }
+                } finally {
+                    mutable.update { it.copy(downloadControlPending = false) }
+                }
             }
         }
     }
@@ -283,7 +354,7 @@ internal class UpdateRepository(
 
     private suspend fun refreshDownload() = transferLock.withLock {
         val id = prefs.getLong("downloadId", -1)
-        if (id == -1L || state.value.stage == UpdateStage.READY) return@withLock
+        if (id == -1L || state.value.stage in setOf(UpdateStage.READY, UpdateStage.PAUSED) || state.value.downloadControlPending) return@withLock
         val release = AppUpdates.restore(prefs.getString("taskRelease", null))?.takeIf(::newer) ?: return@withLock
         try {
             withContext(Dispatchers.IO) {
@@ -300,6 +371,7 @@ internal class UpdateRepository(
                                 verifyApk(release)
                                 mutable.update { it.copy(stage = UpdateStage.READY, message = null) }
                                 maybePrompt()
+                            } catch (cancelled: CancellationException) { throw cancelled
                             } catch (_: Exception) {
                                 // A corrupt or unexpected mirror response is not installable; try the next source.
                                 tryNextChannel(release)
@@ -366,7 +438,7 @@ internal class UpdateRepository(
     }
 
     fun install() {
-        if (state.value.stage != UpdateStage.READY || state.value.installation.busy) return
+        if (state.value.stage != UpdateStage.READY || state.value.installation.busy || state.value.downloadControlPending) return
         if (state.value.installation.phase == InstallPhase.CONFIRMATION) {
             dismiss()
             installer.requestConfirmation()
@@ -406,7 +478,7 @@ internal class UpdateRepository(
     fun installConfirmationReturned() { scope.launch { installer.reconcile() } }
     private fun fail(message: String) {
         val id = prefs.getLong("downloadId", -1)
-        prefs.edit { remove("downloadId") }
+        prefs.edit { remove("downloadId"); remove("downloadPaused") }
         if (id != -1L) scope.launch(Dispatchers.IO) { runCatching { downloads.remove(id) } }
         mutable.update { it.copy(stage = UpdateStage.FAILED, message = message, progress = null) }
     }

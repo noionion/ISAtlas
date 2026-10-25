@@ -63,7 +63,8 @@ internal fun UpdateDialogs(repository: UpdateRepository, state: UpdateState) {
     }
     UpdateReadyNotice(state, repository::dismissReadyNotice, install)
     UpdatePromptDialog(state, onDismiss = repository::dismiss, onSkip = repository::skip,
-        onDownload = repository::download, onInstall = install)
+        onDownload = repository::download, onInstall = install,
+        onCancelDownload = repository::cancelDownload, onToggleDownloadPause = repository::toggleDownloadPause)
 }
 
 /** An ordinary in-app surface: no status-bar notification or notification permission. */
@@ -98,36 +99,59 @@ internal fun UpdatePromptDialog(
     onSkip: () -> Unit,
     onDownload: () -> Unit,
     onInstall: () -> Unit,
+    onCancelDownload: () -> Unit = {},
+    onToggleDownloadPause: () -> Unit = {},
 ) {
     val release = state.release ?: return
     if (state.prompt == null || !state.hasUpdate) return
     val ready = state.stage == UpdateStage.READY
+    val downloadControls = state.busy || state.stage == UpdateStage.PAUSED
     AlertDialog(
         modifier = Modifier.testTag("update-dialog"),
         onDismissRequest = onDismiss,
-        title = { Text(if (ready) "${release.version} 已准备好安装" else "发现新版本 ${release.version}") },
+        title = { Text(when {
+            ready -> "${release.version} 已准备好安装"
+            state.stage == UpdateStage.PAUSED -> "${release.version} 下载已暂停"
+            downloadControls -> "正在下载 ${release.version}"
+            else -> "发现新版本 ${release.version}"
+        }) },
         text = {
             Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState()).testTag("update-notes"),
                 verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (release.prerelease || dev.isatlas.core.AppVersion.parse(release.version)?.prerelease?.isNotEmpty() == true)
                     Text("预览版发布", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-                Text(if (ready) "安装包已校验，点击安装后提交更新；系统要求时再确认。" else
-                    "下载在后台进行，可继续查询。${if (release.size > 0) "安装包约 ${"%.1f".format(release.size / 1048576.0)} MB。" else ""}",
+                Text(when {
+                    ready -> "安装包已校验，点击安装后提交更新；系统要求时再确认。"
+                    state.stage == UpdateStage.PAUSED -> "任务已暂停，不会自动继续；恢复下载后仍可正常查询。"
+                    else -> "下载在后台进行，可继续查询。${if (release.size > 0) "安装包约 ${"%.1f".format(release.size / 1048576.0)} MB。" else ""}"
+                },
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (downloadControls) {
+                    Text(state.summary, modifier = Modifier.testTag("update-transfer-status"),
+                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                    Text("暂停会停止传输；继续时重新下载当前安装包。点击弹窗外或返回可继续查询。",
+                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    if (state.message != null) Text(state.message, style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error)
+                }
                 val notes = release.notes.ifBlank { "此版本未提供更新日志。" }
                     .replace(Regex("(?m)^#{1,6}\\s+"), "").replace("**", "").replace("`", "")
                 Text(notes, style = MaterialTheme.typography.bodyMedium)
-                if (state.busy || state.stage == UpdateStage.FAILED || state.message != null || state.installation.message != null)
+                if (!downloadControls && (state.stage == UpdateStage.FAILED || state.message != null || state.installation.message != null))
                     Text(state.summary, style = MaterialTheme.typography.bodySmall,
                         color = if (state.stage == UpdateStage.FAILED || state.message != null || state.installation.message != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary)
             }
         },
         confirmButton = {
             when {
-                ready -> TextButton(onClick = onInstall, enabled = !state.installation.busy, modifier = Modifier.testTag("update-install")) {
+                ready -> TextButton(onClick = onInstall, enabled = !state.installation.busy && !state.downloadControlPending, modifier = Modifier.testTag("update-install")) {
                     Text(if (state.installation.busy) "正在安装…" else "立即安装")
                 }
-                state.busy -> TextButton(onClick = onDismiss) { Text("继续查询") }
+                downloadControls -> TextButton(onClick = onToggleDownloadPause,
+                    enabled = !state.downloadControlPending && state.stage != UpdateStage.VERIFYING,
+                    modifier = Modifier.testTag("update-pause-resume")) {
+                    Text(if (state.stage == UpdateStage.PAUSED) "继续下载" else "暂停下载")
+                }
                 else -> TextButton(onClick = onDownload, modifier = Modifier.testTag("update-download")) {
                     Text(if (state.stage == UpdateStage.FAILED) "重新下载" else "下载更新")
                 }
@@ -135,8 +159,12 @@ internal fun UpdatePromptDialog(
         },
         dismissButton = {
             Row {
-                if (!ready && !state.busy) TextButton(onClick = onSkip, modifier = Modifier.testTag("update-skip")) { Text("跳过此版本") }
-                TextButton(onClick = onDismiss) { Text(if (ready) "稍后安装" else "稍后") }
+                if (downloadControls) TextButton(onClick = onCancelDownload, enabled = !state.downloadControlPending,
+                    modifier = Modifier.testTag("update-cancel-download")) { Text("取消下载") }
+                else {
+                    if (!ready) TextButton(onClick = onSkip, modifier = Modifier.testTag("update-skip")) { Text("跳过此版本") }
+                    TextButton(onClick = onDismiss) { Text(if (ready) "稍后安装" else "稍后") }
+                }
             }
         },
     )

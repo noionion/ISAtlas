@@ -226,6 +226,197 @@ class UpdateFlowTest {
         }
     }
 
+    @Test fun repeatedManualCheckAndContinueQueryKeepTheSystemDownloadAlive() = runBlocking {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val prefs = context.getSharedPreferences("update-test-repeat-check", Context.MODE_PRIVATE)
+        prefs.edit().clear().commit()
+        val installed = PackageInfo().apply { versionName = "0.3.0"; versionCode = 3 }
+        val repository = UpdateRepository(context, prefs, installed)
+        try {
+            compose.setContent { MaterialTheme {
+                val update by repository.state.collectAsState()
+                AboutScreen(null, {}, update) { repository.check(manual = true) }
+                UpdatePromptDialog(update, repository::dismiss, repository::skip, repository::download, {})
+            } }
+            repository.resume()
+            compose.onNodeWithTag("about-check-update").performScrollTo().performClick()
+            await { repository.state.value.prompt == UpdatePrompt.RELEASE }
+            compose.onNodeWithTag("update-download").performClick()
+            assertTrue(repository.state.value.busy)
+            compose.onNodeWithTag("about-check-update").performScrollTo().performClick()
+            InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
+            compose.onNodeWithTag("update-dialog").assertDoesNotExist()
+            assertTrue(repository.state.value.hasTransfer)
+            val release = repository.state.value.release
+            repeat(3) {
+                repository.check(manual = true)
+                repository.dismiss()
+                assertEquals(release, repository.state.value.release)
+                assertTrue(repository.state.value.hasTransfer)
+            }
+            await(120_000) { repository.state.value.stage in setOf(UpdateStage.READY, UpdateStage.FAILED) }
+            assertEquals(repository.state.value.message, UpdateStage.READY, repository.state.value.stage)
+            assertTrue(repository.state.value.readyNotice)
+        } finally {
+            repository.pause()
+            val id = prefs.getLong("downloadId", -1)
+            if (id != -1L) context.getSystemService(DownloadManager::class.java).remove(id)
+            prefs.edit().clear().commit()
+        }
+    }
+
+    @Test fun failedSystemDownloadStillFallsBackAfterCheckingAndDismissing() = runBlocking {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val prefs = context.getSharedPreferences("update-test-repeat-check-fallback", Context.MODE_PRIVATE)
+        prefs.edit().clear().commit()
+        val published = requireNotNull(UpdateClient().check("0.3.0"))
+        val downloads = context.getSystemService(DownloadManager::class.java)
+        val id = downloads.enqueue(DownloadManager.Request(android.net.Uri.parse(
+            "${AppUpdates.REPOSITORY}/releases/download/v0.0.0/ISAtlas-missing.apk"))
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE))
+        prefs.edit().putString("release", published.encode()).putString("taskRelease", published.encode())
+            .putLong("downloadId", id).putString("channelOrder", "0,1").putInt("channelPosition", 0).commit()
+        val installed = PackageInfo().apply { versionName = "0.3.0"; versionCode = 3 }
+        val repository = UpdateRepository(context, prefs, installed)
+        try {
+            repository.check(manual = true)
+            assertEquals(UpdatePrompt.RELEASE, repository.state.value.prompt)
+            repository.dismiss()
+            repository.resume()
+            await(120_000) { repository.state.value.stage in setOf(UpdateStage.READY, UpdateStage.FAILED) }
+            assertEquals(1, prefs.getInt("channelPosition", -1))
+            assertFalse(repository.state.value.busy)
+            assertTrue(repository.state.value.stage == UpdateStage.READY || repository.state.value.message != null)
+        } finally {
+            repository.pause()
+            downloads.remove(id)
+            val currentId = prefs.getLong("downloadId", -1)
+            if (currentId != -1L) downloads.remove(currentId)
+            prefs.edit().clear().commit()
+        }
+    }
+
+    @Test fun downloadDialogOffersPauseResumeAndCancelInsteadOfSkipOrContinueQuery() {
+        var update by mutableStateOf(UpdateState(release = release, stage = UpdateStage.DOWNLOADING,
+            progress = 25, prompt = UpdatePrompt.RELEASE))
+        var cancels = 0
+        var toggles = 0
+        compose.setContent { MaterialTheme {
+            UpdatePromptDialog(update, { update = update.copy(prompt = null) }, {}, {}, {},
+                onCancelDownload = { cancels++; update = update.copy(stage = UpdateStage.IDLE, prompt = null) },
+                onToggleDownloadPause = { toggles++; update = update.copy(stage = if (update.stage == UpdateStage.PAUSED)
+                    UpdateStage.DOWNLOADING else UpdateStage.PAUSED) })
+        } }
+        compose.onNodeWithTag("update-transfer-status").assertIsDisplayed().assertTextEquals("后台下载中 · 25%")
+        compose.onNodeWithTag("update-skip").assertDoesNotExist()
+        compose.onNodeWithText("继续查询").assertDoesNotExist()
+        compose.onNodeWithText("稍后").assertDoesNotExist()
+        compose.onNodeWithTag("update-pause-resume").assertTextEquals("暂停下载").performClick()
+        compose.onNodeWithTag("update-pause-resume").assertTextEquals("继续下载").performClick()
+        compose.runOnIdle { assertEquals(2, toggles); update = update.copy(downloadControlPending = true) }
+        compose.onNodeWithTag("update-pause-resume").assertIsNotEnabled()
+        compose.onNodeWithTag("update-cancel-download").assertIsNotEnabled()
+        compose.runOnIdle { update = update.copy(downloadControlPending = false, stage = UpdateStage.VERIFYING) }
+        compose.onNodeWithTag("update-pause-resume").assertIsNotEnabled()
+        compose.onNodeWithTag("update-cancel-download").performClick()
+        compose.runOnIdle { assertEquals(1, cancels) }
+        compose.onNodeWithTag("update-dialog").assertDoesNotExist()
+    }
+
+    @Test fun pausedTransferRestoresWithoutCheckingAndCancelsAfterTrackSwitch() = runBlocking {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val prefs = context.getSharedPreferences("update-test-paused-restore", Context.MODE_PRIVATE)
+        prefs.edit().clear().commit()
+        val task = release.copy(version = "0.5.0-beta.1", tag = "v0.5.0-beta.1", prerelease = true,
+            apkUrl = "${AppUpdates.REPOSITORY}/releases/download/v0.5.0-beta.1/ISAtlas-0.5.0-beta.1.apk")
+        prefs.edit().putString("taskRelease", task.encode()).putBoolean("downloadPaused", true)
+            .putString("updateTrack", "PREVIEW").commit()
+        var checks = 0
+        val installed = PackageInfo().apply { versionName = "0.3.0"; versionCode = 3 }
+        val repository = UpdateRepository(context, prefs, installed, UpdateClient { checks++; response() })
+        try {
+            repository.resume()
+            delay(200)
+            assertEquals(UpdateStage.PAUSED, repository.state.value.stage)
+            assertNull(repository.state.value.prompt)
+            assertTrue(repository.state.value.hasTransfer)
+            repository.selectTrack(UpdateTrack.STABLE)
+            repository.check(manual = true)
+            assertEquals(task, repository.state.value.release)
+            assertEquals(UpdatePrompt.RELEASE, repository.state.value.prompt)
+            assertEquals(0, checks)
+            repository.cancelDownload()
+            await { !repository.state.value.downloadControlPending }
+            assertEquals(UpdateStage.IDLE, repository.state.value.stage)
+            assertFalse(repository.state.value.hasUpdate)
+            assertNull(prefs.getString("taskRelease", null))
+            assertFalse(prefs.getBoolean("downloadPaused", false))
+        } finally { repository.pause(); prefs.edit().clear().commit() }
+    }
+
+    @Test fun cancellingChannelSelectionCannotEnqueueALateDownload() = runBlocking {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val prefs = context.getSharedPreferences("update-test-cancel-selection", Context.MODE_PRIVATE)
+        prefs.edit().clear().putString("release", release.encode()).commit()
+        val installed = PackageInfo().apply { versionName = "0.3.0"; versionCode = 3 }
+        val repository = UpdateRepository(context, prefs, installed)
+        try {
+            repository.download()
+            repository.cancelDownload()
+            repository.download() // A second start while stopping must be ignored.
+            await { !repository.state.value.downloadControlPending }
+            delay(300)
+            assertEquals(UpdateStage.IDLE, repository.state.value.stage)
+            assertEquals(-1L, prefs.getLong("downloadId", -1))
+            assertNull(prefs.getString("taskRelease", null))
+            assertNotNull(repository.state.value.release)
+            assertFalse(repository.state.value.hasTransfer)
+        } finally { repository.pause(); prefs.edit().clear().commit() }
+    }
+
+    @Test fun realDownloadCanPauseRestoreContinueAndFinishVerification() = runBlocking {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val prefs = context.getSharedPreferences("update-test-pause-transfer", Context.MODE_PRIVATE)
+        prefs.edit().clear().commit()
+        val installed = PackageInfo().apply { versionName = "0.3.0"; versionCode = 3 }
+        val repository = UpdateRepository(context, prefs, installed)
+        val downloads = context.getSystemService(DownloadManager::class.java)
+        var restored: UpdateRepository? = null
+        try {
+            repository.check(manual = true)
+            await { !repository.state.value.checking }
+            assertNotNull(repository.state.value.release)
+            repository.download()
+            await(30_000) { prefs.getLong("downloadId", -1) != -1L }
+            val firstId = prefs.getLong("downloadId", -1)
+            repository.toggleDownloadPause()
+            await { !repository.state.value.downloadControlPending }
+            assertEquals(UpdateStage.PAUSED, repository.state.value.stage)
+            assertEquals(-1L, prefs.getLong("downloadId", -1))
+            downloads.query(DownloadManager.Query().setFilterById(firstId)).use { assertFalse(it.moveToFirst()) }
+            assertTrue(prefs.getBoolean("downloadPaused", false))
+            repository.pause()
+            restored = UpdateRepository(context, prefs, installed)
+            restored.resume()
+            delay(200)
+            assertEquals(UpdateStage.PAUSED, restored.state.value.stage)
+            assertEquals(-1L, prefs.getLong("downloadId", -1))
+            restored.check(manual = true)
+            assertEquals(UpdatePrompt.RELEASE, restored.state.value.prompt)
+            restored.toggleDownloadPause()
+            await(120_000) { restored.state.value.stage in setOf(UpdateStage.READY, UpdateStage.FAILED) }
+            assertEquals(restored.state.value.message, UpdateStage.READY, restored.state.value.stage)
+            assertNotEquals(firstId, prefs.getLong("downloadId", -1))
+            assertFalse(prefs.getBoolean("downloadPaused", false))
+        } finally {
+            repository.pause()
+            restored?.pause()
+            val id = prefs.getLong("downloadId", -1)
+            if (id != -1L) downloads.remove(id)
+            prefs.edit().clear().commit()
+        }
+    }
+
     @Test fun mismatchedChecksumRetriesChannelsAndNeverOffersInstallation() = runBlocking {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val prefs = context.getSharedPreferences("update-test-rejection", Context.MODE_PRIVATE)
