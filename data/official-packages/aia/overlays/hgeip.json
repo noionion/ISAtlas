@@ -1,0 +1,58 @@
+{
+  "id": "riscv/manual/csr/hgeip",
+  "patch": {
+    "object": {
+      "extensions": {
+        "add": [
+          "Smaia",
+          "Ssaia"
+        ],
+        "remove": []
+      },
+      "fields": {
+        "list": "fields",
+        "remove": [],
+        "items": [
+          {
+            "key": "GEIP",
+            "patch": {
+              "object": {
+                "summary": {
+                  "append": " AIA：mstateen0.IMSIC=0 不强制此字段读零。",
+                  "join": false
+                },
+                "sourceUrl": {
+                  "set": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/CSRs.adoc#L382-L441"
+                },
+                "summaryEn": {
+                  "append": " AIA: mstateen0.IMSIC=0 does not force this field to zero.",
+                  "join": false
+                }
+              },
+              "remove": []
+            }
+          }
+        ]
+      },
+      "sources": {
+        "list": "sources",
+        "remove": [],
+        "items": [
+          {
+            "key": "aia",
+            "patch": {
+              "set": {
+                "namespace": "aia",
+                "title": "RISC-V Advanced Interrupt Architecture 20250312",
+                "revision": "20318d1b03f0ac8253458b82f8244d0d0db074e9",
+                "url": "https://github.com/riscv/riscv-aia/tree/20318d1b03f0ac8253458b82f8244d0d0db074e9",
+                "license": "CC-BY-4.0"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "remove": []
+  }
+}

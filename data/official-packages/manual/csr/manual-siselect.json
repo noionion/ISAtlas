@@ -1,0 +1,57 @@
+{
+  "id": "riscv/manual/csr/siselect",
+  "name": "siselect",
+  "namespace": "manual",
+  "title": "Select an indirect register.",
+  "summary": "选择间接寄存器。",
+  "summaryEn": "Select an indirect register.",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 336
+  },
+  "privilege": "S",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "Sscsrind",
+  "extensions": [
+    "Sscsrind"
+  ],
+  "notes": "",
+  "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/indirect-csr.adoc",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "regions": [],
+  "fields": [
+    {
+      "name": "SELECT",
+      "summary": "选择间接访问目标；可用范围由所实现扩展定义。",
+      "summaryEn": "Select an indirect target; implemented extensions define supported ranges.",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 0
+        }
+      ],
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "aliases": [],
+      "typeRule": "",
+      "condition": "",
+      "view": "",
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/indirect-csr.adoc"
+    }
+  ]
+}

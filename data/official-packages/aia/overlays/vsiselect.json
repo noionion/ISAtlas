@@ -1,0 +1,958 @@
+{
+  "id": "riscv/manual/csr/vsiselect",
+  "patch": {
+    "object": {
+      "extensions": {
+        "add": [
+          "Smaia",
+          "Ssaia"
+        ],
+        "remove": []
+      },
+      "notes": {
+        "append": " vsiselect 至少支持 0–0x1FF；IMSIC 访问要求有效的非零 hstatus.VGEIN。",
+        "join": true
+      },
+      "fields": {
+        "list": "fields",
+        "remove": [],
+        "items": [
+          {
+            "key": "SELECT",
+            "patch": {
+              "object": {
+                "summary": {
+                  "set": "选择间接寄存器；最高位为自定义选择空间，其他保留号不可当作 CSR 地址。"
+                },
+                "summaryEn": {
+                  "set": "Select an indirect register; the top bit designates custom selectors, not CSR addresses."
+                },
+                "aliases": {
+                  "set": [
+                    "eidelivery",
+                    "eithreshold",
+                    "eip",
+                    "eie",
+                    "iprio"
+                  ]
+                },
+                "sourceUrl": {
+                  "set": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/CSRs.adoc#L1-L370"
+                },
+                "values": {
+                  "object": {
+                    "112": {
+                      "set": "IMSIC eidelivery：中断递送控制"
+                    },
+                    "114": {
+                      "set": "IMSIC eithreshold：中断阈值"
+                    },
+                    "48": {
+                      "set": "VS 不可访问 iprio"
+                    },
+                    "49": {
+                      "set": "VS 不可访问 iprio"
+                    },
+                    "50": {
+                      "set": "VS 不可访问 iprio"
+                    },
+                    "51": {
+                      "set": "VS 不可访问 iprio"
+                    },
+                    "52": {
+                      "set": "VS 不可访问 iprio"
+                    },
+                    "53": {
+                      "set": "VS 不可访问 iprio"
+                    },
+                    "54": {
+                      "set": "VS 不可访问 iprio"
+                    },
+                    "55": {
+                      "set": "VS 不可访问 iprio"
+                    },
+                    "56": {
+                      "set": "VS 不可访问 iprio"
+                    },
+                    "57": {
+                      "set": "VS 不可访问 iprio"
+                    },
+                    "58": {
+                      "set": "VS 不可访问 iprio"
+                    },
+                    "59": {
+                      "set": "VS 不可访问 iprio"
+                    },
+                    "60": {
+                      "set": "VS 不可访问 iprio"
+                    },
+                    "61": {
+                      "set": "VS 不可访问 iprio"
+                    },
+                    "62": {
+                      "set": "VS 不可访问 iprio"
+                    },
+                    "63": {
+                      "set": "VS 不可访问 iprio"
+                    },
+                    "128": {
+                      "set": "IMSIC eip0；RV64 仅偶数索引有效"
+                    },
+                    "192": {
+                      "set": "IMSIC eie0；RV64 仅偶数索引有效"
+                    },
+                    "129": {
+                      "set": "IMSIC eip1；RV64 仅偶数索引有效"
+                    },
+                    "193": {
+                      "set": "IMSIC eie1；RV64 仅偶数索引有效"
+                    },
+                    "130": {
+                      "set": "IMSIC eip2；RV64 仅偶数索引有效"
+                    },
+                    "194": {
+                      "set": "IMSIC eie2；RV64 仅偶数索引有效"
+                    },
+                    "131": {
+                      "set": "IMSIC eip3；RV64 仅偶数索引有效"
+                    },
+                    "195": {
+                      "set": "IMSIC eie3；RV64 仅偶数索引有效"
+                    },
+                    "132": {
+                      "set": "IMSIC eip4；RV64 仅偶数索引有效"
+                    },
+                    "196": {
+                      "set": "IMSIC eie4；RV64 仅偶数索引有效"
+                    },
+                    "133": {
+                      "set": "IMSIC eip5；RV64 仅偶数索引有效"
+                    },
+                    "197": {
+                      "set": "IMSIC eie5；RV64 仅偶数索引有效"
+                    },
+                    "134": {
+                      "set": "IMSIC eip6；RV64 仅偶数索引有效"
+                    },
+                    "198": {
+                      "set": "IMSIC eie6；RV64 仅偶数索引有效"
+                    },
+                    "135": {
+                      "set": "IMSIC eip7；RV64 仅偶数索引有效"
+                    },
+                    "199": {
+                      "set": "IMSIC eie7；RV64 仅偶数索引有效"
+                    },
+                    "136": {
+                      "set": "IMSIC eip8；RV64 仅偶数索引有效"
+                    },
+                    "200": {
+                      "set": "IMSIC eie8；RV64 仅偶数索引有效"
+                    },
+                    "137": {
+                      "set": "IMSIC eip9；RV64 仅偶数索引有效"
+                    },
+                    "201": {
+                      "set": "IMSIC eie9；RV64 仅偶数索引有效"
+                    },
+                    "138": {
+                      "set": "IMSIC eip10；RV64 仅偶数索引有效"
+                    },
+                    "202": {
+                      "set": "IMSIC eie10；RV64 仅偶数索引有效"
+                    },
+                    "139": {
+                      "set": "IMSIC eip11；RV64 仅偶数索引有效"
+                    },
+                    "203": {
+                      "set": "IMSIC eie11；RV64 仅偶数索引有效"
+                    },
+                    "140": {
+                      "set": "IMSIC eip12；RV64 仅偶数索引有效"
+                    },
+                    "204": {
+                      "set": "IMSIC eie12；RV64 仅偶数索引有效"
+                    },
+                    "141": {
+                      "set": "IMSIC eip13；RV64 仅偶数索引有效"
+                    },
+                    "205": {
+                      "set": "IMSIC eie13；RV64 仅偶数索引有效"
+                    },
+                    "142": {
+                      "set": "IMSIC eip14；RV64 仅偶数索引有效"
+                    },
+                    "206": {
+                      "set": "IMSIC eie14；RV64 仅偶数索引有效"
+                    },
+                    "143": {
+                      "set": "IMSIC eip15；RV64 仅偶数索引有效"
+                    },
+                    "207": {
+                      "set": "IMSIC eie15；RV64 仅偶数索引有效"
+                    },
+                    "144": {
+                      "set": "IMSIC eip16；RV64 仅偶数索引有效"
+                    },
+                    "208": {
+                      "set": "IMSIC eie16；RV64 仅偶数索引有效"
+                    },
+                    "145": {
+                      "set": "IMSIC eip17；RV64 仅偶数索引有效"
+                    },
+                    "209": {
+                      "set": "IMSIC eie17；RV64 仅偶数索引有效"
+                    },
+                    "146": {
+                      "set": "IMSIC eip18；RV64 仅偶数索引有效"
+                    },
+                    "210": {
+                      "set": "IMSIC eie18；RV64 仅偶数索引有效"
+                    },
+                    "147": {
+                      "set": "IMSIC eip19；RV64 仅偶数索引有效"
+                    },
+                    "211": {
+                      "set": "IMSIC eie19；RV64 仅偶数索引有效"
+                    },
+                    "148": {
+                      "set": "IMSIC eip20；RV64 仅偶数索引有效"
+                    },
+                    "212": {
+                      "set": "IMSIC eie20；RV64 仅偶数索引有效"
+                    },
+                    "149": {
+                      "set": "IMSIC eip21；RV64 仅偶数索引有效"
+                    },
+                    "213": {
+                      "set": "IMSIC eie21；RV64 仅偶数索引有效"
+                    },
+                    "150": {
+                      "set": "IMSIC eip22；RV64 仅偶数索引有效"
+                    },
+                    "214": {
+                      "set": "IMSIC eie22；RV64 仅偶数索引有效"
+                    },
+                    "151": {
+                      "set": "IMSIC eip23；RV64 仅偶数索引有效"
+                    },
+                    "215": {
+                      "set": "IMSIC eie23；RV64 仅偶数索引有效"
+                    },
+                    "152": {
+                      "set": "IMSIC eip24；RV64 仅偶数索引有效"
+                    },
+                    "216": {
+                      "set": "IMSIC eie24；RV64 仅偶数索引有效"
+                    },
+                    "153": {
+                      "set": "IMSIC eip25；RV64 仅偶数索引有效"
+                    },
+                    "217": {
+                      "set": "IMSIC eie25；RV64 仅偶数索引有效"
+                    },
+                    "154": {
+                      "set": "IMSIC eip26；RV64 仅偶数索引有效"
+                    },
+                    "218": {
+                      "set": "IMSIC eie26；RV64 仅偶数索引有效"
+                    },
+                    "155": {
+                      "set": "IMSIC eip27；RV64 仅偶数索引有效"
+                    },
+                    "219": {
+                      "set": "IMSIC eie27；RV64 仅偶数索引有效"
+                    },
+                    "156": {
+                      "set": "IMSIC eip28；RV64 仅偶数索引有效"
+                    },
+                    "220": {
+                      "set": "IMSIC eie28；RV64 仅偶数索引有效"
+                    },
+                    "157": {
+                      "set": "IMSIC eip29；RV64 仅偶数索引有效"
+                    },
+                    "221": {
+                      "set": "IMSIC eie29；RV64 仅偶数索引有效"
+                    },
+                    "158": {
+                      "set": "IMSIC eip30；RV64 仅偶数索引有效"
+                    },
+                    "222": {
+                      "set": "IMSIC eie30；RV64 仅偶数索引有效"
+                    },
+                    "159": {
+                      "set": "IMSIC eip31；RV64 仅偶数索引有效"
+                    },
+                    "223": {
+                      "set": "IMSIC eie31；RV64 仅偶数索引有效"
+                    },
+                    "160": {
+                      "set": "IMSIC eip32；RV64 仅偶数索引有效"
+                    },
+                    "224": {
+                      "set": "IMSIC eie32；RV64 仅偶数索引有效"
+                    },
+                    "161": {
+                      "set": "IMSIC eip33；RV64 仅偶数索引有效"
+                    },
+                    "225": {
+                      "set": "IMSIC eie33；RV64 仅偶数索引有效"
+                    },
+                    "162": {
+                      "set": "IMSIC eip34；RV64 仅偶数索引有效"
+                    },
+                    "226": {
+                      "set": "IMSIC eie34；RV64 仅偶数索引有效"
+                    },
+                    "163": {
+                      "set": "IMSIC eip35；RV64 仅偶数索引有效"
+                    },
+                    "227": {
+                      "set": "IMSIC eie35；RV64 仅偶数索引有效"
+                    },
+                    "164": {
+                      "set": "IMSIC eip36；RV64 仅偶数索引有效"
+                    },
+                    "228": {
+                      "set": "IMSIC eie36；RV64 仅偶数索引有效"
+                    },
+                    "165": {
+                      "set": "IMSIC eip37；RV64 仅偶数索引有效"
+                    },
+                    "229": {
+                      "set": "IMSIC eie37；RV64 仅偶数索引有效"
+                    },
+                    "166": {
+                      "set": "IMSIC eip38；RV64 仅偶数索引有效"
+                    },
+                    "230": {
+                      "set": "IMSIC eie38；RV64 仅偶数索引有效"
+                    },
+                    "167": {
+                      "set": "IMSIC eip39；RV64 仅偶数索引有效"
+                    },
+                    "231": {
+                      "set": "IMSIC eie39；RV64 仅偶数索引有效"
+                    },
+                    "168": {
+                      "set": "IMSIC eip40；RV64 仅偶数索引有效"
+                    },
+                    "232": {
+                      "set": "IMSIC eie40；RV64 仅偶数索引有效"
+                    },
+                    "169": {
+                      "set": "IMSIC eip41；RV64 仅偶数索引有效"
+                    },
+                    "233": {
+                      "set": "IMSIC eie41；RV64 仅偶数索引有效"
+                    },
+                    "170": {
+                      "set": "IMSIC eip42；RV64 仅偶数索引有效"
+                    },
+                    "234": {
+                      "set": "IMSIC eie42；RV64 仅偶数索引有效"
+                    },
+                    "171": {
+                      "set": "IMSIC eip43；RV64 仅偶数索引有效"
+                    },
+                    "235": {
+                      "set": "IMSIC eie43；RV64 仅偶数索引有效"
+                    },
+                    "172": {
+                      "set": "IMSIC eip44；RV64 仅偶数索引有效"
+                    },
+                    "236": {
+                      "set": "IMSIC eie44；RV64 仅偶数索引有效"
+                    },
+                    "173": {
+                      "set": "IMSIC eip45；RV64 仅偶数索引有效"
+                    },
+                    "237": {
+                      "set": "IMSIC eie45；RV64 仅偶数索引有效"
+                    },
+                    "174": {
+                      "set": "IMSIC eip46；RV64 仅偶数索引有效"
+                    },
+                    "238": {
+                      "set": "IMSIC eie46；RV64 仅偶数索引有效"
+                    },
+                    "175": {
+                      "set": "IMSIC eip47；RV64 仅偶数索引有效"
+                    },
+                    "239": {
+                      "set": "IMSIC eie47；RV64 仅偶数索引有效"
+                    },
+                    "176": {
+                      "set": "IMSIC eip48；RV64 仅偶数索引有效"
+                    },
+                    "240": {
+                      "set": "IMSIC eie48；RV64 仅偶数索引有效"
+                    },
+                    "177": {
+                      "set": "IMSIC eip49；RV64 仅偶数索引有效"
+                    },
+                    "241": {
+                      "set": "IMSIC eie49；RV64 仅偶数索引有效"
+                    },
+                    "178": {
+                      "set": "IMSIC eip50；RV64 仅偶数索引有效"
+                    },
+                    "242": {
+                      "set": "IMSIC eie50；RV64 仅偶数索引有效"
+                    },
+                    "179": {
+                      "set": "IMSIC eip51；RV64 仅偶数索引有效"
+                    },
+                    "243": {
+                      "set": "IMSIC eie51；RV64 仅偶数索引有效"
+                    },
+                    "180": {
+                      "set": "IMSIC eip52；RV64 仅偶数索引有效"
+                    },
+                    "244": {
+                      "set": "IMSIC eie52；RV64 仅偶数索引有效"
+                    },
+                    "181": {
+                      "set": "IMSIC eip53；RV64 仅偶数索引有效"
+                    },
+                    "245": {
+                      "set": "IMSIC eie53；RV64 仅偶数索引有效"
+                    },
+                    "182": {
+                      "set": "IMSIC eip54；RV64 仅偶数索引有效"
+                    },
+                    "246": {
+                      "set": "IMSIC eie54；RV64 仅偶数索引有效"
+                    },
+                    "183": {
+                      "set": "IMSIC eip55；RV64 仅偶数索引有效"
+                    },
+                    "247": {
+                      "set": "IMSIC eie55；RV64 仅偶数索引有效"
+                    },
+                    "184": {
+                      "set": "IMSIC eip56；RV64 仅偶数索引有效"
+                    },
+                    "248": {
+                      "set": "IMSIC eie56；RV64 仅偶数索引有效"
+                    },
+                    "185": {
+                      "set": "IMSIC eip57；RV64 仅偶数索引有效"
+                    },
+                    "249": {
+                      "set": "IMSIC eie57；RV64 仅偶数索引有效"
+                    },
+                    "186": {
+                      "set": "IMSIC eip58；RV64 仅偶数索引有效"
+                    },
+                    "250": {
+                      "set": "IMSIC eie58；RV64 仅偶数索引有效"
+                    },
+                    "187": {
+                      "set": "IMSIC eip59；RV64 仅偶数索引有效"
+                    },
+                    "251": {
+                      "set": "IMSIC eie59；RV64 仅偶数索引有效"
+                    },
+                    "188": {
+                      "set": "IMSIC eip60；RV64 仅偶数索引有效"
+                    },
+                    "252": {
+                      "set": "IMSIC eie60；RV64 仅偶数索引有效"
+                    },
+                    "189": {
+                      "set": "IMSIC eip61；RV64 仅偶数索引有效"
+                    },
+                    "253": {
+                      "set": "IMSIC eie61；RV64 仅偶数索引有效"
+                    },
+                    "190": {
+                      "set": "IMSIC eip62；RV64 仅偶数索引有效"
+                    },
+                    "254": {
+                      "set": "IMSIC eie62；RV64 仅偶数索引有效"
+                    },
+                    "191": {
+                      "set": "IMSIC eip63；RV64 仅偶数索引有效"
+                    },
+                    "255": {
+                      "set": "IMSIC eie63；RV64 仅偶数索引有效"
+                    }
+                  },
+                  "remove": []
+                },
+                "valuesEn": {
+                  "object": {
+                    "112": {
+                      "set": "IMSIC eidelivery: delivery control"
+                    },
+                    "114": {
+                      "set": "IMSIC eithreshold: interrupt threshold"
+                    },
+                    "48": {
+                      "set": "Inaccessible at VS level"
+                    },
+                    "49": {
+                      "set": "Inaccessible at VS level"
+                    },
+                    "50": {
+                      "set": "Inaccessible at VS level"
+                    },
+                    "51": {
+                      "set": "Inaccessible at VS level"
+                    },
+                    "52": {
+                      "set": "Inaccessible at VS level"
+                    },
+                    "53": {
+                      "set": "Inaccessible at VS level"
+                    },
+                    "54": {
+                      "set": "Inaccessible at VS level"
+                    },
+                    "55": {
+                      "set": "Inaccessible at VS level"
+                    },
+                    "56": {
+                      "set": "Inaccessible at VS level"
+                    },
+                    "57": {
+                      "set": "Inaccessible at VS level"
+                    },
+                    "58": {
+                      "set": "Inaccessible at VS level"
+                    },
+                    "59": {
+                      "set": "Inaccessible at VS level"
+                    },
+                    "60": {
+                      "set": "Inaccessible at VS level"
+                    },
+                    "61": {
+                      "set": "Inaccessible at VS level"
+                    },
+                    "62": {
+                      "set": "Inaccessible at VS level"
+                    },
+                    "63": {
+                      "set": "Inaccessible at VS level"
+                    },
+                    "128": {
+                      "set": "IMSIC eip0; only even indices on RV64"
+                    },
+                    "192": {
+                      "set": "IMSIC eie0; only even indices on RV64"
+                    },
+                    "129": {
+                      "set": "IMSIC eip1; only even indices on RV64"
+                    },
+                    "193": {
+                      "set": "IMSIC eie1; only even indices on RV64"
+                    },
+                    "130": {
+                      "set": "IMSIC eip2; only even indices on RV64"
+                    },
+                    "194": {
+                      "set": "IMSIC eie2; only even indices on RV64"
+                    },
+                    "131": {
+                      "set": "IMSIC eip3; only even indices on RV64"
+                    },
+                    "195": {
+                      "set": "IMSIC eie3; only even indices on RV64"
+                    },
+                    "132": {
+                      "set": "IMSIC eip4; only even indices on RV64"
+                    },
+                    "196": {
+                      "set": "IMSIC eie4; only even indices on RV64"
+                    },
+                    "133": {
+                      "set": "IMSIC eip5; only even indices on RV64"
+                    },
+                    "197": {
+                      "set": "IMSIC eie5; only even indices on RV64"
+                    },
+                    "134": {
+                      "set": "IMSIC eip6; only even indices on RV64"
+                    },
+                    "198": {
+                      "set": "IMSIC eie6; only even indices on RV64"
+                    },
+                    "135": {
+                      "set": "IMSIC eip7; only even indices on RV64"
+                    },
+                    "199": {
+                      "set": "IMSIC eie7; only even indices on RV64"
+                    },
+                    "136": {
+                      "set": "IMSIC eip8; only even indices on RV64"
+                    },
+                    "200": {
+                      "set": "IMSIC eie8; only even indices on RV64"
+                    },
+                    "137": {
+                      "set": "IMSIC eip9; only even indices on RV64"
+                    },
+                    "201": {
+                      "set": "IMSIC eie9; only even indices on RV64"
+                    },
+                    "138": {
+                      "set": "IMSIC eip10; only even indices on RV64"
+                    },
+                    "202": {
+                      "set": "IMSIC eie10; only even indices on RV64"
+                    },
+                    "139": {
+                      "set": "IMSIC eip11; only even indices on RV64"
+                    },
+                    "203": {
+                      "set": "IMSIC eie11; only even indices on RV64"
+                    },
+                    "140": {
+                      "set": "IMSIC eip12; only even indices on RV64"
+                    },
+                    "204": {
+                      "set": "IMSIC eie12; only even indices on RV64"
+                    },
+                    "141": {
+                      "set": "IMSIC eip13; only even indices on RV64"
+                    },
+                    "205": {
+                      "set": "IMSIC eie13; only even indices on RV64"
+                    },
+                    "142": {
+                      "set": "IMSIC eip14; only even indices on RV64"
+                    },
+                    "206": {
+                      "set": "IMSIC eie14; only even indices on RV64"
+                    },
+                    "143": {
+                      "set": "IMSIC eip15; only even indices on RV64"
+                    },
+                    "207": {
+                      "set": "IMSIC eie15; only even indices on RV64"
+                    },
+                    "144": {
+                      "set": "IMSIC eip16; only even indices on RV64"
+                    },
+                    "208": {
+                      "set": "IMSIC eie16; only even indices on RV64"
+                    },
+                    "145": {
+                      "set": "IMSIC eip17; only even indices on RV64"
+                    },
+                    "209": {
+                      "set": "IMSIC eie17; only even indices on RV64"
+                    },
+                    "146": {
+                      "set": "IMSIC eip18; only even indices on RV64"
+                    },
+                    "210": {
+                      "set": "IMSIC eie18; only even indices on RV64"
+                    },
+                    "147": {
+                      "set": "IMSIC eip19; only even indices on RV64"
+                    },
+                    "211": {
+                      "set": "IMSIC eie19; only even indices on RV64"
+                    },
+                    "148": {
+                      "set": "IMSIC eip20; only even indices on RV64"
+                    },
+                    "212": {
+                      "set": "IMSIC eie20; only even indices on RV64"
+                    },
+                    "149": {
+                      "set": "IMSIC eip21; only even indices on RV64"
+                    },
+                    "213": {
+                      "set": "IMSIC eie21; only even indices on RV64"
+                    },
+                    "150": {
+                      "set": "IMSIC eip22; only even indices on RV64"
+                    },
+                    "214": {
+                      "set": "IMSIC eie22; only even indices on RV64"
+                    },
+                    "151": {
+                      "set": "IMSIC eip23; only even indices on RV64"
+                    },
+                    "215": {
+                      "set": "IMSIC eie23; only even indices on RV64"
+                    },
+                    "152": {
+                      "set": "IMSIC eip24; only even indices on RV64"
+                    },
+                    "216": {
+                      "set": "IMSIC eie24; only even indices on RV64"
+                    },
+                    "153": {
+                      "set": "IMSIC eip25; only even indices on RV64"
+                    },
+                    "217": {
+                      "set": "IMSIC eie25; only even indices on RV64"
+                    },
+                    "154": {
+                      "set": "IMSIC eip26; only even indices on RV64"
+                    },
+                    "218": {
+                      "set": "IMSIC eie26; only even indices on RV64"
+                    },
+                    "155": {
+                      "set": "IMSIC eip27; only even indices on RV64"
+                    },
+                    "219": {
+                      "set": "IMSIC eie27; only even indices on RV64"
+                    },
+                    "156": {
+                      "set": "IMSIC eip28; only even indices on RV64"
+                    },
+                    "220": {
+                      "set": "IMSIC eie28; only even indices on RV64"
+                    },
+                    "157": {
+                      "set": "IMSIC eip29; only even indices on RV64"
+                    },
+                    "221": {
+                      "set": "IMSIC eie29; only even indices on RV64"
+                    },
+                    "158": {
+                      "set": "IMSIC eip30; only even indices on RV64"
+                    },
+                    "222": {
+                      "set": "IMSIC eie30; only even indices on RV64"
+                    },
+                    "159": {
+                      "set": "IMSIC eip31; only even indices on RV64"
+                    },
+                    "223": {
+                      "set": "IMSIC eie31; only even indices on RV64"
+                    },
+                    "160": {
+                      "set": "IMSIC eip32; only even indices on RV64"
+                    },
+                    "224": {
+                      "set": "IMSIC eie32; only even indices on RV64"
+                    },
+                    "161": {
+                      "set": "IMSIC eip33; only even indices on RV64"
+                    },
+                    "225": {
+                      "set": "IMSIC eie33; only even indices on RV64"
+                    },
+                    "162": {
+                      "set": "IMSIC eip34; only even indices on RV64"
+                    },
+                    "226": {
+                      "set": "IMSIC eie34; only even indices on RV64"
+                    },
+                    "163": {
+                      "set": "IMSIC eip35; only even indices on RV64"
+                    },
+                    "227": {
+                      "set": "IMSIC eie35; only even indices on RV64"
+                    },
+                    "164": {
+                      "set": "IMSIC eip36; only even indices on RV64"
+                    },
+                    "228": {
+                      "set": "IMSIC eie36; only even indices on RV64"
+                    },
+                    "165": {
+                      "set": "IMSIC eip37; only even indices on RV64"
+                    },
+                    "229": {
+                      "set": "IMSIC eie37; only even indices on RV64"
+                    },
+                    "166": {
+                      "set": "IMSIC eip38; only even indices on RV64"
+                    },
+                    "230": {
+                      "set": "IMSIC eie38; only even indices on RV64"
+                    },
+                    "167": {
+                      "set": "IMSIC eip39; only even indices on RV64"
+                    },
+                    "231": {
+                      "set": "IMSIC eie39; only even indices on RV64"
+                    },
+                    "168": {
+                      "set": "IMSIC eip40; only even indices on RV64"
+                    },
+                    "232": {
+                      "set": "IMSIC eie40; only even indices on RV64"
+                    },
+                    "169": {
+                      "set": "IMSIC eip41; only even indices on RV64"
+                    },
+                    "233": {
+                      "set": "IMSIC eie41; only even indices on RV64"
+                    },
+                    "170": {
+                      "set": "IMSIC eip42; only even indices on RV64"
+                    },
+                    "234": {
+                      "set": "IMSIC eie42; only even indices on RV64"
+                    },
+                    "171": {
+                      "set": "IMSIC eip43; only even indices on RV64"
+                    },
+                    "235": {
+                      "set": "IMSIC eie43; only even indices on RV64"
+                    },
+                    "172": {
+                      "set": "IMSIC eip44; only even indices on RV64"
+                    },
+                    "236": {
+                      "set": "IMSIC eie44; only even indices on RV64"
+                    },
+                    "173": {
+                      "set": "IMSIC eip45; only even indices on RV64"
+                    },
+                    "237": {
+                      "set": "IMSIC eie45; only even indices on RV64"
+                    },
+                    "174": {
+                      "set": "IMSIC eip46; only even indices on RV64"
+                    },
+                    "238": {
+                      "set": "IMSIC eie46; only even indices on RV64"
+                    },
+                    "175": {
+                      "set": "IMSIC eip47; only even indices on RV64"
+                    },
+                    "239": {
+                      "set": "IMSIC eie47; only even indices on RV64"
+                    },
+                    "176": {
+                      "set": "IMSIC eip48; only even indices on RV64"
+                    },
+                    "240": {
+                      "set": "IMSIC eie48; only even indices on RV64"
+                    },
+                    "177": {
+                      "set": "IMSIC eip49; only even indices on RV64"
+                    },
+                    "241": {
+                      "set": "IMSIC eie49; only even indices on RV64"
+                    },
+                    "178": {
+                      "set": "IMSIC eip50; only even indices on RV64"
+                    },
+                    "242": {
+                      "set": "IMSIC eie50; only even indices on RV64"
+                    },
+                    "179": {
+                      "set": "IMSIC eip51; only even indices on RV64"
+                    },
+                    "243": {
+                      "set": "IMSIC eie51; only even indices on RV64"
+                    },
+                    "180": {
+                      "set": "IMSIC eip52; only even indices on RV64"
+                    },
+                    "244": {
+                      "set": "IMSIC eie52; only even indices on RV64"
+                    },
+                    "181": {
+                      "set": "IMSIC eip53; only even indices on RV64"
+                    },
+                    "245": {
+                      "set": "IMSIC eie53; only even indices on RV64"
+                    },
+                    "182": {
+                      "set": "IMSIC eip54; only even indices on RV64"
+                    },
+                    "246": {
+                      "set": "IMSIC eie54; only even indices on RV64"
+                    },
+                    "183": {
+                      "set": "IMSIC eip55; only even indices on RV64"
+                    },
+                    "247": {
+                      "set": "IMSIC eie55; only even indices on RV64"
+                    },
+                    "184": {
+                      "set": "IMSIC eip56; only even indices on RV64"
+                    },
+                    "248": {
+                      "set": "IMSIC eie56; only even indices on RV64"
+                    },
+                    "185": {
+                      "set": "IMSIC eip57; only even indices on RV64"
+                    },
+                    "249": {
+                      "set": "IMSIC eie57; only even indices on RV64"
+                    },
+                    "186": {
+                      "set": "IMSIC eip58; only even indices on RV64"
+                    },
+                    "250": {
+                      "set": "IMSIC eie58; only even indices on RV64"
+                    },
+                    "187": {
+                      "set": "IMSIC eip59; only even indices on RV64"
+                    },
+                    "251": {
+                      "set": "IMSIC eie59; only even indices on RV64"
+                    },
+                    "188": {
+                      "set": "IMSIC eip60; only even indices on RV64"
+                    },
+                    "252": {
+                      "set": "IMSIC eie60; only even indices on RV64"
+                    },
+                    "189": {
+                      "set": "IMSIC eip61; only even indices on RV64"
+                    },
+                    "253": {
+                      "set": "IMSIC eie61; only even indices on RV64"
+                    },
+                    "190": {
+                      "set": "IMSIC eip62; only even indices on RV64"
+                    },
+                    "254": {
+                      "set": "IMSIC eie62; only even indices on RV64"
+                    },
+                    "191": {
+                      "set": "IMSIC eip63; only even indices on RV64"
+                    },
+                    "255": {
+                      "set": "IMSIC eie63; only even indices on RV64"
+                    }
+                  },
+                  "remove": []
+                }
+              },
+              "remove": [
+                "typeRule",
+                "view"
+              ]
+            }
+          }
+        ]
+      },
+      "sources": {
+        "list": "sources",
+        "remove": [],
+        "items": [
+          {
+            "key": "aia",
+            "patch": {
+              "set": {
+                "namespace": "aia",
+                "title": "RISC-V Advanced Interrupt Architecture 20250312",
+                "revision": "20318d1b03f0ac8253458b82f8244d0d0db074e9",
+                "url": "https://github.com/riscv/riscv-aia/tree/20318d1b03f0ac8253458b82f8244d0d0db074e9",
+                "license": "CC-BY-4.0"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "remove": []
+  }
+}

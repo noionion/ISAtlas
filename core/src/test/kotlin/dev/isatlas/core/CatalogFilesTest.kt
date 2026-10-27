@@ -5,9 +5,11 @@ import kotlinx.serialization.json.*
 import org.junit.Assert.*
 import org.junit.Test
 
-fun installedCatalog(): DataPack = Catalog.decodeFiles(
-    CatalogFilesTest::class.java.getResource("/riscv-catalog.json")!!.readText()
-) { name -> CatalogFilesTest::class.java.getResource("/csr/$name")!!.readText() }
+fun officialPackages() = OfficialPackages(CatalogFilesTest::class.java.getResource("/riscv-packages.json")!!.readText()) {
+    CatalogFilesTest::class.java.getResource("/$it")!!.readBytes()
+}
+fun installedCatalog(): DataPack = officialPackages().catalogs(setOf("aia", "debug", "spmp"),
+    CompilerIsaOptions.decode(CatalogFilesTest::class.java.getResource("/march-extensions.json")!!.readText())).csr
 
 class CatalogFilesTest {
     private val sample = Catalog.decode(javaClass.getResource("/riscv-manual-sample.json")!!.readText())
@@ -19,7 +21,7 @@ class CatalogFilesTest {
     @Test fun `split catalog preserves CSR fields and metadata`() {
         val actual = Catalog.decodeFiles(manifest(listOf("manual-sample.json"))) { Json.encodeToString(sample.registers.first()) }
         assertEquals(sample.copy(registers = listOf(sample.registers.first())), actual)
-        assertEquals(429, installedCatalog().registers.size)
+        assertEquals(434, installedCatalog().registers.size)
     }
 
     @Test fun `unsafe paths and duplicate references fail before reading`() {

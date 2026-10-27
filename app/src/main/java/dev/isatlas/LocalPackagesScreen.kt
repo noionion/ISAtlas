@@ -21,6 +21,25 @@ import dev.isatlas.core.*
     Box(Modifier.fillMaxSize().testTag("local-packages-screen"), contentAlignment = Alignment.TopCenter) {
         Column(Modifier.widthIn(max = 760.dp).fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp).padding(bottom = 32.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            AboutHeading("内置规范包")
+            state.officialPackages.forEach { item ->
+                Row(Modifier.fillMaxWidth().testTag("official-package-${item.id}"), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f).padding(vertical = 6.dp)) {
+                        Text(when (item.id) { "manual" -> "ISA Manual"; "aia" -> "AIA"; "debug" -> "Debug / Trace"; else -> "SPMP" },
+                            style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                        Text("${item.version} · ${item.csrCount} CSR" + if (item.supplementCount > 0) " · 补充 ${item.supplementCount} 项" else " · 含指令库",
+                            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    if (item.required) Text("基础包", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    else Switch(checked = item.id in state.enabledOfficialPackages,
+                        enabled = !state.packageBusy && "official:${item.id}" !in state.packageTogglingIds,
+                        onCheckedChange = { model.enablePackage("official:${item.id}", it) },
+                        modifier = Modifier.testTag("official-package-enabled-${item.id}"))
+                }
+            }
+            Text("扩展包包含新增 CSR 和对基础定义的补充；关闭时撤回对应补充。来源与许可可在数据源页查看。",
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            AboutHeading("本地数据包")
             Text("导入企业或自定义 CSR、指令数据包，离线查询。", Modifier.padding(top = 16.dp), style = MaterialTheme.typography.bodyLarge)
             Text("仅在本机保存，不上传、不加入官方数据库。来源由制作者声明，未经官方验证；卸载应用会删除已导入包。", style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)

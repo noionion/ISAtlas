@@ -7,7 +7,7 @@ import re
 from itertools import combinations,product
 
 ROOT=Path(__file__).resolve().parents[1]
-ASSETS=ROOT/"app/src/main/assets"
+ASSETS=ROOT/"data/official-packages/manual"
 SOURCE=ROOT/"upstream/riscv-isa-manual/src"
 REVISION="584390d9d872835b1bc45ab9ea946b56db3ad485"
 REPOSITORY="https://github.com/riscv/riscv-isa-manual"

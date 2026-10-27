@@ -1,0 +1,200 @@
+{
+  "id": "riscv/manual/csr/hvip",
+  "namespace": "manual",
+  "name": "hvip",
+  "title": "Hypervisor virtual interrupt pending",
+  "summary": "虚拟机模式中断待处理位图。",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 1605
+  },
+  "privilege": "H",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "",
+  "extensions": [
+    "H"
+  ],
+  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
+  "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "VSEIP",
+      "summary": "VS 外部中断待处理状态。",
+      "access": "RW",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 10,
+          "lsb": 10
+        },
+        {
+          "xlen": 64,
+          "msb": 10,
+          "lsb": 10
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+      "summaryEn": "Report the pending virtual supervisor external interrupt source.",
+      "values": {
+        "0": "未挂起",
+        "1": "已挂起"
+      },
+      "valuesEn": {
+        "0": "Not pending",
+        "1": "Pending"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "软件置位向 VS 模式注入相应中断；实际接收仍受委托和中断使能控制。"
+    },
+    {
+      "name": "VSTIP",
+      "summary": "VS 定时器中断待处理状态。",
+      "access": "RW",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 6,
+          "lsb": 6
+        },
+        {
+          "xlen": 64,
+          "msb": 6,
+          "lsb": 6
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+      "summaryEn": "Report the pending virtual supervisor timer interrupt source.",
+      "values": {
+        "0": "未挂起",
+        "1": "已挂起"
+      },
+      "valuesEn": {
+        "0": "Not pending",
+        "1": "Pending"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "软件置位向 VS 模式注入相应中断；实际接收仍受委托和中断使能控制。"
+    },
+    {
+      "name": "VSSIP",
+      "summary": "VS 软件中断待处理状态。",
+      "access": "RW",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 2,
+          "lsb": 2
+        },
+        {
+          "xlen": 64,
+          "msb": 2,
+          "lsb": 2
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+      "summaryEn": "Report the pending virtual supervisor software interrupt source.",
+      "values": {
+        "0": "未挂起",
+        "1": "已挂起"
+      },
+      "valuesEn": {
+        "0": "Not pending",
+        "1": "Pending"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "软件置位向 VS 模式注入相应中断；实际接收仍受委托和中断使能控制。"
+    }
+  ],
+  "regions": [
+    {
+      "label": "0",
+      "access": "图示固定零；访问规则见原文",
+      "summary": "手册位图明确标注的区域。",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 15,
+          "lsb": 11
+        },
+        {
+          "xlen": 64,
+          "msb": 15,
+          "lsb": 11
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/hvipreg-standard.edn",
+      "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
+    },
+    {
+      "label": "0",
+      "access": "图示固定零；访问规则见原文",
+      "summary": "手册位图明确标注的区域。",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 9,
+          "lsb": 7
+        },
+        {
+          "xlen": 64,
+          "msb": 9,
+          "lsb": 7
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/hvipreg-standard.edn",
+      "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
+    },
+    {
+      "label": "0",
+      "access": "图示固定零；访问规则见原文",
+      "summary": "手册位图明确标注的区域。",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 5,
+          "lsb": 3
+        },
+        {
+          "xlen": 64,
+          "msb": 5,
+          "lsb": 3
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/hvipreg-standard.edn",
+      "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
+    },
+    {
+      "label": "0",
+      "access": "图示固定零；访问规则见原文",
+      "summary": "手册位图明确标注的区域。",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 1,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 1,
+          "lsb": 0
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/hvipreg-standard.edn",
+      "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
+    }
+  ],
+  "summaryEn": "Hypervisor virtual interrupt pending"
+}

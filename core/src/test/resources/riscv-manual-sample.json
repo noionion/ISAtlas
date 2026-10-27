@@ -5,7 +5,7 @@
   "namespace": "manual",
   "version": "0.5.4",
   "title": "RISC-V CSR 离线数据库",
-  "coverage": "429 个 CSR / 2007 个字段；ISA Manual 20250508 + AIA 20250312 + Debug 1.0 + SPMP 1.0；厂商数据可通过本地扩展包导入。",
+  "coverage": "434 个 CSR / 2012 个字段；ISA Manual 20250508 + AIA 20250312 + Debug 1.0 + SPMP 1.0；厂商数据可通过本地扩展包导入。",
   "source": {
     "title": "RISC-V ISA Manual 20250508",
     "revision": "584390d9d872835b1bc45ab9ea946b56db3ad485",

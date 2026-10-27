@@ -34,7 +34,7 @@ def evidence(field, reg):
     text = source.read_text(encoding="utf-8")
     name, csr = field["name"], reg["name"]
     terms = [name] + field.get("aliases", [])
-    if re.fullmatch(r"[ms]ireg[2-6]", csr) and name == "DATA":
+    if re.fullmatch(r"(?:m|s|vs)i(?:select|reg[2-6]?)", csr) and name in ("DATA", "SELECT"):
         terms.append(csr)
     if csr.endswith("h") and name == csr.upper():
         terms.append(csr[:-1])  # The chapter uses cycle[h]/time[h]/instret[h].
@@ -69,7 +69,7 @@ def evidence(field, reg):
 def review():
     pack = read_catalog(ASSETS)
     registers = [reg for reg in pack["registers"] if reg["namespace"] == "manual"]
-    assert len(registers) == 391
+    assert len(registers) == 402
     assert len({reg["id"] for reg in pack["registers"]}) == len(pack["registers"])
     assert {r["name"] for r in registers if r["coverage"] == "address-only"} == EXTERNAL_DEBUG
     rows, gaps, enumerated = [], [], 0
@@ -121,7 +121,7 @@ def review():
     sources = json.loads((ROOT / "tools/data-sources.lock.json").read_text(encoding="utf-8"))["sources"]
     vendor_source = next(source for source in sources if source["namespace"] == "thead")
     assert hashlib.sha256(vendor.read_bytes()).hexdigest() == vendor_source["sha256"]
-    assert len(rows) == 1766
+    assert len(rows) == 1779
     report = {"revision": REVISION, "catalogSha256": catalog_sha256(ASSETS), "manualCsrs": len(registers),
               "describedFields": len(rows), "enumeratedFields": enumerated, "missingDescriptions": [],
               "addressOnlyExternalDebug": sorted(EXTERNAL_DEBUG), "partialPlatformLayouts": gaps,

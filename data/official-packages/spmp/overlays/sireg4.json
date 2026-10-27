@@ -1,0 +1,36 @@
+{
+  "id": "riscv/manual/csr/sireg4",
+  "patch": {
+    "object": {
+      "extensions": {
+        "add": [
+          "Sspmp"
+        ],
+        "remove": []
+      },
+      "notes": {
+        "append": "SPMP selector 0x100–0x13F：ireg 访问 spmpaddr[i]，ireg2 访问 spmpcfg[i]；越过实际条目数读零、写忽略。ireg3–6 在此 selector 范围保留。",
+        "join": true
+      },
+      "sources": {
+        "list": "sources",
+        "remove": [],
+        "items": [
+          {
+            "key": "spmp",
+            "patch": {
+              "set": {
+                "namespace": "spmp",
+                "title": "RISC-V S-level Physical Memory Protection 1.0",
+                "revision": "4ce228207193c55247200110e3d5b6881a17c367",
+                "url": "https://github.com/riscv/riscv-spmp/tree/4ce228207193c55247200110e3d5b6881a17c367",
+                "license": "CC-BY-4.0"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "remove": []
+  }
+}

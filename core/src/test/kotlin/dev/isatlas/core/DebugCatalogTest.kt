@@ -8,7 +8,7 @@ class DebugCatalogTest {
     private fun reg(name: String) = pack.registers.single { it.name == name }
 
     @Test fun `debug mode CSRs and supplemental provenance load correctly`() {
-        assertEquals(429, pack.registers.size)
+        assertEquals(434, pack.registers.size)
         assertEquals("D", reg("dcsr").privilege)
         assertEquals("fields", reg("dcsr").coverage)
         assertEquals("riscv/manual/csr/dcsr", reg("dcsr").id)

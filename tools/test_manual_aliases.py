@@ -15,7 +15,7 @@ import manual_pseudo_coverage as coverage
 class ManualAliasTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.data = {entry["name"]: entry for path in (ROOT / "app/src/main/assets/inst").glob("manual-*.json")
+        cls.data = {entry["name"]: entry for path in (ROOT / "data/official-packages/manual/inst").glob("manual-*.json")
                     for entry in [json.loads(path.read_text(encoding="utf-8"))]}
         cls.references = build_references(cls.data)
 

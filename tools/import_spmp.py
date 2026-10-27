@@ -126,7 +126,7 @@ def enrich(input_registers):
         ext="Sspmp" if mode=="s" else "Smpmpdeleg"
         for r in (select,addr,cfg):
             r["extensions"]=list(dict.fromkeys(r.get("extensions",[])+[ext,"Sscsrind" if mode=="s" else "Smcsrind"]))
-            r["condition"]=" / ".join(r["extensions"])+"（依 selector 对应扩展）"
+            r["condition"]=("Sscsrind" if mode=="s" else "Smcsrind")+" / "+ext+"（依 selector 对应扩展）"
         for r in (addr,cfg):
             r["fields"]=[f for f in r["fields"] if f.get("view","") not in ("spmpaddr","spmpcfg")]
             r["regions"]=[f for f in r["regions"] if f.get("view","") not in ("spmpaddr","spmpcfg")]

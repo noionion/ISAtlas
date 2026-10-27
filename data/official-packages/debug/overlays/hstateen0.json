@@ -1,0 +1,52 @@
+{
+  "id": "riscv/manual/csr/hstateen0",
+  "patch": {
+    "object": {
+      "fields": {
+        "list": "fields",
+        "remove": [],
+        "items": [
+          {
+            "key": "CONTEXT",
+            "patch": {
+              "object": {
+                "summary": {
+                  "set": "控制低特权态访问 SCONTEXT/HCONTEXT；对应触发器上下文寄存器仍须实际实现。"
+                },
+                "sourceUrl": {
+                  "set": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L251-L269"
+                },
+                "summaryEn": {
+                  "set": "Control lower-privilege SCONTEXT/HCONTEXT access; the trigger context registers must still be implemented."
+                },
+                "condition": {
+                  "set": "Smstateen Ssstateen Sdtrig"
+                }
+              },
+              "remove": []
+            }
+          }
+        ]
+      },
+      "sources": {
+        "list": "sources",
+        "remove": [],
+        "items": [
+          {
+            "key": "debug",
+            "patch": {
+              "set": {
+                "namespace": "debug",
+                "title": "RISC-V Debug Specification 1.0",
+                "revision": "5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8",
+                "url": "https://github.com/riscv/riscv-debug-spec/tree/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8",
+                "license": "CC-BY-4.0"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "remove": []
+  }
+}

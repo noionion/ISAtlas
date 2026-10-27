@@ -40,6 +40,8 @@ data class AtlasState(
     val showSources: Boolean = false,
     val showLocalPackages: Boolean = false,
     val localPackages: List<ManagedLocalPackage> = emptyList(),
+    val officialPackages: List<OfficialPackageInfo> = emptyList(),
+    val enabledOfficialPackages: Set<String> = setOf("aia", "debug", "spmp"),
     val packageBusy: Boolean = false,
     val packageShowProgress: Boolean = false,
     val packageTogglingIds: Set<String> = emptySet(),
@@ -57,6 +59,9 @@ data class AtlasState(
 class AppViewModel(application: Application, private val saved: SavedStateHandle) : AndroidViewModel(application) {
     private val prefs = application.getSharedPreferences("atlas", 0)
     private val localStore = LocalPackageRepository(application, BuildConfigVersion.code(application))
+    private lateinit var officialStore: OfficialPackages
+    private lateinit var officialCompiler: CompilerIsaOptions
+    private var enabledOfficial = prefs.getStringSet("officialPackages", setOf("aia", "debug", "spmp"))!!.toSet()
     private var pendingPackage: ByteArray? = null
     private val packageOperations = Mutex()
     private val mutable = MutableStateFlow(AtlasState(
@@ -83,15 +88,12 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
             val result = withContext(Dispatchers.IO) {
                 runCatching {
                     val assets = getApplication<Application>().assets
-                    val manifest = assets.open("riscv-catalog.json").bufferedReader().use { it.readText() }
-                    val pack = Catalog.decodeFiles(manifest) { name ->
-                        assets.open("csr/$name").bufferedReader().use { it.readText() }
+                    officialStore = OfficialPackages(assets.open("riscv-packages.json").bufferedReader().use { it.readText() }) { path ->
+                        assets.open(path).use { it.readBytes() }
                     }
-                    val compiler = assets.open("march-extensions.json").bufferedReader().use { CompilerIsaOptions.decode(it.readText()) }
-                    val instructions = InstructionCatalog.decodeFiles(assets.open("riscv-instructions.json").bufferedReader().use { it.readText() }) { name ->
-                        assets.open("inst/$name").bufferedReader().use { it.readText() }
-                    }
-                    localStore.load(LocalCatalogs(pack, instructions, compiler))
+                    officialCompiler = assets.open("march-extensions.json").bufferedReader().use { CompilerIsaOptions.decode(it.readText()) }
+                    enabledOfficial = enabledOfficial.intersect(officialStore.packages.map { it.id }.toSet())
+                    localStore.load(officialStore.catalogs(enabledOfficial, officialCompiler))
                 }
             }
             result.fold(
@@ -135,7 +137,10 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
         viewModelScope.launch {
             try {
                 packageOperations.withLock {
-                    val result = withContext(Dispatchers.IO) { runCatching { localStore.setEnabled(id, enabled) } }
+                    val result = withContext(Dispatchers.IO) { runCatching {
+                        if (id.startsWith("official:")) setOfficialEnabled(id.removePrefix("official:"), enabled)
+                        else localStore.setEnabled(id, enabled)
+                    } }
                     result.fold(onSuccess = ::applyPackages, onFailure = { error ->
                         val message = (error as? IllegalArgumentException)?.message?.takeIf { it.length <= 240 }
                             ?: "切换失败，请检查数据包和可用存储空间。"
@@ -146,6 +151,19 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
                 mutable.update { it.copy(packageTogglingIds = it.packageTogglingIds - id) }
             }
         }
+    }
+    private fun setOfficialEnabled(id: String, enabled: Boolean): LocalPackageSnapshot {
+        require(officialStore.packages.any { it.id == id && !it.required })
+        val previous = enabledOfficial
+        val candidate = if (enabled) previous + id else previous - id
+        val base = officialStore.catalogs(candidate, officialCompiler)
+        val result = localStore.rebase(base)
+        if (!prefs.edit().putStringSet("officialPackages", candidate).commit()) {
+            localStore.rebase(officialStore.catalogs(previous, officialCompiler))
+            error("无法保存数据包设置")
+        }
+        enabledOfficial = candidate
+        return result
     }
     fun removePackage(id: String) = packageOperation("已卸载") { localStore.remove(id) }
     fun packageMessage(value: String?) { mutable.update { it.copy(packageMessage = value) } }
@@ -177,6 +195,7 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
             val roots = current.extensionRoots.intersect(catalogs.compiler.selectable.toSet())
             current.copy(loading = false, error = null, pack = catalogs.csr, instructions = catalogs.instructions,
             compilerIsa = catalogs.compiler, localPackages = snapshot.packages, packageMessage = snapshot.warning,
+            officialPackages = officialStore.packages, enabledOfficialPackages = enabledOfficial,
             namespace = current.namespace?.takeIf { ns -> catalogs.csr.registers.any { it.namespace == ns || it.sources.any { source -> source.namespace == ns } } || catalogs.instructions.instructions.any { it.namespace == ns } },
             extensions = catalogs.compiler.selectionClosure(roots),
             extensionRoots = roots,

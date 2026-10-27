@@ -19,10 +19,9 @@ class LocalPackageFlowTest {
     private fun fixture(name: String) = testContext.assets.open(name).use { it.readBytes() }
     private fun base(): LocalCatalogs {
         val a=context.assets
-        val csr=Catalog.decodeFiles(a.open("riscv-catalog.json").bufferedReader().use { it.readText() }) { a.open("csr/$it").bufferedReader().use { r -> r.readText() } }
-        val instructions=InstructionCatalog.decodeFiles(a.open("riscv-instructions.json").bufferedReader().use { it.readText() }) { a.open("inst/$it").bufferedReader().use { r -> r.readText() } }
+        val packages=OfficialPackages(a.open("riscv-packages.json").bufferedReader().use { it.readText() }) { a.open(it).use { input -> input.readBytes() } }
         val compiler=a.open("march-extensions.json").bufferedReader().use { CompilerIsaOptions.decode(it.readText()) }
-        return LocalCatalogs(csr,instructions,compiler)
+        return packages.catalogs(setOf("aia","debug","spmp"),compiler)
     }
 
     @Test fun repositoryPersistsEnableDisableAndRejectsBadUpgradeWithoutChangingIndex() {
@@ -43,7 +42,7 @@ class LocalPackageFlowTest {
         val restarted=LocalPackageRepository(context,9,folder)
         assertFalse(restarted.load(base()).packages.single().active)
         assertTrue(restarted.setEnabled("org.thead.csr",true).packages.single().active)
-        assertEquals(430,restarted.install(bytes).catalogs.csr.registers.size)
+        assertEquals(435,restarted.install(bytes).catalogs.csr.registers.size)
         assertTrue(restarted.remove("org.thead.csr").packages.isEmpty())
         assertTrue(folder.listFiles().orEmpty().none { it.extension=="zip" })
         // Delete only this test's verified, private children; never the user's actual package store.
@@ -57,7 +56,7 @@ class LocalPackageFlowTest {
         folder.listFiles()!!.single { it.extension=="zip" }.writeText("damaged")
         val restarted=LocalPackageRepository(context,9,folder)
         val result=restarted.load(base())
-        assertEquals(429,result.catalogs.csr.registers.size)
+        assertEquals(434,result.catalogs.csr.registers.size)
         assertNotNull(result.packages.single().problem)
         restarted.install(fixture("demo-combined.zip"))
         assertTrue(LocalPackageRepository(context,9,folder).load(base()).packages.single().active)
@@ -113,7 +112,7 @@ class LocalPackageFlowTest {
         compose.waitUntil(20_000) { model.state.value.localPackages.none { it.record.id=="org.isatlas.demo" && it.active } }
         compose.onNodeWithTag("local-package-progress").assertDoesNotExist()
         compose.onNodeWithTag("local-package-message").assertDoesNotExist()
-        compose.onNodeWithText("选择本地数据包").assertIsDisplayed()
+        compose.onNodeWithText("选择本地数据包").assertIsEnabled()
         compose.onNodeWithText("已停用").assertDoesNotExist()
         assertTrue(model.state.value.pack!!.registers.none { it.namespace=="demo" })
         compose.onNodeWithTag("local-package-enabled-org.isatlas.demo").performScrollTo().performClick()

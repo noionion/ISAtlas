@@ -1,0 +1,343 @@
+{
+  "id": "riscv/manual/csr/hvip",
+  "patch": {
+    "object": {
+      "extensions": {
+        "add": [
+          "Smaia",
+          "Ssaia"
+        ],
+        "remove": []
+      },
+      "notes": {
+        "append": " AIA：13–63 位按委托和虚拟注入规则呈现；低位仍遵守基础特权规范。",
+        "join": true
+      },
+      "fields": {
+        "list": "fields",
+        "remove": [],
+        "items": [
+          {
+            "key": "LOCAL16_23",
+            "patch": {
+              "set": {
+                "name": "LOCAL16_23",
+                "summary": "标准本地中断的待处理位；标准本地中断置位后保持，直至软件清除。",
+                "summaryEn": "Pending bits for standard local interrupts; unsupported sources read as zero.",
+                "access": "RW（受实现、委托及虚拟注入条件约束）",
+                "layouts": [
+                  {
+                    "xlen": 32,
+                    "msb": 23,
+                    "lsb": 16
+                  },
+                  {
+                    "xlen": 64,
+                    "msb": 23,
+                    "lsb": 16
+                  }
+                ],
+                "condition": "Smaia Ssaia",
+                "aliases": [
+                  "interrupts"
+                ],
+                "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+                "values": {},
+                "valuesEn": {},
+                "valuesByXlen": {},
+                "valuesEnByXlen": {}
+              }
+            }
+          },
+          {
+            "key": "CUSTOM24_31",
+            "patch": {
+              "set": {
+                "name": "CUSTOM24_31",
+                "summary": "自定义中断的待处理位；标准本地中断置位后保持，直至软件清除。",
+                "summaryEn": "Pending bits for custom interrupts; unsupported sources read as zero.",
+                "access": "RW（受实现、委托及虚拟注入条件约束）",
+                "layouts": [
+                  {
+                    "xlen": 32,
+                    "msb": 31,
+                    "lsb": 24
+                  },
+                  {
+                    "xlen": 64,
+                    "msb": 31,
+                    "lsb": 24
+                  }
+                ],
+                "condition": "Smaia Ssaia",
+                "aliases": [
+                  "interrupts"
+                ],
+                "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+                "values": {},
+                "valuesEn": {},
+                "valuesByXlen": {},
+                "valuesEnByXlen": {}
+              }
+            }
+          },
+          {
+            "key": "LOCAL32_34",
+            "patch": {
+              "set": {
+                "name": "LOCAL32_34",
+                "summary": "标准本地中断的待处理位；标准本地中断置位后保持，直至软件清除。",
+                "summaryEn": "Pending bits for standard local interrupts; unsupported sources read as zero.",
+                "access": "RW（受实现、委托及虚拟注入条件约束）",
+                "layouts": [
+                  {
+                    "xlen": 64,
+                    "msb": 34,
+                    "lsb": 32
+                  }
+                ],
+                "condition": "Smaia Ssaia",
+                "aliases": [
+                  "interrupts"
+                ],
+                "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+                "values": {},
+                "valuesEn": {},
+                "valuesByXlen": {},
+                "valuesEnByXlen": {}
+              }
+            }
+          },
+          {
+            "key": "RASLIP",
+            "patch": {
+              "set": {
+                "name": "RASLIP",
+                "summary": "低优先级 RAS 事件的待处理位；标准本地中断置位后保持，直至软件清除。",
+                "summaryEn": "Pending bits for low-priority RAS event; unsupported sources read as zero.",
+                "access": "RW（受实现、委托及虚拟注入条件约束）",
+                "layouts": [
+                  {
+                    "xlen": 64,
+                    "msb": 35,
+                    "lsb": 35
+                  }
+                ],
+                "condition": "Smaia Ssaia",
+                "aliases": [
+                  "interrupts"
+                ],
+                "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+                "values": {
+                  "0": "无待处理中断",
+                  "1": "中断待处理"
+                },
+                "valuesEn": {
+                  "0": "No interrupt pending",
+                  "1": "Interrupt pending"
+                },
+                "valuesByXlen": {},
+                "valuesEnByXlen": {}
+              }
+            }
+          },
+          {
+            "key": "LOCAL36_42",
+            "patch": {
+              "set": {
+                "name": "LOCAL36_42",
+                "summary": "标准本地中断的待处理位；标准本地中断置位后保持，直至软件清除。",
+                "summaryEn": "Pending bits for standard local interrupts; unsupported sources read as zero.",
+                "access": "RW（受实现、委托及虚拟注入条件约束）",
+                "layouts": [
+                  {
+                    "xlen": 64,
+                    "msb": 42,
+                    "lsb": 36
+                  }
+                ],
+                "condition": "Smaia Ssaia",
+                "aliases": [
+                  "interrupts"
+                ],
+                "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+                "values": {},
+                "valuesEn": {},
+                "valuesByXlen": {},
+                "valuesEnByXlen": {}
+              }
+            }
+          },
+          {
+            "key": "RASHIP",
+            "patch": {
+              "set": {
+                "name": "RASHIP",
+                "summary": "高优先级 RAS 事件的待处理位；标准本地中断置位后保持，直至软件清除。",
+                "summaryEn": "Pending bits for high-priority RAS event; unsupported sources read as zero.",
+                "access": "RW（受实现、委托及虚拟注入条件约束）",
+                "layouts": [
+                  {
+                    "xlen": 64,
+                    "msb": 43,
+                    "lsb": 43
+                  }
+                ],
+                "condition": "Smaia Ssaia",
+                "aliases": [
+                  "interrupts"
+                ],
+                "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+                "values": {
+                  "0": "无待处理中断",
+                  "1": "中断待处理"
+                },
+                "valuesEn": {
+                  "0": "No interrupt pending",
+                  "1": "Interrupt pending"
+                },
+                "valuesByXlen": {},
+                "valuesEnByXlen": {}
+              }
+            }
+          },
+          {
+            "key": "LOCAL44_47",
+            "patch": {
+              "set": {
+                "name": "LOCAL44_47",
+                "summary": "标准本地中断的待处理位；标准本地中断置位后保持，直至软件清除。",
+                "summaryEn": "Pending bits for standard local interrupts; unsupported sources read as zero.",
+                "access": "RW（受实现、委托及虚拟注入条件约束）",
+                "layouts": [
+                  {
+                    "xlen": 64,
+                    "msb": 47,
+                    "lsb": 44
+                  }
+                ],
+                "condition": "Smaia Ssaia",
+                "aliases": [
+                  "interrupts"
+                ],
+                "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+                "values": {},
+                "valuesEn": {},
+                "valuesByXlen": {},
+                "valuesEnByXlen": {}
+              }
+            }
+          },
+          {
+            "key": "CUSTOM48_63",
+            "patch": {
+              "set": {
+                "name": "CUSTOM48_63",
+                "summary": "自定义中断的待处理位；标准本地中断置位后保持，直至软件清除。",
+                "summaryEn": "Pending bits for custom interrupts; unsupported sources read as zero.",
+                "access": "RW（受实现、委托及虚拟注入条件约束）",
+                "layouts": [
+                  {
+                    "xlen": 64,
+                    "msb": 63,
+                    "lsb": 48
+                  }
+                ],
+                "condition": "Smaia Ssaia",
+                "aliases": [
+                  "interrupts"
+                ],
+                "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+                "values": {},
+                "valuesEn": {},
+                "valuesByXlen": {},
+                "valuesEnByXlen": {}
+              }
+            }
+          },
+          {
+            "key": "LOCAL13_15",
+            "patch": {
+              "set": {
+                "name": "LOCAL13_15",
+                "summary": "本地中断 13–15 的虚拟待处理位；可写或只读零，取决于 hvien 和实现。",
+                "summaryEn": "Virtual pending bits for local causes 13–15; writability depends on hvien and the implementation.",
+                "access": "RW/RO0",
+                "layouts": [
+                  {
+                    "xlen": 32,
+                    "msb": 15,
+                    "lsb": 13
+                  },
+                  {
+                    "xlen": 64,
+                    "msb": 15,
+                    "lsb": 13
+                  }
+                ],
+                "condition": "Smaia Ssaia",
+                "aliases": [],
+                "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/VSLevel.adoc#L299-L436",
+                "values": {},
+                "valuesEn": {},
+                "valuesByXlen": {},
+                "valuesEnByXlen": {}
+              }
+            }
+          }
+        ]
+      },
+      "regions": {
+        "list": "regions",
+        "remove": [
+          "|0|32:15:11,64:15:11"
+        ],
+        "items": [
+          {
+            "key": "|0|32:12:11,64:12:11",
+            "patch": {
+              "set": {
+                "label": "0",
+                "access": "图示固定零；访问规则见原文",
+                "summary": "手册位图明确标注的区域。",
+                "layouts": [
+                  {
+                    "xlen": 32,
+                    "msb": 12,
+                    "lsb": 11
+                  },
+                  {
+                    "xlen": 64,
+                    "msb": 12,
+                    "lsb": 11
+                  }
+                ],
+                "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/hvipreg-standard.edn",
+                "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
+              }
+            }
+          }
+        ]
+      },
+      "sources": {
+        "list": "sources",
+        "remove": [],
+        "items": [
+          {
+            "key": "aia",
+            "patch": {
+              "set": {
+                "namespace": "aia",
+                "title": "RISC-V Advanced Interrupt Architecture 20250312",
+                "revision": "20318d1b03f0ac8253458b82f8244d0d0db074e9",
+                "url": "https://github.com/riscv/riscv-aia/tree/20318d1b03f0ac8253458b82f8244d0d0db074e9",
+                "license": "CC-BY-4.0"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "remove": []
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "debug",
+  "name": "RISC-V Debug Specification 1.0",
+  "version": "1.0",
+  "source": {
+    "namespace": "debug",
+    "title": "RISC-V Debug Specification 1.0",
+    "revision": "5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8",
+    "url": "https://github.com/riscv/riscv-debug-spec/tree/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8",
+    "license": "CC-BY-4.0"
+  },
+  "license": "CC-BY-4.0",
+  "csr": [
+    "csr/debug-tinfo.json",
+    "csr/debug-tcontrol.json",
+    "csr/debug-mscontext.json"
+  ],
+  "overlays": [
+    "overlays/scontext.json",
+    "overlays/hcontext.json",
+    "overlays/hstateen0.json",
+    "overlays/hstateen0h.json",
+    "overlays/mstateen0.json",
+    "overlays/mstateen0h.json",
+    "overlays/tselect.json",
+    "overlays/tdata1.json",
+    "overlays/tdata2.json",
+    "overlays/tdata3.json",
+    "overlays/mcontext.json",
+    "overlays/dcsr.json",
+    "overlays/dpc.json",
+    "overlays/dscratch0.json",
+    "overlays/dscratch1.json"
+  ]
+}

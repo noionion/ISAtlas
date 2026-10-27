@@ -26,8 +26,8 @@ def review(write_report=True):
     targets=[r for r in pack["registers"] if any(s["namespace"]=="spmp" for s in r.get("sources",[]))]
     assert len(targets)==103
     assert sum(len(r["fields"]) for r in targets)==721
-    assert len(regs)==len(pack["registers"])==429
-    assert len({r["locator"]["address"] for r in pack["registers"]})==429
+    assert len(regs)==len(pack["registers"])==434
+    assert len({r["locator"]["address"] for r in pack["registers"]})==434
     assert {r["name"] for r in pack["registers"] if r["namespace"]=="spmp"}=={"mpmpdeleg","spmpen","spmpenh"}
     sharing=(UPSTREAM/"sspmp/Resource_Sharing.adoc").read_text(encoding="utf-8")
     switching=(UPSTREAM/"sspmp/spmpswitch.adoc").read_text(encoding="utf-8")

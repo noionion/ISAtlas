@@ -78,7 +78,7 @@ class LocalPackagesTest {
     @Test fun `hash mismatch is localized and never changes the base`() {
         val files=entries(fixture()); files["csr/demo-control.json"]="{}".toByteArray()
         failure(zip(files),"csr/demo-control.json")
-        assertEquals(429,installedCatalog().registers.size)
+        assertEquals(434,installedCatalog().registers.size)
     }
     @Test fun `unknown files unsafe paths and duplicate JSON keys are rejected`() {
         for (name in listOf("../escape.json","/absolute.json","csr\\escape.json","extra.json")) failure(zip(entries(fixture())+(name to "{}".toByteArray())),"ZIP")
@@ -131,7 +131,7 @@ class LocalPackagesTest {
         val existing=initial.copy(csr=initial.csr.copy(registers=initial.csr.registers+data.registers),instructions=initial.instructions.copy(instructions=initial.instructions.instructions+data.instructions))
         assertEquals(PackageConflict(1,1),LocalPackages.conflicts(data,existing))
         assertThrows(IllegalArgumentException::class.java) { LocalPackages.merge(initial,listOf(data,data)) }
-        assertEquals(429,initial.csr.registers.size)
+        assertEquals(434,initial.csr.registers.size)
     }
     @Test fun `archive expansion UTF8 nesting and byte bounds are enforced`() {
         failure(zip(mapOf("manifest.json" to ByteArray(256*1024+1))))

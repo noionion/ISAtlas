@@ -8,8 +8,8 @@ class ImportedCatalogTest {
     private fun manual(name: String) = pack.registers.single { it.namespace == "manual" && it.name == name }
 
     @Test fun `official manual replaces old sources and vendor data is optional`() {
-        assertEquals(429, pack.registers.size)
-        assertEquals(391, pack.registers.count { it.namespace == "manual" })
+        assertEquals(434, pack.registers.size)
+        assertEquals(402, pack.registers.count { it.namespace == "manual" })
         assertEquals(0, pack.registers.count { it.namespace == "thead" })
         assertFalse(pack.registers.any { it.namespace in setOf("standard", "andes") })
         assertTrue(pack.registers.filter { it.namespace == "manual" }.all {
@@ -65,7 +65,7 @@ class ImportedCatalogTest {
     @Test fun `all manual fields have concise bilingual descriptions and matching enums`() {
         val registers = pack.registers.filter { it.namespace == "manual" }
         val fields = registers.flatMap { it.fields }
-        assertEquals(1766, fields.size)
+        assertEquals(1779, fields.size)
         assertTrue(registers.all { it.summary.any { char -> char in '\u4e00'..'\u9fff' } && it.summaryEn.isNotBlank() })
         fields.forEach { field ->
             assertTrue(field.summary, field.summary.any { it in '\u4e00'..'\u9fff' })

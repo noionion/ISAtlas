@@ -346,7 +346,7 @@ def representative_word(v,xlen):
 
 def scan_catalog(write_report=True):
     root=Path(__file__).resolve().parents[1]
-    directory=root/'app/src/main/assets/inst'
+    directory=root/'data/official-packages/manual/inst'
     rows=[];categories=Counter();checks=Counter();samples=0;register_probes=0;invalid_bit_probes=0
     for path in sorted(directory.glob('manual-*.json')):
         a=json.loads(path.read_text(encoding='utf-8'))

@@ -1,0 +1,102 @@
+{
+  "id": "riscv/manual/csr/scause",
+  "patch": {
+    "object": {
+      "fields": {
+        "list": "fields",
+        "remove": [],
+        "items": [
+          {
+            "key": "CODE",
+            "patch": {
+              "object": {
+                "values": {
+                  "object": {
+                    "12": {
+                      "append": " Sspmp：INT=0 时也用于SPMP 失败。",
+                      "join": false
+                    },
+                    "13": {
+                      "append": " Sspmp：INT=0 时也用于SPMP 失败。",
+                      "join": false
+                    },
+                    "15": {
+                      "append": " Sspmp：INT=0 时也用于SPMP 失败。",
+                      "join": false
+                    },
+                    "20": {
+                      "append": " Sspmp：INT=0 时也用于Shbare 下 VS/VU SPMP 失败。",
+                      "join": false
+                    },
+                    "21": {
+                      "append": " Sspmp：INT=0 时也用于Shbare 下 VS/VU SPMP 失败。",
+                      "join": false
+                    },
+                    "23": {
+                      "append": " Sspmp：INT=0 时也用于Shbare 下 VS/VU SPMP 失败。",
+                      "join": false
+                    }
+                  },
+                  "remove": []
+                },
+                "valuesEn": {
+                  "object": {
+                    "12": {
+                      "append": " Sspmp: also an SPMP violation with INT=0.",
+                      "join": false
+                    },
+                    "13": {
+                      "append": " Sspmp: also an SPMP violation with INT=0.",
+                      "join": false
+                    },
+                    "15": {
+                      "append": " Sspmp: also an SPMP violation with INT=0.",
+                      "join": false
+                    },
+                    "20": {
+                      "append": " Sspmp: also an SPMP violation with INT=0 under Shbare for VS/VU.",
+                      "join": false
+                    },
+                    "21": {
+                      "append": " Sspmp: also an SPMP violation with INT=0 under Shbare for VS/VU.",
+                      "join": false
+                    },
+                    "23": {
+                      "append": " Sspmp: also an SPMP violation with INT=0 under Shbare for VS/VU.",
+                      "join": false
+                    }
+                  },
+                  "remove": []
+                },
+                "typeRule": {
+                  "append": " Sspmp 复用异常码 12/13/15；Shbare 下 VS/VU 复用 20/21/23。只补充异常含义，INT=1 的同号中断保持原义。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          }
+        ]
+      },
+      "sources": {
+        "list": "sources",
+        "remove": [],
+        "items": [
+          {
+            "key": "spmp",
+            "patch": {
+              "set": {
+                "namespace": "spmp",
+                "title": "RISC-V S-level Physical Memory Protection 1.0",
+                "revision": "4ce228207193c55247200110e3d5b6881a17c367",
+                "url": "https://github.com/riscv/riscv-spmp/tree/4ce228207193c55247200110e3d5b6881a17c367",
+                "license": "CC-BY-4.0"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "remove": []
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "id": "riscv/manual/csr/mstatus",
+  "patch": {
+    "object": {
+      "fields": {
+        "list": "fields",
+        "remove": [],
+        "items": [
+          {
+            "key": "SUM",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "set": "Sspmp 中同样控制 S 访问 U 区域；不允许 S 执行 U 区域。 Also govern S data access to U regions under Sspmp; never grant S execution."
+                },
+                "condition": {
+                  "set": "Sspmp"
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "MXR",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "set": "Sspmp 要求 MXR 可写；权限细节以 SPMP 权限表为准。 Sspmp requires writable MXR; see its permission table."
+                },
+                "condition": {
+                  "set": "Sspmp"
+                }
+              },
+              "remove": []
+            }
+          }
+        ]
+      },
+      "sources": {
+        "list": "sources",
+        "remove": [],
+        "items": [
+          {
+            "key": "spmp",
+            "patch": {
+              "set": {
+                "namespace": "spmp",
+                "title": "RISC-V S-level Physical Memory Protection 1.0",
+                "revision": "4ce228207193c55247200110e3d5b6881a17c367",
+                "url": "https://github.com/riscv/riscv-spmp/tree/4ce228207193c55247200110e3d5b6881a17c367",
+                "license": "CC-BY-4.0"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "remove": []
+  }
+}

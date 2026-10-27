@@ -12,7 +12,7 @@ from pathlib import Path
 import re
 import subprocess
 
-from csr_storage import read_catalog, write_catalog, catalog_sha256
+from csr_storage import read_catalog, catalog_sha256
 from manual_field_semantics import enrich
 from manual_extension_dependencies import dependencies
 
@@ -529,8 +529,32 @@ def build_registers(*, include_audit=False):
                 field["condition"] = field_extensions[field["name"]] + "（适用关联，完整条件见手册）"
         if reg["fields"] or reg["regions"]:
             reg["coverage"] = "fields"
+    audit = enrich(list(registers.values()), SOURCE, url)
+    # Generic indirect windows belong to the ISA Manual, independently of AIA/SPMP.
+    indirect = (SOURCE / "indirect-csr.adoc").read_text(encoding="utf-8")
+    windows = re.findall(r"\|(0x[0-9A-Fa-f]+) \|([MSH])RW \|XLEN \|`((?:m|s|vs)i(?:select|reg[2-6]?))`", indirect)
+    assert len(windows) == 21
+    for number, mode, name in windows:
+        select = name.endswith("iselect")
+        ext = "Smcsrind" if mode == "M" else "Sscsrind"
+        zh = "选择间接寄存器。" if select else "访问 selector 选中的间接寄存器。"
+        en = "Select an indirect register." if select else "Access the indirectly selected register."
+        extensions = [ext] + (["H"] if mode == "H" else [])
+        reg = dict(id=f"riscv/manual/csr/{name}", name=name, namespace="manual", title=en,
+                   summary=zh, summaryEn=en, locator=dict(type="riscv-csr", address=int(number, 16)),
+                   privilege="VS" if name.startswith("vs") else mode, access="RW", xlens=[32, 64],
+                   condition=" ".join(extensions), extensions=extensions, notes="", sourceUrl=url("indirect-csr.adoc"),
+                   sourceRevision=REVISION, license="CC-BY-4.0", coverage="fields", regions=[])
+        reg["fields"] = [dict(name="SELECT" if select else "DATA",
+            summary="选择间接访问目标；可用范围由所实现扩展定义。" if select else "访问所选寄存器；权限由对应扩展定义。",
+            summaryEn="Select an indirect target; implemented extensions define supported ranges." if select else "Access the selected register; its extension defines access semantics.",
+            access="WARL" if select else "依 selector", layouts=[dict(xlen=w, msb=w-1, lsb=0) for w in (32, 64)],
+            values={}, valuesEn={}, valuesByXlen={}, valuesEnByXlen={}, aliases=[], typeRule="", condition="", view="",
+            sourceUrl=url("indirect-csr.adoc"))]
+        audit["describedFields"] += 1
+        audit["sources"][name + (".SELECT" if select else ".DATA")] = "indirect-csr.adoc"
+        registers[name] = reg
     result = list(registers.values())
-    audit = enrich(result, SOURCE, url)
     return (result, audit) if include_audit else result
 
 
@@ -541,23 +565,29 @@ def run():
     if subprocess.check_output(["git", "-C", str(UPSTREAM), "status", "--porcelain", "--untracked-files=no"], text=True).strip():
         raise SystemExit("Official manual checkout has local modifications")
     old = read_catalog(ASSETS)
-    retained = [reg for reg in old["registers"] if reg["namespace"] not in ("standard", "andes", "manual", "thead")]
+    retained = []  # Vendor packages are managed separately from pinned official sources.
     manual_registers, semantic_audit = build_registers(include_audit=True)
-    registers = manual_registers + retained
+    registers = manual_registers
+    base = manual_registers
+    layers = {}
     from import_aia import enrich as enrich_aia, verify_checkout as verify_aia, update_metadata as update_aia_metadata
     verify_aia()
-    registers, aia_audit = enrich_aia(registers)
+    registers, aia_audit = enrich_aia(base)
+    layers["aia"] = registers
     from import_debug import enrich as enrich_debug, verify_checkout as verify_debug, update_metadata as update_debug_metadata
     verify_debug()
-    registers, debug_audit = enrich_debug(registers)
+    layers["debug"], debug_audit = enrich_debug(base)
     from import_spmp import enrich as enrich_spmp, verify_checkout as verify_spmp, update_metadata as update_spmp_metadata
     verify_spmp()
-    registers, spmp_audit = enrich_spmp(registers)
+    layers["spmp"], spmp_audit = enrich_spmp(base)
+    from official_packages import export, read_catalog as read_packages
+    export(old, base, layers)
+    registers = read_packages()["registers"]
     fields = sum(len(reg["fields"]) for reg in registers)
     old.update(version="0.5.4", registers=registers,
                coverage=f"{len(registers)} 个 CSR / {fields} 个字段；ISA Manual 20250508 + AIA 20250312 + Debug 1.0 + SPMP 1.0；厂商数据可通过本地扩展包导入。",
                source={"title": "RISC-V ISA Manual 20250508", "revision": REVISION, "url": REPOSITORY})
-    write_catalog(ASSETS, old)
+    export(old, base, layers)
     sample_names = ["mstatus", "mstatush", "misa", "mvendorid", "marchid", "mimpid", "mhartid", "mtvec", "mepc", "mcause", "mtval", "sstatus", "sscratch", "satp", "mie"]
     sample = dict(old, id="riscv-manual-sample", namespace="manual",
                   registers=[next(reg for reg in registers if reg["namespace"] == "manual" and reg["name"] == name) for name in sample_names])

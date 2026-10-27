@@ -1,0 +1,47 @@
+{
+  "id": "riscv/manual/csr/satp",
+  "patch": {
+    "object": {
+      "fields": {
+        "list": "fields",
+        "remove": [],
+        "items": [
+          {
+            "key": "MODE",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Sspmp 仅在 MODE=Bare 时启用，与分页互斥。 Sspmp is active only with MODE=Bare, mutually exclusive with paging.",
+                  "join": true
+                },
+                "condition": {
+                  "set": "Sspmp"
+                }
+              },
+              "remove": []
+            }
+          }
+        ]
+      },
+      "sources": {
+        "list": "sources",
+        "remove": [],
+        "items": [
+          {
+            "key": "spmp",
+            "patch": {
+              "set": {
+                "namespace": "spmp",
+                "title": "RISC-V S-level Physical Memory Protection 1.0",
+                "revision": "4ce228207193c55247200110e3d5b6881a17c367",
+                "url": "https://github.com/riscv/riscv-spmp/tree/4ce228207193c55247200110e3d5b6881a17c367",
+                "license": "CC-BY-4.0"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "remove": []
+  }
+}

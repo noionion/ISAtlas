@@ -6,9 +6,9 @@
 
 ## 存储与覆盖范围
 
-- `app/src/main/assets/inst/manual-{name}.json`：每个指令名一个文件；同名的位宽、扩展或寄存器文件差异存入文件内的编码变体。
-- `app/src/main/assets/inst/pseudo-{name}.json`：伪指令展开及名称参考，每个名称一个文件；未定义展开的示例或历史名称明确标记，不虚构编码。
-- `app/src/main/assets/riscv-instructions.json`：独立指令目录、数据版本、文件索引与 SHA-256；不混入现有 CSR 索引。
+- `data/official-packages/manual/inst/manual-{name}.json`：每个指令名一个文件；同名的位宽、扩展或寄存器文件差异存入文件内的编码变体。
+- `data/official-packages/manual/inst/pseudo-{name}.json`：伪指令展开及名称参考，每个名称一个文件；未定义展开的示例或历史名称明确标记，不虚构编码。
+- `data/official-packages/manual/riscv-instructions.json`：独立指令目录、数据版本、文件索引与 SHA-256；不混入现有 CSR 索引。
 - `docs/data/instruction-import-report.json`：生成统计，仅作本地复核。
 - `docs/data/instruction-review.json`：逐条审核结果、数据指纹及编码重叠分类，仅作本地复核。
 - `docs/data/instruction-context-review.json`：全量上下文规则、静态样本及寄存器/保留位扫描结果，仅作本地复核。

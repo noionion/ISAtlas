@@ -9,7 +9,7 @@ import manual_pseudoinstructions as adapter
 class ManualPseudoTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.assets = ROOT / "app/src/main/assets"
+        cls.assets = ROOT / "data/official-packages/manual"
         cls.instructions = {entry["name"]: entry for path in (cls.assets / "inst").glob("manual-*.json")
                             for entry in [json.loads(path.read_text(encoding="utf-8"))]}
         cls.entries = adapter.build(cls.instructions)

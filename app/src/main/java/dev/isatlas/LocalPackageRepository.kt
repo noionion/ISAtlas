@@ -44,6 +44,12 @@ internal class LocalPackageRepository(context: Context, private val appVersion: 
         return snapshot(warning)
     }
 
+    @Synchronized fun rebase(catalogs: LocalCatalogs): LocalPackageSnapshot {
+        val previous = base
+        base = catalogs
+        return try { snapshot() } catch (error: Exception) { base = previous; throw error }
+    }
+
     private fun decode(bytes: ByteArray) = LocalPackages.decode(bytes,appVersion,base.compiler.tokens.toSet()+setOf("s","u"),
         base.csr.registers.map { it.namespace }.toSet()+base.instructions.instructions.map { it.namespace })
 

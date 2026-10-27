@@ -23,7 +23,7 @@ def review(write_report=True):
     targeted = [r for r in pack["registers"] if r["namespace"] == "aia" or any(s["namespace"] == "aia" for s in r.get("sources", []))]
     registers = {r["name"]: r for r in targeted}
     assert len(targeted) == len(registers) == 51
-    assert sum(r["namespace"] == "aia" for r in targeted) == 32
+    assert sum(r["namespace"] == "aia" for r in targeted) == 26
     assert len({r["id"] for r in pack["registers"]}) == len(pack["registers"])
     assert len({(r["namespace"], r["locator"]["address"]) for r in pack["registers"]}) == len(pack["registers"])
     source_rows = csr_rows()
@@ -78,7 +78,7 @@ def review(write_report=True):
         actual = {f["name"]: (f["layouts"][0]["msb"], f["layouts"][0]["lsb"]) for f in registers[name]["fields"]}
         assert expected == actual, name
     report = dict(revision=REVISION, catalogSha256=catalog_sha256(ASSETS),
-        directCsrTableEntries=len(source_rows), addedCsrs=32, supplementedCsrs=19,
+        directCsrTableEntries=len(source_rows), addedCsrs=26, supplementedCsrs=25,
         reviewedFields=sum(len(r["fields"]) for r in targeted),
         highHalfCsrs=sum(row["width"] == "32" for row in source_rows.values()),
         missingDescriptions=[], duplicateIdentities=[], layoutErrors=[], sourceEvidence=sources,

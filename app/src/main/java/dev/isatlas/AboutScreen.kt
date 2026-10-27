@@ -66,7 +66,7 @@ internal fun AboutScreen(pack: DataPack?, onShowSources: () -> Unit, update: Upd
             AboutHeading("数据库")
             AboutRow("数据库版本", pack?.version ?: "尚未加载", tag = "about-database-version")
             AboutRow("数据源与许可", tag = "about-sources", onClick = onShowSources)
-            AboutRow("本地数据包", subtitle = "导入与管理 CSR / 指令扩展包", tag = "about-local-packages", onClick = onShowLocalPackages)
+            AboutRow("数据包", subtitle = "管理内置规范与本地 CSR / 指令包", tag = "about-local-packages", onClick = onShowLocalPackages)
 
             AboutHeading("项目与支持")
             AboutRow("GitHub", subtitle = "noionion/ISAtlas", tag = "about-github", onClick = { openLink(PROJECT_URL) })

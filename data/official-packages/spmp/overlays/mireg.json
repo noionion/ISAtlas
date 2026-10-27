@@ -1,0 +1,170 @@
+{
+  "id": "riscv/manual/csr/mireg",
+  "patch": {
+    "object": {
+      "condition": {
+        "append": " / Smpmpdeleg（依 selector 对应扩展）",
+        "join": false
+      },
+      "extensions": {
+        "add": [
+          "Smpmpdeleg"
+        ],
+        "remove": []
+      },
+      "notes": {
+        "append": "SPMP selector 0x100–0x13F：ireg 访问 spmpaddr[i]，ireg2 访问 spmpcfg[i]；越过实际条目数读零、写忽略。ireg3–6 在此 selector 范围保留。 不同间接写及后续访存之间不自动排序；S/U 使用 SFENCE.VMA x0,x0，适用的 VS/VU 使用 HFENCE.GVMA x0,x0。",
+        "join": true
+      },
+      "regions": {
+        "list": "regions",
+        "remove": [],
+        "items": [
+          {
+            "key": "spmpaddr|0|64:63:54",
+            "patch": {
+              "set": {
+                "label": "0",
+                "access": "RO",
+                "summary": "规范位图规定为零。",
+                "summaryEn": "Zero in the normative diagram.",
+                "layouts": [
+                  {
+                    "xlen": 64,
+                    "msb": 63,
+                    "lsb": 54
+                  }
+                ],
+                "view": "spmpaddr",
+                "sourceUrl": "https://github.com/riscv/riscv-spmp/blob/4ce228207193c55247200110e3d5b6881a17c367/sspmp/images/bytefield/spmpaddr-rv64.adoc#L1-L17"
+              }
+            }
+          }
+        ]
+      },
+      "fields": {
+        "list": "fields",
+        "remove": [],
+        "items": [
+          {
+            "key": "spmpaddr.ADDRESS",
+            "patch": {
+              "set": {
+                "name": "spmpaddr.ADDRESS",
+                "summary": "编码区域物理地址高位；TOR/NAPOT 的解释与 PMP 相同。",
+                "summaryEn": "Encode upper physical address bits; interpret TOR/NAPOT as for PMP.",
+                "access": "WARL",
+                "layouts": [
+                  {
+                    "xlen": 32,
+                    "msb": 31,
+                    "lsb": 0
+                  },
+                  {
+                    "xlen": 64,
+                    "msb": 53,
+                    "lsb": 0
+                  }
+                ],
+                "values": {},
+                "valuesEn": {},
+                "valuesByXlen": {},
+                "valuesEnByXlen": {},
+                "aliases": [
+                  "spmpaddr",
+                  "spmpaddr0",
+                  "spmpaddr1",
+                  "spmpaddr2",
+                  "spmpaddr3",
+                  "spmpaddr4",
+                  "spmpaddr5",
+                  "spmpaddr6",
+                  "spmpaddr7",
+                  "spmpaddr8",
+                  "spmpaddr9",
+                  "spmpaddr10",
+                  "spmpaddr11",
+                  "spmpaddr12",
+                  "spmpaddr13",
+                  "spmpaddr14",
+                  "spmpaddr15",
+                  "spmpaddr16",
+                  "spmpaddr17",
+                  "spmpaddr18",
+                  "spmpaddr19",
+                  "spmpaddr20",
+                  "spmpaddr21",
+                  "spmpaddr22",
+                  "spmpaddr23",
+                  "spmpaddr24",
+                  "spmpaddr25",
+                  "spmpaddr26",
+                  "spmpaddr27",
+                  "spmpaddr28",
+                  "spmpaddr29",
+                  "spmpaddr30",
+                  "spmpaddr31",
+                  "spmpaddr32",
+                  "spmpaddr33",
+                  "spmpaddr34",
+                  "spmpaddr35",
+                  "spmpaddr36",
+                  "spmpaddr37",
+                  "spmpaddr38",
+                  "spmpaddr39",
+                  "spmpaddr40",
+                  "spmpaddr41",
+                  "spmpaddr42",
+                  "spmpaddr43",
+                  "spmpaddr44",
+                  "spmpaddr45",
+                  "spmpaddr46",
+                  "spmpaddr47",
+                  "spmpaddr48",
+                  "spmpaddr49",
+                  "spmpaddr50",
+                  "spmpaddr51",
+                  "spmpaddr52",
+                  "spmpaddr53",
+                  "spmpaddr54",
+                  "spmpaddr55",
+                  "spmpaddr56",
+                  "spmpaddr57",
+                  "spmpaddr58",
+                  "spmpaddr59",
+                  "spmpaddr60",
+                  "spmpaddr61",
+                  "spmpaddr62",
+                  "spmpaddr63"
+                ],
+                "typeRule": "RV32 编码 PA[33:2]；未实现地址位及最小粒度受 WARL 约束。S 侧锁定条目或下一条锁定 TOR 的地址写入被忽略；M 可经 miselect 解除 L。 RV64 编码 PA[55:2]；未实现地址位及最小粒度受 WARL 约束。S 侧锁定条目或下一条锁定 TOR 的地址写入被忽略；M 可经 miselect 解除 L。",
+                "condition": "",
+                "view": "spmpaddr",
+                "sourceUrl": "https://github.com/riscv/riscv-spmp/blob/4ce228207193c55247200110e3d5b6881a17c367/sspmp/spmp_spec.adoc#L1-L313"
+              }
+            }
+          }
+        ]
+      },
+      "sources": {
+        "list": "sources",
+        "remove": [],
+        "items": [
+          {
+            "key": "spmp",
+            "patch": {
+              "set": {
+                "namespace": "spmp",
+                "title": "RISC-V S-level Physical Memory Protection 1.0",
+                "revision": "4ce228207193c55247200110e3d5b6881a17c367",
+                "url": "https://github.com/riscv/riscv-spmp/tree/4ce228207193c55247200110e3d5b6881a17c367",
+                "license": "CC-BY-4.0"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "remove": []
+  }
+}

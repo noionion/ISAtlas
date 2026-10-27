@@ -15,7 +15,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
     testImplementation("junit:junit:4.13.2")
 }
-sourceSets.test { resources.srcDir("../app/src/main/assets") }
+sourceSets.test {
+    resources.srcDir("../app/src/main/assets")
+    resources.srcDir("../data/official-packages/manual")
+}
 
 tasks.register<JavaExec>("validateLocalPackage") {
     group = "verification"

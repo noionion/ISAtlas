@@ -21,6 +21,8 @@ def deduplicate(registers):
 
 def write_catalog(assets, pack):
     assets = Path(assets)
+    if (assets / "riscv-packages.json").exists():
+        raise ValueError("Built-in packages must be regenerated with tools/import_isa_manual.py")
     unique = deduplicate(pack["registers"])
     payloads = {}
     for reg in sorted(unique, key=lambda r: (r.get("namespace", pack["namespace"]), r["locator"]["address"], r["name"])):
@@ -52,6 +54,9 @@ def write_catalog(assets, pack):
 
 def read_catalog(assets):
     assets = Path(assets)
+    if (assets / "riscv-packages.json").exists():
+        from official_packages import read_catalog as read_packages
+        return read_packages(assets)
     manifest = json.loads((assets / "riscv-catalog.json").read_text(encoding="utf-8"))
     files = manifest.pop("files")
     manifest["registers"] = [json.loads((assets / "csr" / name).read_text(encoding="utf-8")) for name in files]
@@ -60,6 +65,12 @@ def read_catalog(assets):
 
 def catalog_sha256(assets):
     assets = Path(assets)
+    if (assets / "riscv-packages.json").exists():
+        content = (assets / "riscv-packages.json").read_bytes()
+        digest = hashlib.sha256(content)
+        for item in json.loads(content)["packages"]:
+            digest.update((assets / item["file"]).read_bytes())
+        return digest.hexdigest()
     manifest_bytes = (assets / "riscv-catalog.json").read_bytes()
     digest = hashlib.sha256(manifest_bytes)
     for name in json.loads(manifest_bytes)["files"]:
@@ -70,9 +81,5 @@ def catalog_sha256(assets):
 
 if __name__ == "__main__":
     assets = Path(__file__).resolve().parents[1] / "app/src/main/assets"
-    pack = json.loads((assets / "riscv-catalog.json").read_text(encoding="utf-8"))
-    if "files" in pack:
-        pack = read_catalog(assets)
-    removed = write_catalog(assets, pack)
-    assert read_catalog(assets) == dict(pack, registers=sorted({r["id"]: r for r in pack["registers"]}.values(), key=lambda r: (r.get("namespace", pack["namespace"]), r["locator"]["address"], r["name"])))
-    print(f"CSR files: {len(pack['registers']) - removed}; identical duplicates removed: {removed}; SHA-256: {catalog_sha256(assets)}")
+    pack = read_catalog(assets)
+    print(f"CSR files: {len(pack['registers'])}; SHA-256: {catalog_sha256(assets)}")

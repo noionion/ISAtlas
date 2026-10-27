@@ -1,0 +1,276 @@
+{
+  "id": "riscv/manual/csr/pmpcfg15",
+  "patch": {
+    "object": {
+      "notes": {
+        "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+        "join": true
+      },
+      "fields": {
+        "list": "fields",
+        "remove": [],
+        "items": [
+          {
+            "key": "PMP60L",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP60A",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP60X",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP60W",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP60R",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP61L",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP61A",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP61X",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP61W",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP61R",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP62L",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP62A",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP62X",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP62W",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP62R",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP63L",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP63A",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP63X",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP63W",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          },
+          {
+            "key": "PMP63R",
+            "patch": {
+              "object": {
+                "typeRule": {
+                  "append": " Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
+                  "join": true
+                }
+              },
+              "remove": []
+            }
+          }
+        ]
+      },
+      "sources": {
+        "list": "sources",
+        "remove": [],
+        "items": [
+          {
+            "key": "spmp",
+            "patch": {
+              "set": {
+                "namespace": "spmp",
+                "title": "RISC-V S-level Physical Memory Protection 1.0",
+                "revision": "4ce228207193c55247200110e3d5b6881a17c367",
+                "url": "https://github.com/riscv/riscv-spmp/tree/4ce228207193c55247200110e3d5b6881a17c367",
+                "license": "CC-BY-4.0"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "remove": []
+  }
+}

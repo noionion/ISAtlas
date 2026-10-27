@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    {
+      "id": "manual",
+      "name": "RISC-V ISA Manual 20250508",
+      "version": "20250508",
+      "source": {
+        "namespace": "manual",
+        "title": "RISC-V ISA Manual 20250508",
+        "revision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+        "url": "https://github.com/riscv/riscv-isa-manual",
+        "license": "CC-BY-4.0"
+      },
+      "license": "CC-BY-4.0",
+      "required": true,
+      "csrCount": 402,
+      "supplementCount": 0,
+      "file": "packages/manual.zip",
+      "sha256": "04937042a129a3ae33c05d47e0ca8b63c08f7dcf4b2abbd9e34c1d911b8f172c"
+    },
+    {
+      "id": "aia",
+      "name": "RISC-V Advanced Interrupt Architecture 20250312",
+      "version": "20250312",
+      "source": {
+        "namespace": "aia",
+        "title": "RISC-V Advanced Interrupt Architecture 20250312",
+        "revision": "20318d1b03f0ac8253458b82f8244d0d0db074e9",
+        "url": "https://github.com/riscv/riscv-aia/tree/20318d1b03f0ac8253458b82f8244d0d0db074e9",
+        "license": "CC-BY-4.0"
+      },
+      "license": "CC-BY-4.0",
+      "required": false,
+      "csrCount": 26,
+      "supplementCount": 25,
+      "file": "packages/aia.zip",
+      "sha256": "7e63d9dc163ee2116e04c86dad0c180a4240227a71bf14cd8c39dff890e6611e"
+    },
+    {
+      "id": "debug",
+      "name": "RISC-V Debug Specification 1.0",
+      "version": "1.0",
+      "source": {
+        "namespace": "debug",
+        "title": "RISC-V Debug Specification 1.0",
+        "revision": "5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8",
+        "url": "https://github.com/riscv/riscv-debug-spec/tree/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8",
+        "license": "CC-BY-4.0"
+      },
+      "license": "CC-BY-4.0",
+      "required": false,
+      "csrCount": 3,
+      "supplementCount": 15,
+      "file": "packages/debug.zip",
+      "sha256": "b10ddf6e90ecc2546d1673fa80f17c56a4f86bfab2fe377a90c601c5e9249cf7"
+    },
+    {
+      "id": "spmp",
+      "name": "RISC-V S-level Physical Memory Protection 1.0",
+      "version": "1.0",
+      "source": {
+        "namespace": "spmp",
+        "title": "RISC-V S-level Physical Memory Protection 1.0",
+        "revision": "4ce228207193c55247200110e3d5b6881a17c367",
+        "url": "https://github.com/riscv/riscv-spmp/tree/4ce228207193c55247200110e3d5b6881a17c367",
+        "license": "CC-BY-4.0"
+      },
+      "license": "CC-BY-4.0",
+      "required": false,
+      "csrCount": 3,
+      "supplementCount": 100,
+      "file": "packages/spmp.zip",
+      "sha256": "1affa34981cd798f24b68fc43af0c49e396f42931e7a377d3d05ad3cfd9516ec"
+    }
+  ]
+}

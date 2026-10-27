@@ -20,7 +20,7 @@ from instruction_sources import (ROOT, SOURCE, REVISION, REPOSITORY, clean,
                                  byte_rows, named_sections, waves)
 from instruction_summaries import summary
 
-ASSETS = ROOT / "app/src/main/assets"
+ASSETS = ROOT / "data/official-packages/manual"
 INST = ASSETS / "inst"
 CATALOG = ASSETS / "riscv-instructions.json"
 REPORT = ROOT / "docs/data/instruction-import-report.json"
@@ -565,3 +565,5 @@ if __name__ == "__main__":
     assert_upstream()
     build()
     write()
+    from official_packages import refresh
+    refresh()

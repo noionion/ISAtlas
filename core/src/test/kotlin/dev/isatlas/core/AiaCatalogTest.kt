@@ -8,7 +8,7 @@ class AiaCatalogTest {
     private fun reg(name: String) = pack.registers.single { it.name == name }
 
     @Test fun `AIA entries load without duplicating existing register identities`() {
-        assertEquals(32, pack.registers.count { it.namespace == "aia" })
+        assertEquals(26, pack.registers.count { it.namespace == "aia" })
         assertEquals("riscv/manual/csr/mip", reg("mip").id)
         assertEquals(0xFB0, (reg("mtopi").locator as RegisterLocator.Csr).address)
         assertEquals(0x35C, (reg("mtopei").locator as RegisterLocator.Csr).address)

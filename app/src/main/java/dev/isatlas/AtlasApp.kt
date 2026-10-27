@@ -164,9 +164,9 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
                     onCheckUpdate = { updates.check(manual = true) })
             }
             RaisedPage(state.showSources, "数据源与许可", "返回关于", { model.showSources(false) }) {
-                DataSourcesScreen(state.pack, state.localPackages)
+                DataSourcesScreen(state.pack, state.localPackages, state.officialPackages)
             }
-            RaisedPage(state.showLocalPackages, "本地数据包", "返回关于", { model.showLocalPackages(false) }) {
+            RaisedPage(state.showLocalPackages, "数据包", "返回关于", { model.showLocalPackages(false) }) {
                 LocalPackagesScreen(state, model)
             }
         }

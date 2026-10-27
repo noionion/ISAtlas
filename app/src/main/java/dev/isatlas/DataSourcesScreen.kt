@@ -21,9 +21,10 @@ import dev.isatlas.core.DataPack
 import dev.isatlas.core.Catalog
 import dev.isatlas.core.ManagedLocalPackage
 import dev.isatlas.core.SourceAttribution
+import dev.isatlas.core.OfficialPackageInfo
 
 @Composable
-fun DataSourcesScreen(pack: DataPack?, localPackages: List<ManagedLocalPackage> = emptyList()) {
+fun DataSourcesScreen(pack: DataPack?, localPackages: List<ManagedLocalPackage> = emptyList(), officialPackages: List<OfficialPackageInfo> = emptyList()) {
     val uriHandler = LocalUriHandler.current
     var linkError by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize().testTag("sources-screen"), contentAlignment = Alignment.TopCenter) {
@@ -33,7 +34,7 @@ fun DataSourcesScreen(pack: DataPack?, localPackages: List<ManagedLocalPackage> 
                 Text("数据库尚未加载。", Modifier.padding(vertical = 24.dp))
             } else {
                 val local = localPackages.filter { it.active }.mapNotNull { it.data?.manifest }
-                val sources = Catalog.sourceAttributions(pack).filter { source -> local.none { it.namespace == source.namespace } } +
+                val sources = (Catalog.sourceAttributions(pack) + officialPackages.map { it.source }).associateBy { it.namespace to it.revision }.values.filter { source -> local.none { it.namespace == source.namespace } } +
                     local.map { SourceAttribution(it.namespace, it.name, it.version, "local://${it.id}", it.license) }
                 sources.forEach { source ->
                         val namespace = source.namespace

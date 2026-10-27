@@ -4,15 +4,21 @@
 
 ## 文件结构
 
-`app/src/main/assets/riscv-catalog.json` 保存包元数据和 `files` 数组；数组中的每个文件名对应 `csr/` 下一个完整的 RegisterDefinition。文件名为小写的 `{namespace}-{name}.json`，例如 `manual-mstatus.json`。RV32/RV64 布局在同一文件中保存。
+可审阅 JSON 按来源保存在 `data/official-packages/{manual,aia,debug,spmp}/`。每包有 `manifest.json`、`LICENSE.txt`、新增条目的 `csr/` 和针对基础定义的 `overlays/`；Manual 还包含 `inst/` 与独立指令索引。RV32/RV64 布局仍在同一 CSR 文件中保存。
 
-应用通过 Catalog.decodeFiles 读取索引，合并为 DataPack 后校验。拒绝重复文件引用、不安全路径、重复稳定身份、位段重叠和越界编码。稳定身份为 architecture / namespace / csr / name；不同来源的同址 CSR 并存，不按地址去重。tools/csr_storage.py 对同 id、相同内容去重；同 id、不同内容报错，并保留原数据。
+应用只打包 `app/src/main/assets/packages/{manual,aia,debug,spmp}.zip`，由 `riscv-packages.json` 列出固定来源、版本、许可、条目数、归档路径和 SHA-256。读取时先校验归档，再合成启用包并执行 Catalog / InstructionCatalog 校验；不把完整 JSON 再重复放入 APK。
 
-数据指纹为 SHA-256：先加入索引原始字节，再按 files 顺序追加文件名 UTF-8、NUL 和对应 JSON 原始字节。
+Manual 为不可关闭的基础包。AIA、Debug、SPMP 默认开启，可分别启停；按固定顺序重建基础目录并应用增量，关闭时完全撤回该包的新增记录和补充内容。`fields` 按稳定名称、`sources` 按 namespace、`regions` 按 view/label/layout 标识合并；扩展关联取增量集合，枚举逐键合并，增补文字追加，避免一个包带入另一个已关闭包的定义。应用随后合入本地包，不改写本地包索引或启停设置。
+
+通用间接 CSR 窗口属于 ISA Manual 的 `indirect-csr.adoc`，21 个 M/S/VS 窗口均在基础包中。此次从 AIA 归回 6 个窗口，并补齐原先遗漏的 5 个 VS 窗口；例如 `mireg4=0x355`，不误用保留的 `0x354`。AIA/SPMP 的 selector、字段格式和规则作为各自增量保存，SPMP 不依赖 AIA 数据包开启。
+
+归档为确定性 ZIP：固定文件顺序、时间戳和压缩参数。数据总指纹为索引原始字节及按索引顺序连接的 ZIP 原始字节的 SHA-256。`tools/import_isa_manual.py` 从固定子模块重新生成全部 CSR 包，`tools/import_manual_instructions.py` 写入 Manual 指令源后刷新归档；只重打包可运行 `tools/official_packages.py`。
+
+内置归档是 ISAtlas 对规范的适配产物，并非上游官方发布的数据格式，也不等同于[本地导入包](local-packages.md)。本地导入继续禁止 `manual/aia/debug/spmp` 等保留命名空间，不能覆盖内置规范包。
 
 ## 包与寄存器
 
-包包含 schemaVersion、id、architecture、namespace、version、title、coverage、source；存储索引用 files，内存 DataPack 用 registers。当前 architecture 仅支持 riscv。source 保存 title、revision 和 url。
+包包含 schemaVersion、id、architecture、namespace、version、title、coverage、source；内置包 manifest 用 csr/overlays 索引，内存 DataPack 用 registers。当前 architecture 仅支持 riscv。source 保存 title、revision 和 url。
 
 寄存器保存 id、namespace、name、title、summary、summaryEn、locator、privilege、access、xlens、condition、extensions、notes、sourceUrl、sourceRevision、license、coverage、fields 和 regions。locator 为 type=riscv-csr 与数值 address。字段声明的 XLEN 必须属于寄存器适用范围。
 
@@ -38,7 +44,7 @@ regions 保存非命名区域，每项包含 label、access、summary、summaryE
 
 summaryEn、英文编码表、按位宽编码表及字段/区域 sourceUrl 均为可选属性，兼容保留的厂商条目。当前界面显示中文，英文摘要参与搜索，为后续 i18n 留存。
 
-当前目录包含 391 个 manual CSR（经补充后 1,766 个字段）、32 个 aia CSR（139 个字段）、3 个 debug CSR（5 个字段）、3 个 spmp CSR（97 个字段），合计 429 个 CSR、2,007 个字段定义；字段数包含互斥触发器和 SPMP 访问窗口格式。具体来源与边界见 data-import.md 和 field-review.md。其他架构及指令定义需要扩展对应模型、解析、搜索和显示能力，不能直接复用 CSR 编号语义。
+当前目录包含 402 个 manual CSR（经补充后 1,779 个字段）、26 个 aia CSR（131 个字段）、3 个 debug CSR（5 个字段）、3 个 spmp CSR（97 个字段），合计 434 个 CSR、2,012 个字段定义；字段数包含互斥触发器和 SPMP 访问窗口格式。具体来源与边界见 data-import.md 和 field-review.md。其他架构及指令定义需要扩展对应模型、解析、搜索和显示能力，不能直接复用 CSR 编号语义。
 
 SPMP 的 selector 0x100–0x13F 也不是 CSR 编号。spmpaddr/spmpcfg 使用 ireg/ireg2 的 `view`，保留通用格式；实际条目索引由 xiselect 选择。字段别名支持检索 spmpaddr0–63 / spmpcfg0–63，但不创建虚假直接 CSR。
 

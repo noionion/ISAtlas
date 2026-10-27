@@ -1,0 +1,66 @@
+{
+  "id": "riscv/manual/csr/mireg",
+  "patch": {
+    "object": {
+      "extensions": {
+        "add": [
+          "Smaia"
+        ],
+        "remove": []
+      },
+      "notes": {
+        "append": " IMSIC：eidelivery 为 WARL（0 禁止、1 允许、0x40000000 可选旁路；guest 不支持旁路）；eithreshold 为 WLRL（0 无阈值，P>0 时仅 ID<P 可递送）。eip/eie 的未实现身份和 ID0 读零。RV64 的奇数 eip/eie selector 访问陷阱；0x71、0x73–0x7F 读零写忽略。 iprio selector 0x30–0x3F：RV32 每项四个 8 位优先级，RV64 仅偶数项有效、每项八个；每个优先级为 WARL 或只读零。",
+        "join": true
+      },
+      "fields": {
+        "list": "fields",
+        "remove": [],
+        "items": [
+          {
+            "key": "DATA",
+            "patch": {
+              "object": {
+                "summary": {
+                  "set": "访问 miselect 选择的 iprio 或 IMSIC eidelivery/eithreshold/eip/eie；访问属性由所选寄存器决定。"
+                },
+                "summaryEn": {
+                  "set": "Access iprio or IMSIC state selected by miselect; access semantics depend on that register."
+                },
+                "access": {
+                  "append": "：WARL/WLRL/RW/RO0",
+                  "join": false
+                },
+                "sourceUrl": {
+                  "set": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/IMSIC.adoc#L423-L577"
+                }
+              },
+              "remove": [
+                "typeRule",
+                "view"
+              ]
+            }
+          }
+        ]
+      },
+      "sources": {
+        "list": "sources",
+        "remove": [],
+        "items": [
+          {
+            "key": "aia",
+            "patch": {
+              "set": {
+                "namespace": "aia",
+                "title": "RISC-V Advanced Interrupt Architecture 20250312",
+                "revision": "20318d1b03f0ac8253458b82f8244d0d0db074e9",
+                "url": "https://github.com/riscv/riscv-aia/tree/20318d1b03f0ac8253458b82f8244d0d0db074e9",
+                "license": "CC-BY-4.0"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "remove": []
+  }
+}

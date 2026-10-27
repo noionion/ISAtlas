@@ -1,4 +1,4 @@
-> 当前内置数据库为 0.5.4：429 个 CSR、2,007 个字段。玄铁 CSR 已移出为[独立 ZIP](../examples/local-packages/thead-csr.zip)，导入后可查询。下文各规范接入数量保留该轮基线。
+> 当前内置数据库为 0.5.4：全部内置规范包启用时为 434 个 CSR、2,012 个字段。玄铁 CSR 已移出为[独立 ZIP](../examples/local-packages/thead-csr.zip)，导入后可查询。下文各规范接入数量保留该轮基线。
 
 # 官方 ISA 手册数据接入
 

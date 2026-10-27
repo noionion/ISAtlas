@@ -1,0 +1,1333 @@
+{
+  "id": "riscv/manual/csr/pmpcfg14",
+  "namespace": "manual",
+  "name": "pmpcfg14",
+  "title": "Physical memory protection configuration",
+  "summary": "PMP 区域权限、匹配方式与锁定配置。",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 942
+  },
+  "privilege": "M",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "",
+  "extensions": [],
+  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
+  "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
+  "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "PMP56L",
+      "summary": "PMP 条目 56：锁定 PMP 配置及关联地址，复位前通常不能修改；锁定还影响 M 模式的权限检查，Smepmp 可细化其语义。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 7,
+          "lsb": 7
+        },
+        {
+          "xlen": 64,
+          "msb": 7,
+          "lsb": 7
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 56: lock its configuration and address.",
+      "values": {
+        "0": "未锁定",
+        "1": "锁定（受 Smepmp 规则约束）"
+      },
+      "valuesEn": {
+        "0": "Unlocked",
+        "1": "Locked, subject to Smepmp"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP56A",
+      "summary": "PMP 条目 56：选择 PMP 地址匹配方式；实现粒度会限制可用的 NA4/NAPOT 编码。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 4,
+          "lsb": 3
+        },
+        {
+          "xlen": 64,
+          "msb": 4,
+          "lsb": 3
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 56: select its address-matching mode.",
+      "values": {
+        "0": "OFF：不匹配",
+        "1": "TOR：上界匹配",
+        "2": "NA4：自然对齐的 4 字节区域",
+        "3": "NAPOT：自然对齐的二次幂区域"
+      },
+      "valuesEn": {
+        "0": "OFF: disabled",
+        "1": "TOR: top of range",
+        "2": "NA4: aligned four-byte region",
+        "3": "NAPOT: aligned power-of-two region"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP56X",
+      "summary": "PMP 条目 56：控制匹配区域的指令执行权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 2,
+          "lsb": 2
+        },
+        {
+          "xlen": 64,
+          "msb": 2,
+          "lsb": 2
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 56: control execute permission.",
+      "values": {
+        "0": "基础 PMP：禁止执行",
+        "1": "基础 PMP：允许执行"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny execution",
+        "1": "Base PMP: permit execution"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP56W",
+      "summary": "PMP 条目 56：控制匹配区域的写权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 1,
+          "lsb": 1
+        },
+        {
+          "xlen": 64,
+          "msb": 1,
+          "lsb": 1
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 56: control write permission.",
+      "values": {
+        "0": "基础 PMP：禁止写入",
+        "1": "基础 PMP：允许写入"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny writes",
+        "1": "Base PMP: permit writes"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP56R",
+      "summary": "PMP 条目 56：控制匹配区域的读权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 0,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 0,
+          "lsb": 0
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 56: control read permission.",
+      "values": {
+        "0": "基础 PMP：禁止读取",
+        "1": "基础 PMP：允许读取"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny reads",
+        "1": "Base PMP: permit reads"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP57L",
+      "summary": "PMP 条目 57：锁定 PMP 配置及关联地址，复位前通常不能修改；锁定还影响 M 模式的权限检查，Smepmp 可细化其语义。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 15,
+          "lsb": 15
+        },
+        {
+          "xlen": 64,
+          "msb": 15,
+          "lsb": 15
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 57: lock its configuration and address.",
+      "values": {
+        "0": "未锁定",
+        "1": "锁定（受 Smepmp 规则约束）"
+      },
+      "valuesEn": {
+        "0": "Unlocked",
+        "1": "Locked, subject to Smepmp"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP57A",
+      "summary": "PMP 条目 57：选择 PMP 地址匹配方式；实现粒度会限制可用的 NA4/NAPOT 编码。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 12,
+          "lsb": 11
+        },
+        {
+          "xlen": 64,
+          "msb": 12,
+          "lsb": 11
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 57: select its address-matching mode.",
+      "values": {
+        "0": "OFF：不匹配",
+        "1": "TOR：上界匹配",
+        "2": "NA4：自然对齐的 4 字节区域",
+        "3": "NAPOT：自然对齐的二次幂区域"
+      },
+      "valuesEn": {
+        "0": "OFF: disabled",
+        "1": "TOR: top of range",
+        "2": "NA4: aligned four-byte region",
+        "3": "NAPOT: aligned power-of-two region"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP57X",
+      "summary": "PMP 条目 57：控制匹配区域的指令执行权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 10,
+          "lsb": 10
+        },
+        {
+          "xlen": 64,
+          "msb": 10,
+          "lsb": 10
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 57: control execute permission.",
+      "values": {
+        "0": "基础 PMP：禁止执行",
+        "1": "基础 PMP：允许执行"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny execution",
+        "1": "Base PMP: permit execution"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP57W",
+      "summary": "PMP 条目 57：控制匹配区域的写权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 9,
+          "lsb": 9
+        },
+        {
+          "xlen": 64,
+          "msb": 9,
+          "lsb": 9
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 57: control write permission.",
+      "values": {
+        "0": "基础 PMP：禁止写入",
+        "1": "基础 PMP：允许写入"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny writes",
+        "1": "Base PMP: permit writes"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP57R",
+      "summary": "PMP 条目 57：控制匹配区域的读权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 8,
+          "lsb": 8
+        },
+        {
+          "xlen": 64,
+          "msb": 8,
+          "lsb": 8
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 57: control read permission.",
+      "values": {
+        "0": "基础 PMP：禁止读取",
+        "1": "基础 PMP：允许读取"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny reads",
+        "1": "Base PMP: permit reads"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP58L",
+      "summary": "PMP 条目 58：锁定 PMP 配置及关联地址，复位前通常不能修改；锁定还影响 M 模式的权限检查，Smepmp 可细化其语义。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 23,
+          "lsb": 23
+        },
+        {
+          "xlen": 64,
+          "msb": 23,
+          "lsb": 23
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 58: lock its configuration and address.",
+      "values": {
+        "0": "未锁定",
+        "1": "锁定（受 Smepmp 规则约束）"
+      },
+      "valuesEn": {
+        "0": "Unlocked",
+        "1": "Locked, subject to Smepmp"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP58A",
+      "summary": "PMP 条目 58：选择 PMP 地址匹配方式；实现粒度会限制可用的 NA4/NAPOT 编码。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 20,
+          "lsb": 19
+        },
+        {
+          "xlen": 64,
+          "msb": 20,
+          "lsb": 19
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 58: select its address-matching mode.",
+      "values": {
+        "0": "OFF：不匹配",
+        "1": "TOR：上界匹配",
+        "2": "NA4：自然对齐的 4 字节区域",
+        "3": "NAPOT：自然对齐的二次幂区域"
+      },
+      "valuesEn": {
+        "0": "OFF: disabled",
+        "1": "TOR: top of range",
+        "2": "NA4: aligned four-byte region",
+        "3": "NAPOT: aligned power-of-two region"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP58X",
+      "summary": "PMP 条目 58：控制匹配区域的指令执行权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 18,
+          "lsb": 18
+        },
+        {
+          "xlen": 64,
+          "msb": 18,
+          "lsb": 18
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 58: control execute permission.",
+      "values": {
+        "0": "基础 PMP：禁止执行",
+        "1": "基础 PMP：允许执行"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny execution",
+        "1": "Base PMP: permit execution"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP58W",
+      "summary": "PMP 条目 58：控制匹配区域的写权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 17,
+          "lsb": 17
+        },
+        {
+          "xlen": 64,
+          "msb": 17,
+          "lsb": 17
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 58: control write permission.",
+      "values": {
+        "0": "基础 PMP：禁止写入",
+        "1": "基础 PMP：允许写入"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny writes",
+        "1": "Base PMP: permit writes"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP58R",
+      "summary": "PMP 条目 58：控制匹配区域的读权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 16,
+          "lsb": 16
+        },
+        {
+          "xlen": 64,
+          "msb": 16,
+          "lsb": 16
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 58: control read permission.",
+      "values": {
+        "0": "基础 PMP：禁止读取",
+        "1": "基础 PMP：允许读取"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny reads",
+        "1": "Base PMP: permit reads"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP59L",
+      "summary": "PMP 条目 59：锁定 PMP 配置及关联地址，复位前通常不能修改；锁定还影响 M 模式的权限检查，Smepmp 可细化其语义。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 31
+        },
+        {
+          "xlen": 64,
+          "msb": 31,
+          "lsb": 31
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 59: lock its configuration and address.",
+      "values": {
+        "0": "未锁定",
+        "1": "锁定（受 Smepmp 规则约束）"
+      },
+      "valuesEn": {
+        "0": "Unlocked",
+        "1": "Locked, subject to Smepmp"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP59A",
+      "summary": "PMP 条目 59：选择 PMP 地址匹配方式；实现粒度会限制可用的 NA4/NAPOT 编码。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 28,
+          "lsb": 27
+        },
+        {
+          "xlen": 64,
+          "msb": 28,
+          "lsb": 27
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 59: select its address-matching mode.",
+      "values": {
+        "0": "OFF：不匹配",
+        "1": "TOR：上界匹配",
+        "2": "NA4：自然对齐的 4 字节区域",
+        "3": "NAPOT：自然对齐的二次幂区域"
+      },
+      "valuesEn": {
+        "0": "OFF: disabled",
+        "1": "TOR: top of range",
+        "2": "NA4: aligned four-byte region",
+        "3": "NAPOT: aligned power-of-two region"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP59X",
+      "summary": "PMP 条目 59：控制匹配区域的指令执行权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 26,
+          "lsb": 26
+        },
+        {
+          "xlen": 64,
+          "msb": 26,
+          "lsb": 26
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 59: control execute permission.",
+      "values": {
+        "0": "基础 PMP：禁止执行",
+        "1": "基础 PMP：允许执行"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny execution",
+        "1": "Base PMP: permit execution"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP59W",
+      "summary": "PMP 条目 59：控制匹配区域的写权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 25,
+          "lsb": 25
+        },
+        {
+          "xlen": 64,
+          "msb": 25,
+          "lsb": 25
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 59: control write permission.",
+      "values": {
+        "0": "基础 PMP：禁止写入",
+        "1": "基础 PMP：允许写入"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny writes",
+        "1": "Base PMP: permit writes"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP59R",
+      "summary": "PMP 条目 59：控制匹配区域的读权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 24,
+          "lsb": 24
+        },
+        {
+          "xlen": 64,
+          "msb": 24,
+          "lsb": 24
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 59: control read permission.",
+      "values": {
+        "0": "基础 PMP：禁止读取",
+        "1": "基础 PMP：允许读取"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny reads",
+        "1": "Base PMP: permit reads"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP60L",
+      "summary": "PMP 条目 60：锁定 PMP 配置及关联地址，复位前通常不能修改；锁定还影响 M 模式的权限检查，Smepmp 可细化其语义。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 39,
+          "lsb": 39
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 60: lock its configuration and address.",
+      "values": {
+        "0": "未锁定",
+        "1": "锁定（受 Smepmp 规则约束）"
+      },
+      "valuesEn": {
+        "0": "Unlocked",
+        "1": "Locked, subject to Smepmp"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP60A",
+      "summary": "PMP 条目 60：选择 PMP 地址匹配方式；实现粒度会限制可用的 NA4/NAPOT 编码。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 36,
+          "lsb": 35
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 60: select its address-matching mode.",
+      "values": {
+        "0": "OFF：不匹配",
+        "1": "TOR：上界匹配",
+        "2": "NA4：自然对齐的 4 字节区域",
+        "3": "NAPOT：自然对齐的二次幂区域"
+      },
+      "valuesEn": {
+        "0": "OFF: disabled",
+        "1": "TOR: top of range",
+        "2": "NA4: aligned four-byte region",
+        "3": "NAPOT: aligned power-of-two region"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP60X",
+      "summary": "PMP 条目 60：控制匹配区域的指令执行权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 34,
+          "lsb": 34
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 60: control execute permission.",
+      "values": {
+        "0": "基础 PMP：禁止执行",
+        "1": "基础 PMP：允许执行"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny execution",
+        "1": "Base PMP: permit execution"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP60W",
+      "summary": "PMP 条目 60：控制匹配区域的写权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 33,
+          "lsb": 33
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 60: control write permission.",
+      "values": {
+        "0": "基础 PMP：禁止写入",
+        "1": "基础 PMP：允许写入"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny writes",
+        "1": "Base PMP: permit writes"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP60R",
+      "summary": "PMP 条目 60：控制匹配区域的读权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 32,
+          "lsb": 32
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 60: control read permission.",
+      "values": {
+        "0": "基础 PMP：禁止读取",
+        "1": "基础 PMP：允许读取"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny reads",
+        "1": "Base PMP: permit reads"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP61L",
+      "summary": "PMP 条目 61：锁定 PMP 配置及关联地址，复位前通常不能修改；锁定还影响 M 模式的权限检查，Smepmp 可细化其语义。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 47,
+          "lsb": 47
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 61: lock its configuration and address.",
+      "values": {
+        "0": "未锁定",
+        "1": "锁定（受 Smepmp 规则约束）"
+      },
+      "valuesEn": {
+        "0": "Unlocked",
+        "1": "Locked, subject to Smepmp"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP61A",
+      "summary": "PMP 条目 61：选择 PMP 地址匹配方式；实现粒度会限制可用的 NA4/NAPOT 编码。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 44,
+          "lsb": 43
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 61: select its address-matching mode.",
+      "values": {
+        "0": "OFF：不匹配",
+        "1": "TOR：上界匹配",
+        "2": "NA4：自然对齐的 4 字节区域",
+        "3": "NAPOT：自然对齐的二次幂区域"
+      },
+      "valuesEn": {
+        "0": "OFF: disabled",
+        "1": "TOR: top of range",
+        "2": "NA4: aligned four-byte region",
+        "3": "NAPOT: aligned power-of-two region"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP61X",
+      "summary": "PMP 条目 61：控制匹配区域的指令执行权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 42,
+          "lsb": 42
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 61: control execute permission.",
+      "values": {
+        "0": "基础 PMP：禁止执行",
+        "1": "基础 PMP：允许执行"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny execution",
+        "1": "Base PMP: permit execution"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP61W",
+      "summary": "PMP 条目 61：控制匹配区域的写权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 41,
+          "lsb": 41
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 61: control write permission.",
+      "values": {
+        "0": "基础 PMP：禁止写入",
+        "1": "基础 PMP：允许写入"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny writes",
+        "1": "Base PMP: permit writes"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP61R",
+      "summary": "PMP 条目 61：控制匹配区域的读权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 40,
+          "lsb": 40
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 61: control read permission.",
+      "values": {
+        "0": "基础 PMP：禁止读取",
+        "1": "基础 PMP：允许读取"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny reads",
+        "1": "Base PMP: permit reads"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP62L",
+      "summary": "PMP 条目 62：锁定 PMP 配置及关联地址，复位前通常不能修改；锁定还影响 M 模式的权限检查，Smepmp 可细化其语义。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 55,
+          "lsb": 55
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 62: lock its configuration and address.",
+      "values": {
+        "0": "未锁定",
+        "1": "锁定（受 Smepmp 规则约束）"
+      },
+      "valuesEn": {
+        "0": "Unlocked",
+        "1": "Locked, subject to Smepmp"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP62A",
+      "summary": "PMP 条目 62：选择 PMP 地址匹配方式；实现粒度会限制可用的 NA4/NAPOT 编码。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 52,
+          "lsb": 51
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 62: select its address-matching mode.",
+      "values": {
+        "0": "OFF：不匹配",
+        "1": "TOR：上界匹配",
+        "2": "NA4：自然对齐的 4 字节区域",
+        "3": "NAPOT：自然对齐的二次幂区域"
+      },
+      "valuesEn": {
+        "0": "OFF: disabled",
+        "1": "TOR: top of range",
+        "2": "NA4: aligned four-byte region",
+        "3": "NAPOT: aligned power-of-two region"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP62X",
+      "summary": "PMP 条目 62：控制匹配区域的指令执行权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 50,
+          "lsb": 50
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 62: control execute permission.",
+      "values": {
+        "0": "基础 PMP：禁止执行",
+        "1": "基础 PMP：允许执行"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny execution",
+        "1": "Base PMP: permit execution"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP62W",
+      "summary": "PMP 条目 62：控制匹配区域的写权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 49,
+          "lsb": 49
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 62: control write permission.",
+      "values": {
+        "0": "基础 PMP：禁止写入",
+        "1": "基础 PMP：允许写入"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny writes",
+        "1": "Base PMP: permit writes"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP62R",
+      "summary": "PMP 条目 62：控制匹配区域的读权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 48,
+          "lsb": 48
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 62: control read permission.",
+      "values": {
+        "0": "基础 PMP：禁止读取",
+        "1": "基础 PMP：允许读取"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny reads",
+        "1": "Base PMP: permit reads"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP63L",
+      "summary": "PMP 条目 63：锁定 PMP 配置及关联地址，复位前通常不能修改；锁定还影响 M 模式的权限检查，Smepmp 可细化其语义。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 63
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 63: lock its configuration and address.",
+      "values": {
+        "0": "未锁定",
+        "1": "锁定（受 Smepmp 规则约束）"
+      },
+      "valuesEn": {
+        "0": "Unlocked",
+        "1": "Locked, subject to Smepmp"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP63A",
+      "summary": "PMP 条目 63：选择 PMP 地址匹配方式；实现粒度会限制可用的 NA4/NAPOT 编码。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 60,
+          "lsb": 59
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 63: select its address-matching mode.",
+      "values": {
+        "0": "OFF：不匹配",
+        "1": "TOR：上界匹配",
+        "2": "NA4：自然对齐的 4 字节区域",
+        "3": "NAPOT：自然对齐的二次幂区域"
+      },
+      "valuesEn": {
+        "0": "OFF: disabled",
+        "1": "TOR: top of range",
+        "2": "NA4: aligned four-byte region",
+        "3": "NAPOT: aligned power-of-two region"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP63X",
+      "summary": "PMP 条目 63：控制匹配区域的指令执行权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 58,
+          "lsb": 58
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 63: control execute permission.",
+      "values": {
+        "0": "基础 PMP：禁止执行",
+        "1": "基础 PMP：允许执行"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny execution",
+        "1": "Base PMP: permit execution"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP63W",
+      "summary": "PMP 条目 63：控制匹配区域的写权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 57,
+          "lsb": 57
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 63: control write permission.",
+      "values": {
+        "0": "基础 PMP：禁止写入",
+        "1": "基础 PMP：允许写入"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny writes",
+        "1": "Base PMP: permit writes"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    },
+    {
+      "name": "PMP63R",
+      "summary": "PMP 条目 63：控制匹配区域的读权限。",
+      "access": "WARL（受锁定位和组合约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 56,
+          "lsb": 56
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
+      "summaryEn": "PMP entry 63: control read permission.",
+      "values": {
+        "0": "基础 PMP：禁止读取",
+        "1": "基础 PMP：允许读取"
+      },
+      "valuesEn": {
+        "0": "Base PMP: deny reads",
+        "1": "Base PMP: permit reads"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+    }
+  ],
+  "regions": [
+    {
+      "label": "0",
+      "access": "图示固定零；访问规则见原文",
+      "summary": "手册位图明确标注的区域。",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 6,
+          "lsb": 5
+        },
+        {
+          "xlen": 64,
+          "msb": 6,
+          "lsb": 5
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/pmpcfg.edn",
+      "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
+    },
+    {
+      "label": "0",
+      "access": "图示固定零；访问规则见原文",
+      "summary": "手册位图明确标注的区域。",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 14,
+          "lsb": 13
+        },
+        {
+          "xlen": 64,
+          "msb": 14,
+          "lsb": 13
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/pmpcfg.edn",
+      "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
+    },
+    {
+      "label": "0",
+      "access": "图示固定零；访问规则见原文",
+      "summary": "手册位图明确标注的区域。",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 22,
+          "lsb": 21
+        },
+        {
+          "xlen": 64,
+          "msb": 22,
+          "lsb": 21
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/pmpcfg.edn",
+      "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
+    },
+    {
+      "label": "0",
+      "access": "图示固定零；访问规则见原文",
+      "summary": "手册位图明确标注的区域。",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 30,
+          "lsb": 29
+        },
+        {
+          "xlen": 64,
+          "msb": 30,
+          "lsb": 29
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/pmpcfg.edn",
+      "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
+    },
+    {
+      "label": "0",
+      "access": "图示固定零；访问规则见原文",
+      "summary": "手册位图明确标注的区域。",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 38,
+          "lsb": 37
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/pmpcfg.edn",
+      "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
+    },
+    {
+      "label": "0",
+      "access": "图示固定零；访问规则见原文",
+      "summary": "手册位图明确标注的区域。",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 46,
+          "lsb": 45
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/pmpcfg.edn",
+      "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
+    },
+    {
+      "label": "0",
+      "access": "图示固定零；访问规则见原文",
+      "summary": "手册位图明确标注的区域。",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 54,
+          "lsb": 53
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/pmpcfg.edn",
+      "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
+    },
+    {
+      "label": "0",
+      "access": "图示固定零；访问规则见原文",
+      "summary": "手册位图明确标注的区域。",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 62,
+          "lsb": 61
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/pmpcfg.edn",
+      "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
+    }
+  ],
+  "summaryEn": "Physical memory protection configuration"
+}

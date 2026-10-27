@@ -66,7 +66,7 @@ class ManualImporterTests(unittest.TestCase):
 
     def test_all_field_descriptions_are_bilingual_with_matching_encoding_domains(self):
         fields = [field for reg in self.registers.values() for field in reg["fields"]]
-        self.assertEqual(1570, len(fields))
+        self.assertEqual(1591, len(fields))
         for field in fields:
             self.assertRegex(field["summary"], r"[\u4e00-\u9fff]")
             self.assertTrue(field["summaryEn"].strip())
