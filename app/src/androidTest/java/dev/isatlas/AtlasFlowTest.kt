@@ -208,25 +208,18 @@ class AtlasFlowTest {
         org.junit.Assert.assertEquals(0f, scrollPosition(), 0.01f)
     }
 
-    @Test fun importedVendorFieldsAndAddressOnlyEntriesAreDistinct() {
+    @Test fun builtinDebugFieldsAndSourcesRemainAvailableWithoutVendorImport() {
         compose.onNodeWithContentDescription("筛选").performClick()
         compose.onNodeWithText("RV64").performClick()
         compose.onNodeWithTag("source-andes").assertDoesNotExist()
         compose.onNodeWithTag("source-standard").assertDoesNotExist()
         compose.onNodeWithTag("source-manual").assertIsDisplayed()
-        compose.onNodeWithTag("source-thead").performScrollTo().performClick().assertIsSelected()
-        saveFilterScreen("filters-sources.png")
-        closeFilters()
-        compose.onNodeWithTag("search-input").performTextReplacement("th.sxstatus")
-        compose.onNode(hasText("th.sxstatus") and hasText("S · CSR")).performClick()
-        compose.onNodeWithTag("register-diagram").assertIsDisplayed()
-        compose.onNodeWithContentDescription("返回搜索").performClick()
-        compose.onNodeWithContentDescription("筛选").performClick()
-        compose.onNodeWithText("重置筛选").performScrollTo().performClick()
+        compose.onNodeWithTag("source-debug").performScrollTo().performClick().assertIsSelected()
         closeFilters()
         compose.onNodeWithTag("search-input").performTextReplacement("dcsr")
         compose.onNode(hasText("dcsr") and hasText("D · CSR")).performClick()
-        compose.onNodeWithText("仅收录地址，字段布局待补充。").assertIsDisplayed()
+        compose.onNodeWithTag("register-diagram").assertIsDisplayed()
+        compose.onNodeWithText("仅收录地址，字段布局待补充。").assertDoesNotExist()
         compose.onNodeWithContentDescription("关于 ISAtlas").performClick()
         compose.onNodeWithTag("about-sources").performScrollTo().performClick()
         compose.onNodeWithTag("sources-screen").assertIsDisplayed()
@@ -241,7 +234,7 @@ class AtlasFlowTest {
         val appVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName!!
         compose.onNodeWithContentDescription("关于 ISAtlas").performClick()
         compose.onNodeWithTag("about-app-version").assertTextEquals(appVersion)
-        compose.onNodeWithTag("about-database-version").assertTextEquals("0.5.3")
+        compose.onNodeWithTag("about-database-version").assertTextEquals("0.5.4")
         compose.onNodeWithTag("about-csr-count").assertDoesNotExist()
         compose.onNodeWithTag("about-field-count").assertDoesNotExist()
         compose.onNodeWithText("存储方式").assertDoesNotExist()
@@ -253,10 +246,7 @@ class AtlasFlowTest {
         compose.onNodeWithTag("source-license-manual-CC-BY-4.0").performScrollTo().performClick()
         compose.onNodeWithTag("source-license-text-manual-CC-BY-4.0").assertTextContains("Attribution 4.0 International", substring = true)
         compose.onNodeWithTag("source-license-manual-CC-BY-4.0").performScrollTo().performClick()
-        compose.onNodeWithTag("source-revision-thead").performScrollTo().assertTextEquals("5a75db2696881a812a04e6e00347d3920dae03f2")
-        compose.onNodeWithTag("source-license-thead-Apache-2.0").performScrollTo().performClick()
-        compose.onNodeWithTag("source-license-text-thead-Apache-2.0").assertTextContains("Apache License", substring = true)
-        compose.onNodeWithTag("source-license-thead-Apache-2.0").performScrollTo().performClick()
+        compose.onNodeWithTag("source-revision-spmp").performScrollTo().assertTextEquals("4ce228207193c55247200110e3d5b6881a17c367")
         try {
             compose.runOnUiThread { compose.activity.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE }
             compose.waitUntil(10_000) { compose.activity.resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE }

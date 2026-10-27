@@ -1,6 +1,6 @@
 # 离线 CSR 数据格式
 
-当前 CSR 数据包版本为 0.5.3；应用版本为 0.5.0，两者独立。schemaVersion 仍为 1，新增可选属性带有默认值。
+当前 CSR 数据包版本为 0.5.4；应用版本为 0.5.0，两者独立。schemaVersion 仍为 1，新增可选属性带有默认值。
 
 ## 文件结构
 
@@ -38,6 +38,8 @@ regions 保存非命名区域，每项包含 label、access、summary、summaryE
 
 summaryEn、英文编码表、按位宽编码表及字段/区域 sourceUrl 均为可选属性，兼容保留的厂商条目。当前界面显示中文，英文摘要参与搜索，为后续 i18n 留存。
 
-当前目录包含 391 个 manual CSR（经补充后 1,766 个字段）、32 个 aia CSR（139 个字段）、3 个 debug CSR（5 个字段）、3 个 spmp CSR（97 个字段）和 1 个 thead CSR（1 个字段），合计 430 个 CSR、2,008 个字段定义；字段数包含互斥触发器和 SPMP 访问窗口格式。具体来源与边界见 data-import.md 和 field-review.md。其他架构及指令定义需要扩展对应模型、解析、搜索和显示能力，不能直接复用 CSR 编号语义。
+当前目录包含 391 个 manual CSR（经补充后 1,766 个字段）、32 个 aia CSR（139 个字段）、3 个 debug CSR（5 个字段）、3 个 spmp CSR（97 个字段），合计 429 个 CSR、2,007 个字段定义；字段数包含互斥触发器和 SPMP 访问窗口格式。具体来源与边界见 data-import.md 和 field-review.md。其他架构及指令定义需要扩展对应模型、解析、搜索和显示能力，不能直接复用 CSR 编号语义。
 
 SPMP 的 selector 0x100–0x13F 也不是 CSR 编号。spmpaddr/spmpcfg 使用 ireg/ireg2 的 `view`，保留通用格式；实际条目索引由 xiselect 选择。字段别名支持检索 spmpaddr0–63 / spmpcfg0–63，但不创建虚假直接 CSR。
+
+玄铁 CSR 已移至可选本地 ZIP，不再随内置数据加载。[本地包规范与导入方法](local-packages.md) 定义外层清单、哈希、扩展、依赖与隐私边界；内部 CSR/指令记录复用现有模型。

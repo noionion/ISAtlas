@@ -541,7 +541,7 @@ def run():
     if subprocess.check_output(["git", "-C", str(UPSTREAM), "status", "--porcelain", "--untracked-files=no"], text=True).strip():
         raise SystemExit("Official manual checkout has local modifications")
     old = read_catalog(ASSETS)
-    retained = [reg for reg in old["registers"] if reg["namespace"] not in ("standard", "andes", "manual")]
+    retained = [reg for reg in old["registers"] if reg["namespace"] not in ("standard", "andes", "manual", "thead")]
     manual_registers, semantic_audit = build_registers(include_audit=True)
     registers = manual_registers + retained
     from import_aia import enrich as enrich_aia, verify_checkout as verify_aia, update_metadata as update_aia_metadata
@@ -554,8 +554,8 @@ def run():
     verify_spmp()
     registers, spmp_audit = enrich_spmp(registers)
     fields = sum(len(reg["fields"]) for reg in registers)
-    old.update(version="0.5.3", registers=registers,
-               coverage=f"{len(registers)} 个 CSR / {fields} 个字段；ISA Manual 20250508 + AIA 20250312 + Debug 1.0 + SPMP 1.0；保留其他来源。",
+    old.update(version="0.5.4", registers=registers,
+               coverage=f"{len(registers)} 个 CSR / {fields} 个字段；ISA Manual 20250508 + AIA 20250312 + Debug 1.0 + SPMP 1.0；厂商数据可通过本地扩展包导入。",
                source={"title": "RISC-V ISA Manual 20250508", "revision": REVISION, "url": REPOSITORY})
     write_catalog(ASSETS, old)
     sample_names = ["mstatus", "mstatush", "misa", "mvendorid", "marchid", "mimpid", "mhartid", "mtvec", "mepc", "mcause", "mtval", "sstatus", "sscratch", "satp", "mie"]
@@ -573,7 +573,7 @@ def run():
     notices = ["ISAtlas data attribution\n\nOfficial RISC-V Instruction Set Manual; RISC-V International and contributors.",
                f"Source: {REPOSITORY}\nTag: 20250508\nCommit: {REVISION}\nChanges: extract CSR tables/figures and instruction encodings into JSON; normalize labels; translate and summarize CSR fields and instructions in Chinese and English; annotate encodings and XLEN-specific rules; omit unsupported layouts.\n",
                (UPSTREAM / "LICENSE").read_text(encoding="utf-8")]
-    if retained:
+    if any(reg["namespace"] == "thead" for reg in retained):
         notices += ["\nRetained T-head data: https://github.com/T-head-Semi/thead-extension-spec\nRevision: 5a75db2696881a812a04e6e00347d3920dae03f2\n",
                     (ROOT / "tools/licenses/thead-Apache-2.0.txt").read_text(encoding="utf-8")]
     (ASSETS / "THIRD_PARTY_NOTICES.txt").write_text("\n".join(notices), encoding="utf-8", newline="\n")
@@ -583,7 +583,7 @@ def run():
     licenses = ASSETS / "licenses"
     licenses.mkdir(exist_ok=True)
     (licenses / "CC-BY-4.0.txt").write_text((UPSTREAM / "LICENSE").read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
-    if retained:
+    if any(reg["namespace"] == "thead" for reg in retained):
         (licenses / "Apache-2.0.txt").write_text((ROOT / "tools/licenses/thead-Apache-2.0.txt").read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
     options_path = ASSETS / "march-extensions.json"
     options = json.loads(options_path.read_text(encoding="utf-8"))

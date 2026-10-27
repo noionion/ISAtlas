@@ -93,6 +93,7 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
     BackHandler(enabled = drawer.isOpen) { scope.launch { drawer.close() } }
     BackHandler(enabled = state.showAbout) { model.showAbout(false) }
     BackHandler(enabled = state.showSources) { model.showSources(false) }
+    BackHandler(enabled = state.showLocalPackages) { model.showLocalPackages(false) }
     RightFilterDrawer(state = drawer, enabled = !detailOpen && !state.showAbout,
         panel = { FilterPanel(state, model) }) {
         Box(Modifier.fillMaxSize()) {
@@ -156,13 +157,17 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
                 }
             }
             RaisedPage(state.showAbout, "关于 ISAtlas", "收起关于", { model.showAbout(false) },
-                modifier = if (state.showSources) Modifier.clearAndSetSemantics {} else Modifier) {
+                modifier = if (state.showSources || state.showLocalPackages) Modifier.clearAndSetSemantics {} else Modifier) {
                 AboutScreen(state.pack, onShowSources = { model.showSources(true) }, update = update,
                     onSelectTrack = updates::selectTrack,
+                    onShowLocalPackages = { model.showLocalPackages(true) },
                     onCheckUpdate = { updates.check(manual = true) })
             }
             RaisedPage(state.showSources, "数据源与许可", "返回关于", { model.showSources(false) }) {
-                DataSourcesScreen(state.pack)
+                DataSourcesScreen(state.pack, state.localPackages)
+            }
+            RaisedPage(state.showLocalPackages, "本地数据包", "返回关于", { model.showLocalPackages(false) }) {
+                LocalPackagesScreen(state, model)
             }
         }
     }
@@ -277,6 +282,7 @@ private fun ResultCard(hit: SearchHit, pack: DataPack, onOpen: (SearchHit) -> Un
 
 @Composable
 private fun RegisterDetail(state: AtlasState, reg: RegisterDefinition, onWidthChange: (Int) -> Unit) {
+    val localPackage = state.localPackages.firstOrNull { it.active && it.data?.manifest?.namespace == reg.namespace }
     val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val views = reg.fields.filter { it.layout(state.xlen) != null }.map { it.view }.distinct().ifEmpty { listOf("") }
     var selectedView by rememberSaveable(reg.id, state.selectedField) {
@@ -367,7 +373,7 @@ private fun RegisterDetail(state: AtlasState, reg: RegisterDefinition, onWidthCh
                             if (expanded) Text(field.typeRule, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
                         }
                         (field.valuesByXlen[state.xlen] ?: field.values).forEach { (value, description) -> Text("$value  →  $description", style = MaterialTheme.typography.bodySmall) }
-                        if (field.sourceUrl.isNotBlank()) TextButton(onClick = { runCatching { uriHandler.openUri(field.sourceUrl) }.onFailure { sourceError = true } }) {
+                        if (field.sourceUrl.startsWith("https://")) TextButton(onClick = { runCatching { uriHandler.openUri(field.sourceUrl) }.onFailure { sourceError = true } }) {
                             Text("字段规范原文")
                         }
                     }
@@ -377,14 +383,17 @@ private fun RegisterDetail(state: AtlasState, reg: RegisterDefinition, onWidthCh
         item {
             HorizontalDivider()
             Text("来源与版本", Modifier.padding(top = 16.dp), style = MaterialTheme.typography.titleMedium)
+            localPackage?.let { item ->
+                Text("${item.record.name} · 本地导入 · 来源未经官方验证", style = MaterialTheme.typography.bodySmall)
+            }
             Text("${reg.namespace.ifBlank { state.pack!!.namespace }} · ${reg.license}", style = MaterialTheme.typography.bodySmall)
             Text(reg.sourceRevision.ifBlank { state.pack!!.source.revision }, style = MaterialTheme.typography.bodySmall)
-            Text("数据包 v${state.pack!!.version} · ${if (reg.coverage == "address-only") "仅地址索引" else "上游字段目录"}", style = MaterialTheme.typography.bodySmall)
+            Text("数据包 v${localPackage?.record?.version ?: state.pack!!.version} · ${if (reg.coverage == "address-only") "仅地址索引" else if (localPackage != null) "本地字段目录" else "上游字段目录"}", style = MaterialTheme.typography.bodySmall)
             if (reg.condition.isNotBlank()) Text("适用条件：${reg.condition}", style = MaterialTheme.typography.bodySmall)
-            TextButton(onClick = { runCatching { uriHandler.openUri(reg.sourceUrl) }.onFailure { sourceError = true } }) { Text("打开数据来源 ↗") }
+            if (reg.sourceUrl.startsWith("https://")) TextButton(onClick = { runCatching { uriHandler.openUri(reg.sourceUrl) }.onFailure { sourceError = true } }) { Text("打开数据来源 ↗") }
             reg.sources.filter { it.namespace != reg.namespace }.forEach { source ->
                 Text("补充：${source.title} · ${source.license} · ${source.revision.take(8)}", style = MaterialTheme.typography.bodySmall)
-                TextButton(onClick = { runCatching { uriHandler.openUri(source.url) }.onFailure { sourceError = true } },
+                if (source.url.startsWith("https://")) TextButton(onClick = { runCatching { uriHandler.openUri(source.url) }.onFailure { sourceError = true } },
                     modifier = Modifier.testTag("csr-source-${source.namespace}")) { Text("打开 ${source.namespace.uppercase()} 补充来源 ↗") }
             }
             if (sourceError) SelectionContainer { Text("无法打开浏览器：${reg.sourceUrl}", style = MaterialTheme.typography.bodySmall) }

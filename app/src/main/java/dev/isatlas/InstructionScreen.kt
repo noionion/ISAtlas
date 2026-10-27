@@ -331,8 +331,11 @@ fun InstructionDetail(state: AtlasState, hit: InstructionHit, onWidth: (Int) -> 
         item {
             HorizontalDivider()
             Text("${instruction.namespace} · ${instruction.license} · ${instruction.sourceRevision.take(8)}", style = MaterialTheme.typography.labelSmall)
+            state.localPackages.firstOrNull { it.active && it.data?.manifest?.namespace == instruction.namespace }?.let { item ->
+                Text("${item.record.name} · 本地导入 · 来源未经官方验证", style = MaterialTheme.typography.bodySmall)
+            }
             val source = encoding?.sources?.firstOrNull()?.url ?: instruction.semanticSources.firstOrNull()?.url
-            if (source != null) TextButton(onClick = { runCatching { uri.openUri(source) }.onFailure { linkError = true } }) { Text("打开规范原文 ↗") }
+            if (source?.startsWith("https://") == true) TextButton(onClick = { runCatching { uri.openUri(source) }.onFailure { linkError = true } }) { Text("打开规范原文 ↗") }
             if (linkError) Text("无法打开浏览器", style = MaterialTheme.typography.bodySmall)
         }
     }

@@ -11,13 +11,15 @@
     },
     {
       "namespace": "thead",
-      "artifact": "app/src/main/assets/csr/thead-th.sxstatus.json",
-      "sha256": "04b35397400426d175d1a4453fdf30c80e809c9368460aca9e05922bf3d60361",
+      "artifact": "examples/local-packages/thead-csr.zip",
       "licenseFile": "tools/licenses/thead-Apache-2.0.txt",
       "repository": "https://github.com/T-head-Semi/thead-extension-spec",
       "revision": "5a75db2696881a812a04e6e00347d3920dae03f2",
       "license": "Apache-2.0",
-      "status": "retained existing vendor data"
+      "status": "optional local extension ZIP; excluded from built-in assets",
+      "originalSha256": "04b35397400426d175d1a4453fdf30c80e809c9368460aca9e05922bf3d60361",
+      "sha256": "4ae8dad239b4e07d8d2a7955d909c06957a378772818fbe1bc08db95dde7d71f",
+      "file": "examples/local-packages/thead/csr/th.sxstatus.json"
     },
     {
       "namespace": "aia",

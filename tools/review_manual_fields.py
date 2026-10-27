@@ -117,7 +117,7 @@ def review():
                 assert reg["name"] in PARTIAL_INTERRUPT and missing == list(range(16, width)), (reg["name"], missing)
                 gaps.append({"csr": reg["name"], "xlen": width, "range": [width - 1, 16],
                              "reason": "Figure defines standard bits 15:0 only; platform interrupt layouts are not invented."})
-    vendor = ASSETS / "csr/thead-th.sxstatus.json"
+    vendor = ROOT / "examples/local-packages/thead/csr/th.sxstatus.json"
     sources = json.loads((ROOT / "tools/data-sources.lock.json").read_text(encoding="utf-8"))["sources"]
     vendor_source = next(source for source in sources if source["namespace"] == "thead")
     assert hashlib.sha256(vendor.read_bytes()).hexdigest() == vendor_source["sha256"]
@@ -125,7 +125,7 @@ def review():
     report = {"revision": REVISION, "catalogSha256": catalog_sha256(ASSETS), "manualCsrs": len(registers),
               "describedFields": len(rows), "enumeratedFields": enumerated, "missingDescriptions": [],
               "addressOnlyExternalDebug": sorted(EXTERNAL_DEBUG), "partialPlatformLayouts": gaps,
-              "retainedVendorUnchanged": True, "fields": rows}
+              "vendorExtensionVerified": True, "fields": rows}
     report_path = ROOT / "docs/data/field-review.json"
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

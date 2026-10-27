@@ -63,7 +63,7 @@ class DebugFlowTest {
 
     @Test fun sourcesShowPinnedDebugVersionAndLicense() {
         compose.onNodeWithContentDescription("关于 ISAtlas").performClick()
-        compose.onNodeWithTag("about-database-version").performScrollTo().assertTextEquals("0.5.3")
+        compose.onNodeWithTag("about-database-version").performScrollTo().assertTextEquals("0.5.4")
         compose.onNodeWithTag("about-sources").performScrollTo().performClick()
         compose.onNodeWithTag("source-revision-debug").performScrollTo().assertTextEquals("5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8")
         compose.onNodeWithTag("source-license-debug-CC-BY-4.0").performScrollTo().performClick()

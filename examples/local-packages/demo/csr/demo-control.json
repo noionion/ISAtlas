@@ -1,0 +1,66 @@
+{
+  "name": "demo.control",
+  "summary": "虚构控制寄存器，仅用于导入演示。",
+  "summaryEn": "Fictional control register for import demonstrations.",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 1984
+  },
+  "privilege": "M",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "extensions": [
+    "xdemo"
+  ],
+  "fields": [
+    {
+      "name": "ENABLE",
+      "summary": "控制演示功能是否启用。",
+      "summaryEn": "Enable the demo feature.",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 0,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 0,
+          "lsb": 0
+        }
+      ],
+      "values": {
+        "0": "禁用",
+        "1": "启用"
+      },
+      "valuesEn": {
+        "0": "Disabled",
+        "1": "Enabled"
+      }
+    }
+  ],
+  "regions": [
+    {
+      "label": "WPRI",
+      "access": "WPRI",
+      "summary": "虚构示例中的保留位。",
+      "summaryEn": "Reserved bits in this fictional example.",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 1
+        },
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 1
+        }
+      ]
+    }
+  ]
+}

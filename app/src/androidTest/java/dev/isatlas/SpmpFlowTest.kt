@@ -56,7 +56,7 @@ class SpmpFlowTest {
 
     @Test fun sourceShowsRatifiedVersionAndLicense() {
         compose.onNodeWithContentDescription("关于 ISAtlas").performClick()
-        compose.onNodeWithTag("about-database-version").performScrollTo().assertTextEquals("0.5.3")
+        compose.onNodeWithTag("about-database-version").performScrollTo().assertTextEquals("0.5.4")
         compose.onNodeWithTag("about-sources").performScrollTo().performClick()
         compose.onNodeWithTag("source-revision-spmp").performScrollTo().assertTextEquals("4ce228207193c55247200110e3d5b6881a17c367")
         compose.onNodeWithTag("source-license-spmp-CC-BY-4.0").performScrollTo().performClick()

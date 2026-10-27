@@ -1,6 +1,7 @@
 package dev.isatlas
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -11,6 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 data class AtlasState(
     val loading: Boolean = true,
@@ -35,6 +38,13 @@ data class AtlasState(
     val selectedField: String? = null,
     val showAbout: Boolean = false,
     val showSources: Boolean = false,
+    val showLocalPackages: Boolean = false,
+    val localPackages: List<ManagedLocalPackage> = emptyList(),
+    val packageBusy: Boolean = false,
+    val packageShowProgress: Boolean = false,
+    val packageTogglingIds: Set<String> = emptySet(),
+    val packagePreview: LocalPackagePreview? = null,
+    val packageMessage: String? = null,
 ) {
     val instructionResults get() = instructions?.let { InstructionSearch.query(it, query, CatalogFilter(xlen, privilege, namespace, compilerIsa?.associatedTags(extensions) ?: extensions), compilerIsa) } ?: InstructionResults(emptyList())
     val selectedInstruction get() = selectedInstructionKey?.let { key -> instructions?.instructions?.firstNotNullOfOrNull { instruction -> instruction.encodings.mapIndexed { index, encoding -> InstructionHit(instruction, encoding, index, selectedInstructionWord, pattern = selectedInstructionPattern) }.find { it.key == key } } }
@@ -46,6 +56,9 @@ data class AtlasState(
 
 class AppViewModel(application: Application, private val saved: SavedStateHandle) : AndroidViewModel(application) {
     private val prefs = application.getSharedPreferences("atlas", 0)
+    private val localStore = LocalPackageRepository(application, BuildConfigVersion.code(application))
+    private var pendingPackage: ByteArray? = null
+    private val packageOperations = Mutex()
     private val mutable = MutableStateFlow(AtlasState(
         instructionPage = saved["instructionPage"] ?: 0,
         selectedInstructionKey = saved["selectedInstructionKey"],
@@ -59,6 +72,7 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
         selectedField = saved["selectedField"],
         showAbout = saved["showAbout"] ?: false,
         showSources = saved["showSources"] ?: false,
+        showLocalPackages = saved["showLocalPackages"] ?: false,
     ))
     val state = mutable.asStateFlow()
     init { load() }
@@ -77,13 +91,101 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
                     val instructions = InstructionCatalog.decodeFiles(assets.open("riscv-instructions.json").bufferedReader().use { it.readText() }) { name ->
                         assets.open("inst/$name").bufferedReader().use { it.readText() }
                     }
-                    Triple(pack, compiler, instructions)
+                    localStore.load(LocalCatalogs(pack, instructions, compiler))
                 }
             }
             result.fold(
-                onSuccess = { (pack, compiler, instructions) -> mutable.update { it.copy(loading = false, pack = pack, compilerIsa = compiler, instructions = instructions) } },
+                onSuccess = { snapshot -> applyPackages(snapshot, initial = true) },
                 onFailure = { mutable.update { it.copy(loading = false, error = "内置数据包读取失败，请重试。") } },
             )
+        }
+    }
+
+    fun previewPackage(uri: Uri) {
+        if (mutable.value.packageBusy) return
+        mutable.update { it.copy(packageBusy = true, packageShowProgress = true, packageMessage = null) }
+        viewModelScope.launch {
+            packageOperations.withLock {
+                val result = withContext(Dispatchers.IO) {
+                    runCatching {
+                        val bytes = getApplication<Application>().contentResolver.openInputStream(uri)?.use { LocalPackages.readBounded(it) }
+                            ?: throw IllegalArgumentException("无法读取所选文件")
+                        localStore.preview(bytes) to bytes
+                    }
+                }
+                result.fold(onSuccess = { (preview, bytes) ->
+                    pendingPackage = bytes
+                    mutable.update { it.copy(packageBusy = false, packageShowProgress = false, packagePreview = preview) }
+                }, onFailure = { packageFailure(it) })
+            }
+        }
+    }
+    fun dismissPackagePreview() {
+        if (mutable.value.packageBusy) return
+        pendingPackage = null
+        mutable.update { it.copy(packagePreview = null) }
+    }
+    fun confirmPackageImport() {
+        val bytes = pendingPackage ?: return
+        packageOperation("导入完成") { localStore.install(bytes) }
+    }
+    fun enablePackage(id: String, enabled: Boolean) {
+        if (mutable.value.packageBusy || id in mutable.value.packageTogglingIds) return
+        mutable.update { it.copy(packageTogglingIds = it.packageTogglingIds + id) }
+        viewModelScope.launch {
+            try {
+                packageOperations.withLock {
+                    val result = withContext(Dispatchers.IO) { runCatching { localStore.setEnabled(id, enabled) } }
+                    result.fold(onSuccess = ::applyPackages, onFailure = { error ->
+                        val message = (error as? IllegalArgumentException)?.message?.takeIf { it.length <= 240 }
+                            ?: "切换失败，请检查数据包和可用存储空间。"
+                        mutable.update { it.copy(packageMessage = message) }
+                    })
+                }
+            } finally {
+                mutable.update { it.copy(packageTogglingIds = it.packageTogglingIds - id) }
+            }
+        }
+    }
+    fun removePackage(id: String) = packageOperation("已卸载") { localStore.remove(id) }
+    fun packageMessage(value: String?) { mutable.update { it.copy(packageMessage = value) } }
+    private fun packageOperation(message: String?, action: () -> LocalPackageSnapshot) {
+        if (mutable.value.packageBusy) return
+        mutable.update { it.copy(packageBusy = true, packageShowProgress = message != null, packageMessage = null) }
+        viewModelScope.launch {
+            packageOperations.withLock {
+                val result = withContext(Dispatchers.IO) { runCatching(action) }
+                result.fold(onSuccess = { snapshot ->
+                    pendingPackage = null
+                    applyPackages(snapshot)
+                    mutable.update { it.copy(packageBusy = false, packageShowProgress = false, packagePreview = null, packageMessage = message) }
+                }, onFailure = { packageFailure(it) })
+            }
+        }
+    }
+    private fun packageFailure(error: Throwable) {
+        val message = when (error) {
+            is PackageValidationException -> error.message
+            is IllegalArgumentException -> error.message?.takeIf { it.length <= 240 }
+            else -> null
+        } ?: "操作失败；当前数据保持不变，请检查文件和可用存储空间。"
+        mutable.update { it.copy(packageBusy = false, packageShowProgress = false, packageMessage = message) }
+    }
+    private fun applyPackages(snapshot: LocalPackageSnapshot, initial: Boolean = false) {
+        val catalogs = snapshot.catalogs
+        mutable.update { current ->
+            val roots = current.extensionRoots.intersect(catalogs.compiler.selectable.toSet())
+            current.copy(loading = false, error = null, pack = catalogs.csr, instructions = catalogs.instructions,
+            compilerIsa = catalogs.compiler, localPackages = snapshot.packages, packageMessage = snapshot.warning,
+            namespace = current.namespace?.takeIf { ns -> catalogs.csr.registers.any { it.namespace == ns || it.sources.any { source -> source.namespace == ns } } || catalogs.instructions.instructions.any { it.namespace == ns } },
+            extensions = catalogs.compiler.selectionClosure(roots),
+            extensionRoots = roots,
+            selectedId = current.selectedId?.takeIf { id -> catalogs.csr.registers.any { it.id == id } },
+            selectedInstructionKey = current.selectedInstructionKey?.takeIf { key -> catalogs.instructions.instructions.any { entry -> entry.encodings.indices.any { "${entry.id}:$it" == key } } },
+        ) }
+        if (!initial) {
+            saved["selectedId"] = mutable.value.selectedId
+            saved["selectedInstructionKey"] = mutable.value.selectedInstructionKey
         }
     }
 
@@ -173,11 +275,21 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
     fun showAbout(value: Boolean) {
         saved["showAbout"] = value
         if (!value) saved["showSources"] = false
-        mutable.update { it.copy(showAbout = value, showSources = if (value) it.showSources else false) }
+        if (!value) saved["showLocalPackages"] = false
+        mutable.update { it.copy(showAbout = value, showSources = if (value) it.showSources else false, showLocalPackages = if (value) it.showLocalPackages else false) }
     }
     fun showSources(value: Boolean) {
         saved["showSources"] = value
         if (value) saved["showAbout"] = true
         mutable.update { it.copy(showSources = value, showAbout = it.showAbout || value) }
     }
+    fun showLocalPackages(value: Boolean) {
+        saved["showLocalPackages"] = value
+        if (value) saved["showAbout"] = true
+        mutable.update { it.copy(showLocalPackages = value, showAbout = it.showAbout || value) }
+    }
+}
+
+internal object BuildConfigVersion {
+    @Suppress("DEPRECATION") fun code(application: Application): Int = application.packageManager.getPackageInfo(application.packageName, 0).versionCode
 }

@@ -1,0 +1,69 @@
+{
+  "name": "demo.add",
+  "summary": "rd = rs1 + rs2（虚构 custom-0 编码）",
+  "summaryEn": "rd = rs1 + rs2 (fictional custom-0 encoding)",
+  "encodings": [
+    {
+      "length": 32,
+      "xlens": [
+        32,
+        64
+      ],
+      "requires": [
+        [
+          "i",
+          "xdemo"
+        ]
+      ],
+      "mask": "0xfe00707f",
+      "match": "0x0000000b",
+      "privilege": "U",
+      "fields": [
+        {
+          "name": "funct7",
+          "msb": 31,
+          "lsb": 25,
+          "value": 0
+        },
+        {
+          "name": "rs2",
+          "msb": 24,
+          "lsb": 20,
+          "operand": "rs2",
+          "registerClass": "integer"
+        },
+        {
+          "name": "rs1",
+          "msb": 19,
+          "lsb": 15,
+          "operand": "rs1",
+          "registerClass": "integer"
+        },
+        {
+          "name": "funct3",
+          "msb": 14,
+          "lsb": 12,
+          "value": 0
+        },
+        {
+          "name": "rd",
+          "msb": 11,
+          "lsb": 7,
+          "operand": "rd",
+          "registerClass": "integer"
+        },
+        {
+          "name": "opcode",
+          "msb": 6,
+          "lsb": 0,
+          "value": 11
+        }
+      ]
+    }
+  ],
+  "assemblyOperands": [
+    "rd",
+    "rs1",
+    "rs2"
+  ]
+}

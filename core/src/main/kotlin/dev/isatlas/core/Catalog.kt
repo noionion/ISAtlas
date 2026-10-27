@@ -129,17 +129,17 @@ object Catalog {
         require(pack.architecture == "riscv") { "当前版本仅支持 RISC-V 数据包" }
         require(pack.id.isNotBlank() && pack.namespace.isNotBlank() && pack.version.isNotBlank())
         require(pack.registers.isNotEmpty()) { "数据包为空" }
-        require(pack.source.revision.isNotBlank() && pack.source.url.startsWith("https://"))
+        require(pack.source.revision.isNotBlank() && isSourceReference(pack.source.url))
         require(pack.registers.map { it.id }.distinct().size == pack.registers.size) { "寄存器身份重复" }
         pack.registers.forEach { reg ->
             reg.sources.forEach { source ->
                 require(source.namespace.isNotBlank() && source.title.isNotBlank() && source.revision.isNotBlank() && source.license.isNotBlank())
-                require(source.url.startsWith("https://"))
+                require(isSourceReference(source.url))
             }
             require(reg.id.startsWith("${pack.architecture}/${reg.namespace.ifBlank { pack.namespace }}/csr/"))
             require(reg.coverage in setOf("fields", "address-only"))
             require(reg.coverage != "address-only" || reg.fields.isEmpty())
-            require(reg.name.isNotBlank() && reg.sourceUrl.startsWith("https://"))
+            require(reg.name.isNotBlank() && isSourceReference(reg.sourceUrl))
             require(reg.xlens.isNotEmpty() && reg.xlens.distinct().size == reg.xlens.size)
             require(reg.xlens.all { it == 32 || it == 64 })
             require((reg.locator as RegisterLocator.Csr).address in 0..0xfff)

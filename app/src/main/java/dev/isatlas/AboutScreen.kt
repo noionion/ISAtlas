@@ -30,7 +30,7 @@ private const val PROJECT_URL = "https://github.com/noionion/ISAtlas"
 
 @Composable
 internal fun AboutScreen(pack: DataPack?, onShowSources: () -> Unit, update: UpdateState,
-    onSelectTrack: (UpdateTrack) -> Unit = {}, onCheckUpdate: () -> Unit) {
+    onSelectTrack: (UpdateTrack) -> Unit = {}, onShowLocalPackages: () -> Unit = {}, onCheckUpdate: () -> Unit) {
     val context = LocalContext.current
     val version = remember(context) {
         runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }
@@ -63,10 +63,10 @@ internal fun AboutScreen(pack: DataPack?, onShowSources: () -> Unit, update: Upd
                 tag = "about-check-update", showBadge = update.hasUpdate, onClick = onCheckUpdate)
             AboutRow("更新通道", subtitle = update.trackSummary, tag = "about-update-track", onClick = { showTrackPicker = true })
 
-            // Database management belongs here; local import can extend this section later.
             AboutHeading("数据库")
             AboutRow("数据库版本", pack?.version ?: "尚未加载", tag = "about-database-version")
             AboutRow("数据源与许可", tag = "about-sources", onClick = onShowSources)
+            AboutRow("本地数据包", subtitle = "导入与管理 CSR / 指令扩展包", tag = "about-local-packages", onClick = onShowLocalPackages)
 
             AboutHeading("项目与支持")
             AboutRow("GitHub", subtitle = "noionion/ISAtlas", tag = "about-github", onClick = { openLink(PROJECT_URL) })

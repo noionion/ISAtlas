@@ -7,10 +7,10 @@ class ImportedCatalogTest {
     private val pack = installedCatalog()
     private fun manual(name: String) = pack.registers.single { it.namespace == "manual" && it.name == name }
 
-    @Test fun `official manual replaces old sources and preserves vendor data`() {
-        assertEquals(430, pack.registers.size)
+    @Test fun `official manual replaces old sources and vendor data is optional`() {
+        assertEquals(429, pack.registers.size)
         assertEquals(391, pack.registers.count { it.namespace == "manual" })
-        assertEquals(1, pack.registers.count { it.namespace == "thead" })
+        assertEquals(0, pack.registers.count { it.namespace == "thead" })
         assertFalse(pack.registers.any { it.namespace in setOf("standard", "andes") })
         assertTrue(pack.registers.filter { it.namespace == "manual" }.all {
             it.sourceRevision == "584390d9d872835b1bc45ab9ea946b56db3ad485" && it.license == "CC-BY-4.0" &&
@@ -46,11 +46,11 @@ class ImportedCatalogTest {
         } })
     }
 
-    @Test fun `removed sources produce no results while retained vendor is searchable`() {
+    @Test fun `removed sources and optional vendor data are absent before import`() {
         assertTrue(Search.query(pack, "mcache_ctl", 32).isEmpty())
         assertTrue(Search.query(pack, "", 64, namespace = "standard").isEmpty())
         assertTrue(Search.query(pack, "", 32, namespace = "andes").isEmpty())
-        assertTrue(Search.query(pack, "th.sxstatus", 64, namespace = "thead").single().register.fields.any { it.name == "THEADISAEE" })
+        assertTrue(Search.query(pack, "th.sxstatus", 64, namespace = "thead").isEmpty())
     }
 
     @Test fun `unsupported layouts remain address only without invented rules`() {

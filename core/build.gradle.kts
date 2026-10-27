@@ -16,3 +16,12 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
 }
 sourceSets.test { resources.srcDir("../app/src/main/assets") }
+
+tasks.register<JavaExec>("validateLocalPackage") {
+    group = "verification"
+    description = "Validate a local ZIP using the same offline validator as Android (-PlocalPackage=path)."
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("dev.isatlas.core.LocalPackageTool")
+    val input = providers.gradleProperty("localPackage").orNull
+    args(input?.let { rootProject.file(it).absolutePath } ?: "", rootProject.file("app/src/main/assets/march-extensions.json").absolutePath)
+}

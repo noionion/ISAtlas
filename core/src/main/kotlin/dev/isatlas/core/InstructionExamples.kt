@@ -55,7 +55,7 @@ object InstructionExamples {
         val rs1 = operands["rs1"] ?: operands["rs1'"] ?: operands["rd/rs1"] ?: operands["rd'/rs1'"]
         val rs2 = operands["rs2"] ?: operands["rs2'"]
         val imm = raw["imm"]?.toLongOrNull()
-        val note = when {
+        val note = if (instruction.namespace != "manual") instruction.summary to instruction.summaryEn else when {
             name == "add" -> "假设 $rs1 = 3、$rs2 = 5，执行后 $rd = 8。" to "With $rs1 = 3 and $rs2 = 5, $rd becomes 8."
             name == "sub" -> "假设 $rs1 = 9、$rs2 = 4，执行后 $rd = 5。" to "With $rs1 = 9 and $rs2 = 4, $rd becomes 5."
             name in setOf("addi", "c.addi", "c.addi4spn", "c.addi16sp") && imm != null -> {

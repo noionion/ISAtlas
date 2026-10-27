@@ -3,7 +3,7 @@
   "namespace": "thead",
   "name": "th.sxstatus",
   "title": "XuanTie extension status",
-  "summary": "XuanTie extension status register for S-mode",
+  "summary": "控制监管态玄铁扩展状态。",
   "locator": {
     "type": "riscv-csr",
     "address": 1472
@@ -25,7 +25,7 @@
   "fields": [
     {
       "name": "THEADISAEE",
-      "summary": "Controls availability of XThead extensions. Do not clear; clearing behavior is undefined.",
+      "summary": "控制玄铁扩展是否可用；不应清零，清零行为未定义。",
       "access": "RW（不应清零）",
       "layouts": [
         {
@@ -34,22 +34,34 @@
           "lsb": 22
         }
       ],
-      "values": {},
-      "condition": ""
+      "values": {
+        "0": "不应写入；行为未定义",
+        "1": "启用玄铁扩展"
+      },
+      "condition": "",
+      "summaryEn": "Controls availability of XThead extensions. Do not clear; clearing behavior is undefined.",
+      "sourceUrl": "https://github.com/T-head-Semi/thead-extension-spec/blob/5a75db2696881a812a04e6e00347d3920dae03f2/xtheadsxstatus.adoc",
+      "valuesEn": {
+        "0": "Do not write; behavior is undefined",
+        "1": "Enable XuanTie extensions"
+      }
     }
   ],
   "regions": [
     {
       "label": "WPRI",
       "access": "WPRI",
-      "summary": "Reserved by XTheadSxStatus 1.0; other extensions may define these bits.",
+      "summary": "为未来标准用途保留；其他扩展可能定义这些位。",
       "layouts": [
         {
           "xlen": 64,
           "msb": 63,
           "lsb": 23
         }
-      ]
+      ],
+      "summaryEn": "Reserved by XTheadSxStatus 1.0; other extensions may define these bits.",
+      "sourceUrl": "https://github.com/T-head-Semi/thead-extension-spec/blob/5a75db2696881a812a04e6e00347d3920dae03f2/xtheadsxstatus.adoc"
     }
-  ]
+  ],
+  "summaryEn": "Control supervisor-level XuanTie extension state."
 }

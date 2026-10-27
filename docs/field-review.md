@@ -4,7 +4,7 @@
 
 ## 完成范围
 
-当前目录内 391 个 manual 来源 CSR 均具有已适配布局。经 AIA、Debug 和 SPMP 补充后，已录入的 **1,766 个 manual 字段全部具有中文 summary 和英文 summaryEn**，缺失描述为 0。另有 32 个 aia CSR、139 个字段，3 个 debug CSR、5 个字段，3 个 spmp CSR、97 个字段，同样具有中英文摘要。保留的 T-head CSR 及其 JSON 的 SHA-256 与转换前一致。总包为 430 个 CSR、2,008 个字段定义，包含互斥触发器和间接窗口格式。
+当前目录内 391 个 manual 来源 CSR 均具有已适配布局。经 AIA、Debug 和 SPMP 补充后，已录入的 **1,766 个 manual 字段全部具有中文 summary 和英文 summaryEn**，缺失描述为 0。另有 32 个 aia CSR、139 个字段，3 个 debug CSR、5 个字段，3 个 spmp CSR、97 个字段，同样具有中英文摘要。T-head CSR 现为可选本地 ZIP，主来源和许可保留，补充中英文说明及 0/1 约束；源文件新旧指纹分别记录。当前内置包为 429 个 CSR、2,007 个字段定义，包含互斥触发器和间接窗口格式。
 
 中文说明默认显示；英文说明和英文枚举保存在数据模型中，供后续 i18n 使用。功能说明优先一句话；较长约束放在 typeRule。数值、地址、计数值和位掩码按实际语义说明，不伪造为有限模式枚举。有限模式列出所有编码，保留编码也标明。cause.CODE 同一编号按 INT=0/1 分别说明；H 等扩展专属原因附带条件。
 
@@ -68,8 +68,10 @@ python -m unittest discover -s tools -p "test_*.py"
 
 ## English summary
 
-The current catalog contains 430 CSRs and 2,008 field definitions, including mutually exclusive trigger formats. All 1,766 fields under preserved ISA-manual identities, 139 fields under AIA identities, five new Debug fields, 97 SPMP fields, and the retained vendor field have concise Chinese and English summaries. Finite encodings include localized value descriptions. The application displays Chinese by default and retains English data for future localization.
+The current catalog contains 429 CSRs and 2,007 field definitions, including mutually exclusive trigger formats. All 1,766 fields under preserved ISA-manual identities, 139 fields under AIA identities, five new Debug fields, and 97 SPMP fields have concise Chinese and English summaries. Finite encodings include localized value descriptions. The application displays Chinese by default and retains English data for future localization.
 
 AIA adds 32 CSRs and supplements 19 existing entries. Debug 1.0 adds three CSRs and supplements 15 existing entries, completing the eleven formerly address-only debug/trigger registers. Reviews check every format and XLEN for bit ranges, overlaps, source evidence, and explicit read-only-zero regions. Composite SIZE and HIT encodings preserve their physical fields and document combined meanings. The upstream tmexttrigger TYPE reset discrepancy is recorded; its explicit prose and type table define type 7. Unspecified upper DCSR bits and platform interrupt regions remain explicitly unexpanded. Trace trigger actions are covered; independent trace encoder/control registers and non-CSR debug address spaces are excluded. The retained vendor record is unchanged.
 
 Ratified SPMP 1.0 adds three numbered CSRs and ten indirect-access windows defined by the pinned ISA manual, while supplementing 90 existing entries. All 103 affected entries and 721 fields are audited. Indirect SPMP entries are represented as window views, preserving selector/CSR namespace separation. Shared-region permissions, delegation/locking, enable aliases, SUM/Bare conditions and fault codes are recorded. The RV32 mpmpdeleg diagram/prose granularity discrepancy is disclosed; unnumbered hypervisor 0.2 draft CSRs are excluded.
+
+The T-head CSR has been moved into an optional local ZIP, retaining its pinned upstream source and license while adding localized descriptions and value constraints. It is not loaded until explicitly imported.

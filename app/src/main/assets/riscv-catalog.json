@@ -3,9 +3,9 @@
   "id": "riscv-csr-catalog",
   "architecture": "riscv",
   "namespace": "catalog",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "title": "RISC-V CSR 离线数据库",
-  "coverage": "430 个 CSR / 2008 个字段；ISA Manual 20250508 + AIA 20250312 + Debug 1.0 + SPMP 1.0；保留其他来源。",
+  "coverage": "429 个 CSR / 2007 个字段；ISA Manual 20250508 + AIA 20250312 + Debug 1.0 + SPMP 1.0；厂商数据可通过本地扩展包导入。",
   "source": {
     "title": "RISC-V ISA Manual 20250508",
     "revision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
@@ -440,7 +440,6 @@
     "manual-mconfigptr.json",
     "spmp-spmpen.json",
     "spmp-spmpenh.json",
-    "spmp-mpmpdeleg.json",
-    "thead-th.sxstatus.json"
+    "spmp-mpmpdeleg.json"
   ]
 }

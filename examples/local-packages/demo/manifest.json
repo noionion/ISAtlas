@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "org.isatlas.demo",
+  "namespace": "demo",
+  "name": "离线包演示",
+  "version": "1.0.0",
+  "publisher": "ISAtlas",
+  "architecture": "riscv",
+  "minAppVersionCode": 9,
+  "description": "完全虚构的 CSR 与 custom-0 指令，供本地包功能测试。",
+  "license": "CC0-1.0",
+  "csr": [
+    "csr/demo-control.json"
+  ],
+  "instructions": [
+    "inst/demo-add.json"
+  ],
+  "hashes": {},
+  "extensions": {
+    "xdemo": [
+      "i"
+    ]
+  }
+}

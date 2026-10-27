@@ -19,9 +19,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import dev.isatlas.core.DataPack
 import dev.isatlas.core.Catalog
+import dev.isatlas.core.ManagedLocalPackage
+import dev.isatlas.core.SourceAttribution
 
 @Composable
-fun DataSourcesScreen(pack: DataPack?) {
+fun DataSourcesScreen(pack: DataPack?, localPackages: List<ManagedLocalPackage> = emptyList()) {
     val uriHandler = LocalUriHandler.current
     var linkError by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize().testTag("sources-screen"), contentAlignment = Alignment.TopCenter) {
@@ -30,7 +32,10 @@ fun DataSourcesScreen(pack: DataPack?) {
             if (pack == null) {
                 Text("数据库尚未加载。", Modifier.padding(vertical = 24.dp))
             } else {
-                Catalog.sourceAttributions(pack).forEach { source ->
+                val local = localPackages.filter { it.active }.mapNotNull { it.data?.manifest }
+                val sources = Catalog.sourceAttributions(pack).filter { source -> local.none { it.namespace == source.namespace } } +
+                    local.map { SourceAttribution(it.namespace, it.name, it.version, "local://${it.id}", it.license) }
+                sources.forEach { source ->
                         val namespace = source.namespace
                         val revision = source.revision
                         key(namespace, revision) {
@@ -47,10 +52,19 @@ fun DataSourcesScreen(pack: DataPack?) {
                                 Text(revision, Modifier.testTag("source-revision-$namespace"),
                                     fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
                             }
-                            TextButton(onClick = {
+                            if (source.url.startsWith("https://")) TextButton(onClick = {
                                 linkError = runCatching { uriHandler.openUri(source.url) }.isFailure
                             }, contentPadding = PaddingValues(0.dp)) { Text("查看固定版本原文 ↗") }
-                            if (source.license.isNotBlank()) SourceLicense(namespace, source.license)
+                            val localManifest = local.find { it.namespace == namespace }
+                            if (localManifest != null) {
+                                Text("${localManifest.publisher} · 本地导入 · 来源未经官方验证", style = MaterialTheme.typography.bodySmall)
+                                Text("许可：${source.license}", style = MaterialTheme.typography.bodyMedium)
+                                if (localManifest.licenseText.isNotBlank()) {
+                                    var expanded by rememberSaveable(namespace) { mutableStateOf(false) }
+                                    TextButton(onClick = { expanded = !expanded }) { Text(if (expanded) "收起许可正文" else "查看许可正文") }
+                                    if (expanded) Text(localManifest.licenseText, style = MaterialTheme.typography.bodySmall)
+                                }
+                            } else if (source.license.isNotBlank()) SourceLicense(namespace, source.license)
                             HorizontalDivider(Modifier.padding(top = 12.dp), color = MaterialTheme.colorScheme.outlineVariant)
                         }
                     }

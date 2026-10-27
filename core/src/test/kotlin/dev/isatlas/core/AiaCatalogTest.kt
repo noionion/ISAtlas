@@ -41,7 +41,7 @@ class AiaCatalogTest {
 
     @Test fun `data sources expose pinned supplemental AIA provenance and license once`() {
         val sources = Catalog.sourceAttributions(pack)
-        assertEquals(setOf("aia", "debug", "manual", "spmp", "thead"), sources.map { it.namespace }.toSet())
+        assertEquals(setOf("aia", "debug", "manual", "spmp"), sources.map { it.namespace }.toSet())
         val aia = sources.single { it.namespace == "aia" }
         assertEquals("20318d1b03f0ac8253458b82f8244d0d0db074e9", aia.revision)
         assertEquals("CC-BY-4.0", aia.license)

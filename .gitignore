@@ -26,6 +26,7 @@ keystore.properties
 !/docs/project-maintenance.md
 !/docs/instruction-data.md
 !/docs/pseudoinstruction-coverage.md
+!/docs/local-packages.md
 !/docs/images/
 /docs/images/*
 !/docs/images/bit-layout.png

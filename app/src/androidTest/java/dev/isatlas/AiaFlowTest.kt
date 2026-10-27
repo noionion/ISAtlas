@@ -56,7 +56,7 @@ class AiaFlowTest {
 
     @Test fun aboutShowsAiaVersionAndLicenseAlongsideManual() {
         compose.onNodeWithContentDescription("关于 ISAtlas").performClick()
-        compose.onNodeWithTag("about-database-version").performScrollTo().assertTextEquals("0.5.3")
+        compose.onNodeWithTag("about-database-version").performScrollTo().assertTextEquals("0.5.4")
         compose.onNodeWithTag("about-sources").performScrollTo().performClick()
         compose.onNodeWithTag("source-revision-aia").performScrollTo().assertTextEquals("20318d1b03f0ac8253458b82f8244d0d0db074e9")
         compose.onNodeWithTag("source-license-aia-CC-BY-4.0").performScrollTo().performClick()

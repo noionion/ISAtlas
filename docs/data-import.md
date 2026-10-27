@@ -1,3 +1,5 @@
+> 当前内置数据库为 0.5.4：429 个 CSR、2,007 个字段。玄铁 CSR 已移出为[独立 ZIP](../examples/local-packages/thead-csr.zip)，导入后可查询。下文各规范接入数量保留该轮基线。
+
 # 官方 ISA 手册数据接入
 
 基础来源为 https://github.com/riscv/riscv-isa-manual ，通过 upstream/riscv-isa-manual submodule 固定到发布标签 20250508、commit 584390d9d872835b1bc45ab9ea946b56db3ad485。上游采用 CC-BY-4.0，逐条数据保留固定版本来源，应用中附带署名、修改说明和许可证全文。
@@ -67,3 +69,7 @@ python -m unittest discover -s tools -p "test_*.py"
 ```
 
 只使用 Python 3.10+ 标准库。脚本校验上游 commit 和工作区未修改，输出 assets/csr/*.json、riscv-catalog.json 索引、许可证、手册样本及 docs/data/manual-import-report.json。重复生成按统一多文件指纹校验。CSR JSON、来源锁定、许可证和转换工具纳入版本控制；生成的复核报告与临时截图保持忽略。
+
+### 可选厂商扩展
+
+`thead` 不再被再生成流程保留在生产 assets/csr 中；固定来源和 Apache-2.0 许可移入 examples/local-packages/thead，原文件指纹及新增中英文说明后的指纹记在来源锁文件。使用 tools/package_local.py 制作 ZIP，包预览与应用内生命周期见 [本地包文档](local-packages.md)。
