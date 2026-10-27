@@ -58,9 +58,12 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
     val context = LocalContext.current
     val updates = remember(context) { UpdateRepository.get(context) }
     val update by updates.state.collectAsStateWithLifecycle()
-    val selected = state.selected
-    val selectedInstruction = state.selectedInstruction
-    val selectedPseudo = state.selectedPseudo
+    // Keep covered search/detail content unchanged while packages are rebuilding.
+    // Returning to the catalog publishes the latest state without recreating its grid.
+    val catalogState = remember(state.takeUnless { it.showAbout }) { state }
+    val selected = catalogState.selected
+    val selectedInstruction = catalogState.selectedInstruction
+    val selectedPseudo = catalogState.selectedPseudo
     val detailOpen = selected != null || selectedInstruction != null || selectedPseudo != null
     val landscapeHome = !detailOpen && LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val drawer = rememberDrawerState(DrawerValue.Closed)
@@ -95,7 +98,7 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
     BackHandler(enabled = state.showSources) { model.showSources(false) }
     BackHandler(enabled = state.showLocalPackages) { model.showLocalPackages(false) }
     RightFilterDrawer(state = drawer, enabled = !detailOpen && !state.showAbout,
-        panel = { FilterPanel(state, model) }) {
+        panel = { FilterPanel(catalogState, model) }) {
         Box(Modifier.fillMaxSize()) {
             Scaffold(
                 modifier = if (state.showAbout) Modifier.clearAndSetSemantics {} else Modifier,
@@ -139,10 +142,10 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
                                 Text(state.error!!)
                                 Button(onClick = model::load) { Text("重试") }
                             }
-                            selected != null -> key(selected.id) { RegisterDetail(state, selected, model::xlen) }
-                            selectedInstruction != null -> InstructionDetail(state, selectedInstruction, model::xlen, model::abiRegisters, { model.open(it) }, model::openPseudoBase)
-                            selectedPseudo != null -> PseudoInstructionDetail(state, selectedPseudo, model::xlen, model::openPseudoBase)
-                            else -> CatalogSearchScreen(state, model, searchGrid, instructionGrid, showSearch = !landscapeHome,
+                            selected != null -> key(selected.id) { RegisterDetail(catalogState, selected, model::xlen) }
+                            selectedInstruction != null -> InstructionDetail(catalogState, selectedInstruction, model::xlen, model::abiRegisters, { model.open(it) }, model::openPseudoBase)
+                            selectedPseudo != null -> PseudoInstructionDetail(catalogState, selectedPseudo, model::xlen, model::openPseudoBase)
+                            else -> CatalogSearchScreen(catalogState, model, searchGrid, instructionGrid, showSearch = !landscapeHome,
                                 expanded = mapOf(SearchCategory.CSR to csrExpanded, SearchCategory.FIELD to fieldsExpanded, SearchCategory.DESCRIPTION to descriptionsExpanded),
                                 onToggle = { category -> when (category) {
                                     SearchCategory.CSR -> csrExpanded = !csrExpanded

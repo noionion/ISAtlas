@@ -69,6 +69,40 @@ class OfficialPackageFlowTest {
         }
     }
 
+    @Test fun rapidRequestsUpdateThumbImmediatelyAndPersistTheLastChoice() {
+        lateinit var model: AppViewModel
+        compose.runOnUiThread { model = ViewModelProvider(compose.activity)[AppViewModel::class.java] }
+        compose.waitUntil(30_000) { !model.state.value.loading }
+        val original = "aia" in model.state.value.enabledOfficialPackages
+        try {
+            compose.runOnUiThread {
+                model.close(); model.showAbout(true); model.showLocalPackages(true)
+                model.enablePackage("official:aia", !original)
+                assertEquals(!original, model.state.value.packageToggleTargets["official:aia"])
+                assertEquals(original, "aia" in model.state.value.enabledOfficialPackages)
+                model.enablePackage("official:aia", original)
+                model.enablePackage("official:aia", !original)
+                assertEquals(!original, model.state.value.packageToggleTargets["official:aia"])
+            }
+            compose.onNodeWithTag("official-package-enabled-aia").performScrollTo().assertIsEnabled()
+            compose.onNodeWithTag("local-package-progress").assertDoesNotExist()
+            compose.waitUntil(20_000) { model.state.value.packageTogglingIds.isEmpty() }
+            assertEquals(!original, "aia" in model.state.value.enabledOfficialPackages)
+            assertEquals(!original, "aia" in context.getSharedPreferences("atlas", 0).getStringSet("officialPackages", emptySet())!!)
+            compose.runOnUiThread {
+                repeat(10) { model.enablePackage("official:aia", if (it % 2 == 0) !original else original) }
+                assertEquals(original, model.state.value.packageToggleTargets["official:aia"])
+            }
+            compose.waitUntil(20_000) { model.state.value.packageTogglingIds.isEmpty() }
+            assertEquals(original, "aia" in model.state.value.enabledOfficialPackages)
+            assertNull(model.state.value.packageMessage)
+        } finally {
+            compose.runOnUiThread { model.enablePackage("official:aia", original) }
+            compose.waitUntil(20_000) { model.state.value.packageTogglingIds.isEmpty() }
+            compose.runOnUiThread { model.showLocalPackages(false); model.showAbout(false) }
+        }
+    }
+
     @Test fun builtinSelectionRebasesLocalPackagesWithoutRewritingOrDisablingThem() {
         val folder = File(context.noBackupFilesDir, "official-package-test-${System.nanoTime()}")
         try {

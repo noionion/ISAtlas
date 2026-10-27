@@ -44,10 +44,11 @@ data class AtlasState(
     val enabledOfficialPackages: Set<String> = setOf("aia", "debug", "spmp"),
     val packageBusy: Boolean = false,
     val packageShowProgress: Boolean = false,
-    val packageTogglingIds: Set<String> = emptySet(),
+    val packageToggleTargets: Map<String, Boolean> = emptyMap(),
     val packagePreview: LocalPackagePreview? = null,
     val packageMessage: String? = null,
 ) {
+    val packageTogglingIds get() = packageToggleTargets.keys
     val instructionResults get() = instructions?.let { InstructionSearch.query(it, query, CatalogFilter(xlen, privilege, namespace, compilerIsa?.associatedTags(extensions) ?: extensions), compilerIsa) } ?: InstructionResults(emptyList())
     val selectedInstruction get() = selectedInstructionKey?.let { key -> instructions?.instructions?.firstNotNullOfOrNull { instruction -> instruction.encodings.mapIndexed { index, encoding -> InstructionHit(instruction, encoding, index, selectedInstructionWord, pattern = selectedInstructionPattern) }.find { it.key == key } } }
     val selectedPseudo get() = instructions?.pseudos?.find { it.id == selectedPseudoId }
@@ -132,26 +133,42 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
         packageOperation("导入完成") { localStore.install(bytes) }
     }
     fun enablePackage(id: String, enabled: Boolean) {
-        if (mutable.value.packageBusy || id in mutable.value.packageTogglingIds) return
-        mutable.update { it.copy(packageTogglingIds = it.packageTogglingIds + id) }
+        if (mutable.value.loading || mutable.value.packageBusy) return
+        val running = id in mutable.value.packageTogglingIds
+        if (!running && packageEnabled(id) == enabled) return
+        // The thumb responds to the requested state immediately. A running worker
+        // coalesces later taps rather than disabling/recolouring the switch.
+        mutable.update { it.copy(packageToggleTargets = it.packageToggleTargets + (id to enabled)) }
+        if (running) return
         viewModelScope.launch {
             try {
                 packageOperations.withLock {
-                    val result = withContext(Dispatchers.IO) { runCatching {
-                        if (id.startsWith("official:")) setOfficialEnabled(id.removePrefix("official:"), enabled)
-                        else localStore.setEnabled(id, enabled)
-                    } }
-                    result.fold(onSuccess = ::applyPackages, onFailure = { error ->
-                        val message = (error as? IllegalArgumentException)?.message?.takeIf { it.length <= 240 }
-                            ?: "切换失败，请检查数据包和可用存储空间。"
-                        mutable.update { it.copy(packageMessage = message) }
-                    })
+                    while (true) {
+                        val target = mutable.value.packageToggleTargets[id] ?: break
+                        if (packageEnabled(id) != target) {
+                            val result = withContext(Dispatchers.IO) { runCatching {
+                                if (id.startsWith("official:")) setOfficialEnabled(id.removePrefix("official:"), target)
+                                else localStore.setEnabled(id, target)
+                            } }
+                            result.fold(onSuccess = ::applyPackages, onFailure = { error ->
+                                val message = (error as? IllegalArgumentException)?.message?.takeIf { it.length <= 240 }
+                                    ?: "切换失败，请检查数据包和可用存储空间。"
+                                mutable.update { it.copy(packageMessage = message) }
+                            })
+                            if (result.isFailure) break
+                        }
+                        if (mutable.value.packageToggleTargets[id] == target) break
+                    }
                 }
             } finally {
-                mutable.update { it.copy(packageTogglingIds = it.packageTogglingIds - id) }
+                // A failed operation rolls the thumb back to the committed state.
+                mutable.update { it.copy(packageToggleTargets = it.packageToggleTargets - id) }
             }
         }
     }
+    private fun packageEnabled(id: String): Boolean = if (id.startsWith("official:"))
+        id.removePrefix("official:") in mutable.value.enabledOfficialPackages
+    else mutable.value.localPackages.any { it.record.id == id && it.active }
     private fun setOfficialEnabled(id: String, enabled: Boolean): LocalPackageSnapshot {
         require(officialStore.packages.any { it.id == id && !it.required })
         val previous = enabledOfficial

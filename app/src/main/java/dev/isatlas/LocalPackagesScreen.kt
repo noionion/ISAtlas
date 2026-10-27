@@ -31,8 +31,8 @@ import dev.isatlas.core.*
                             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     if (item.required) Text("基础包", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    else Switch(checked = item.id in state.enabledOfficialPackages,
-                        enabled = !state.packageBusy && "official:${item.id}" !in state.packageTogglingIds,
+                    else Switch(checked = state.packageToggleTargets["official:${item.id}"] ?: (item.id in state.enabledOfficialPackages),
+                        enabled = !state.packageBusy,
                         onCheckedChange = { model.enablePackage("official:${item.id}", it) },
                         modifier = Modifier.testTag("official-package-enabled-${item.id}"))
                 }
@@ -62,7 +62,7 @@ import dev.isatlas.core.*
                             Text(record.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                             Text("${record.version} · ${manifest?.publisher ?: "本地导入"}", style = MaterialTheme.typography.bodySmall)
                         }
-                        Switch(checked = item.active, enabled = !state.packageBusy && record.id !in state.packageTogglingIds && item.data != null,
+                        Switch(checked = state.packageToggleTargets[record.id] ?: item.active, enabled = !state.packageBusy && item.data != null,
                             onCheckedChange = { model.enablePackage(record.id, it) }, modifier = Modifier.testTag("local-package-enabled-${record.id}"))
                     }
                     item.problem?.let { problem ->
