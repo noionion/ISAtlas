@@ -607,3 +607,24 @@ Revision: 5a75db2696881a812a04e6e00347d3920dae03f2
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+RISC-V Advanced Interrupt Architecture; RISC-V International and contributors.
+AIA source: https://github.com/riscv/riscv-aia
+Tag: 20250312
+Commit: 20318d1b03f0ac8253458b82f8244d0d0db074e9
+License: CC-BY-4.0
+Changes: extract direct CSR addresses and fields; supplement existing interrupt CSR definitions; translate and summarize fields in Chinese and English; document indirect IMSIC access without inventing CSR addresses.
+
+RISC-V Debug Specification; RISC-V International and contributors.
+Debug source: https://github.com/riscv/riscv-debug-spec
+Tag: 1.0
+Commit: 5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8
+License chosen: CC-BY-4.0 (XML files also offer BSD-2-Clause).
+Changes: extract hart CSR addresses, trigger format views and field/enum definitions; translate concise Chinese descriptions and retain English summaries; exclude DM/DMI/JTAG and virtual registers.
+
+RISC-V S-level Physical Memory Protection 1.0; RISC-V International and contributors.
+SPMP source: https://github.com/riscv/riscv-spmp
+Tag: v1.0
+Commit: 4ce228207193c55247200110e3d5b6881a17c367
+License: CC-BY-4.0
+Changes: extract numbered CSRs, indirect register format views and conditional manual supplements; summarize in Chinese and English; retain selector/CSR namespace separation; exclude unnumbered hypervisor draft CSRs.

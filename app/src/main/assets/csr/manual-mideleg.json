@@ -15,7 +15,9 @@
     64
   ],
   "condition": "",
-  "extensions": [],
+  "extensions": [
+    "Smaia"
+  ],
   "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
   "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
   "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
@@ -24,7 +26,7 @@
   "fields": [
     {
       "name": "INTERRUPTS",
-      "summary": "按原因编号选择向 S 模式委托的中断，可委托范围由实现和架构约束决定。",
+      "summary": "按原因位委托中断；AIA 扩宽至 64 位，RV32 的高半通过对应 h 寄存器访问。",
       "access": "WARL",
       "layouts": [
         {
@@ -39,8 +41,8 @@
         }
       ],
       "aliases": [],
-      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
-      "summaryEn": "Select trap causes delegated to S-mode.",
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L506-L616",
+      "summaryEn": "Delegate interrupts by cause bit; AIA extends to 64 bits, with RV32 high halves in the corresponding h CSR.",
       "values": {},
       "valuesEn": {},
       "valuesByXlen": {},
@@ -49,5 +51,14 @@
     }
   ],
   "regions": [],
-  "summaryEn": "Machine interrupt delegation register"
+  "summaryEn": "Machine interrupt delegation register",
+  "sources": [
+    {
+      "namespace": "aia",
+      "title": "RISC-V Advanced Interrupt Architecture 20250312",
+      "revision": "20318d1b03f0ac8253458b82f8244d0d0db074e9",
+      "url": "https://github.com/riscv/riscv-aia/tree/20318d1b03f0ac8253458b82f8244d0d0db074e9",
+      "license": "CC-BY-4.0"
+    }
+  ]
 }

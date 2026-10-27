@@ -19,7 +19,7 @@ class CatalogFilesTest {
     @Test fun `split catalog preserves CSR fields and metadata`() {
         val actual = Catalog.decodeFiles(manifest(listOf("manual-sample.json"))) { Json.encodeToString(sample.registers.first()) }
         assertEquals(sample.copy(registers = listOf(sample.registers.first())), actual)
-        assertEquals(382, installedCatalog().registers.size)
+        assertEquals(430, installedCatalog().registers.size)
     }
 
     @Test fun `unsafe paths and duplicate references fail before reading`() {

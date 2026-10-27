@@ -1,0 +1,148 @@
+{
+  "id": "riscv/aia/csr/mtopei",
+  "namespace": "aia",
+  "name": "mtopei",
+  "title": "Read the highest-priority external interrupt; a write claims the current interrupt",
+  "summary": "读取 IMSIC 的最高优先级外部中断；写操作领取该中断。",
+  "summaryEn": "Read the highest-priority external interrupt; a write claims the current interrupt.",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 860
+  },
+  "privilege": "M",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "Smaia IMSIC",
+  "notes": "AIA 20250312；可用性取决于特权模式、XLEN 与 IMSIC 实现。 写入值被忽略，写操作清除当前报告身份的 pending 位；通常用同一条 CSR 指令原子读取并领取。不受 eidelivery 或 *ie 全局信号控制。",
+  "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/CSRs.adoc#L1-L370",
+  "sourceRevision": "20318d1b03f0ac8253458b82f8244d0d0db074e9",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "IID",
+      "summary": "最高优先级外部中断的次级身份号；0 表示没有满足条件的中断。",
+      "summaryEn": "Minor interrupt identity; zero denotes no eligible external interrupt.",
+      "access": "RO（写 CSR 领取中断）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 26,
+          "lsb": 16
+        },
+        {
+          "xlen": 64,
+          "msb": 26,
+          "lsb": 16
+        }
+      ],
+      "condition": "",
+      "aliases": [
+        "InterruptIdentity"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/IMSIC.adoc#L518-L577",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "IPRIO",
+      "summary": "外部中断优先级，等于身份号；数值越小优先级越高。",
+      "summaryEn": "External priority equals identity; smaller values have higher priority.",
+      "access": "RO（写 CSR 领取中断）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 10,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 10,
+          "lsb": 0
+        }
+      ],
+      "condition": "",
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/IMSIC.adoc#L518-L577",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    }
+  ],
+  "regions": [
+    {
+      "label": "0",
+      "access": "RO0（保留）",
+      "summary": "保留位，读零。",
+      "summaryEn": "Reserved; reads as zero.",
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/IMSIC.adoc#L518-L577",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 15,
+          "lsb": 11
+        }
+      ]
+    },
+    {
+      "label": "0",
+      "access": "RO0（保留）",
+      "summary": "保留位，读零。",
+      "summaryEn": "Reserved; reads as zero.",
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/IMSIC.adoc#L518-L577",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 27
+        }
+      ]
+    },
+    {
+      "label": "0",
+      "access": "RO0（保留）",
+      "summary": "保留位，读零。",
+      "summaryEn": "Reserved; reads as zero.",
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/IMSIC.adoc#L518-L577",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 15,
+          "lsb": 11
+        }
+      ]
+    },
+    {
+      "label": "0",
+      "access": "RO0（保留）",
+      "summary": "保留位，读零。",
+      "summaryEn": "Reserved; reads as zero.",
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/IMSIC.adoc#L518-L577",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 27
+        }
+      ]
+    }
+  ],
+  "extensions": [
+    "Smaia"
+  ],
+  "sources": [
+    {
+      "namespace": "aia",
+      "title": "RISC-V Advanced Interrupt Architecture 20250312",
+      "revision": "20318d1b03f0ac8253458b82f8244d0d0db074e9",
+      "url": "https://github.com/riscv/riscv-aia/tree/20318d1b03f0ac8253458b82f8244d0d0db074e9",
+      "license": "CC-BY-4.0"
+    }
+  ]
+}

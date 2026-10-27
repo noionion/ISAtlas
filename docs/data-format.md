@@ -1,6 +1,6 @@
 # 离线 CSR 数据格式
 
-当前数据包版本为 0.5.0；应用版本为 0.2.0，两者独立。schemaVersion 仍为 1，新增可选属性带有默认值。
+当前 CSR 数据包版本为 0.5.3；应用版本为 0.5.0，两者独立。schemaVersion 仍为 1，新增可选属性带有默认值。
 
 ## 文件结构
 
@@ -16,11 +16,15 @@
 
 寄存器保存 id、namespace、name、title、summary、summaryEn、locator、privilege、access、xlens、condition、extensions、notes、sourceUrl、sourceRevision、license、coverage、fields 和 regions。locator 为 type=riscv-csr 与数值 address。字段声明的 XLEN 必须属于寄存器适用范围。
 
+可选 `sources` 列出补充来源，每项保存 namespace、title、revision、url、license。AIA 对已有手册寄存器的补充保留原 ID、namespace 和主来源；新增/修订字段的 sourceUrl 指向实际规范。来源页面合并展示主来源和补充来源，按 AIA、Debug 或 SPMP 来源筛选时也能查到这些已存在的寄存器。IMSIC 的间接 selector 与 APLIC 的 MMIO 偏移不是 CSR 地址，不写成 `riscv-csr` 条目。
+
 coverage=fields 表示有已适配布局，可能包含手册明确的局部图；coverage=address-only 时 fields 和 regions 必须为空。未收录位段不得自动视为 WPRI。
 
 ## 字段与保留区域
 
 字段包含 name、summary、summaryEn、access、layouts，以及可选 values、valuesEn、valuesByXlen、valuesEnByXlen、condition、aliases、typeRule、sourceUrl。每个布局为 xlen、msb、lsb，端点均包含在内。别名用于查询，界面显示 canonical 名称。
+
+字段和 region 的可选 `view` 区分同一地址的互斥布局，默认空字符串为通用格式。例如 `tdata1` 的 `mcontrol6.ACTION` 使用 `view=mcontrol6`；详情切换格式时只显示对应位图，字段搜索会直接打开目标格式。字段稳定名称包含格式前缀，位图标签仅显示短名称。不同 view 可以复用位位置，同一 view 内仍禁止字段与 region 重叠；每个 view 的完整性按 XLEN 分别审核。`mcontrol` 等只是 TDATA1 的格式，不作为独立 CSR 编号。
 
 summary 为默认中文的一句话功能说明，summaryEn 为英文摘要；较长约束放在 typeRule。sourceUrl 指向固定提交的手册正文或位图。condition 和 typeRule 仅作说明，不是可执行的扩展或实现参数求解器。
 
@@ -34,4 +38,6 @@ regions 保存非命名区域，每项包含 label、access、summary、summaryE
 
 summaryEn、英文编码表、按位宽编码表及字段/区域 sourceUrl 均为可选属性，兼容保留的厂商条目。当前界面显示中文，英文摘要参与搜索，为后续 i18n 留存。
 
-当前目录包含 381 个 manual CSR（1,570 个字段）和 1 个 thead CSR（1 个字段）。具体来源与边界见 data-import.md 和 field-review.md。未来的条件互斥布局、其他架构及指令定义需要扩展对应模型、解析、搜索和显示能力，不能直接复用 CSR 编号语义。
+当前目录包含 391 个 manual CSR（经补充后 1,766 个字段）、32 个 aia CSR（139 个字段）、3 个 debug CSR（5 个字段）、3 个 spmp CSR（97 个字段）和 1 个 thead CSR（1 个字段），合计 430 个 CSR、2,008 个字段定义；字段数包含互斥触发器和 SPMP 访问窗口格式。具体来源与边界见 data-import.md 和 field-review.md。其他架构及指令定义需要扩展对应模型、解析、搜索和显示能力，不能直接复用 CSR 编号语义。
+
+SPMP 的 selector 0x100–0x13F 也不是 CSR 编号。spmpaddr/spmpcfg 使用 ireg/ireg2 的 `view`，保留通用格式；实际条目索引由 xiselect 选择。字段别名支持检索 spmpaddr0–63 / spmpcfg0–63，但不创建虚假直接 CSR。

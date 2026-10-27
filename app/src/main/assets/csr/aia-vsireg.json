@@ -1,0 +1,65 @@
+{
+  "id": "riscv/aia/csr/vsireg",
+  "namespace": "aia",
+  "name": "vsireg",
+  "title": "Access the indirect register selected by vsiselect",
+  "summary": "访问 vsiselect 选中的间接寄存器。",
+  "summaryEn": "Access the indirect register selected by vsiselect.",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 593
+  },
+  "privilege": "VS",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "Smaia Ssaia H",
+  "notes": "AIA 20250312；可用性取决于特权模式、XLEN 与 IMSIC 实现。 IMSIC：eidelivery 为 WARL（0 禁止、1 允许、0x40000000 可选旁路；guest 不支持旁路）；eithreshold 为 WLRL（0 无阈值，P>0 时仅 ID<P 可递送）。eip/eie 的未实现身份和 ID0 读零。RV64 的奇数 eip/eie selector 访问陷阱；0x71、0x73–0x7F 读零写忽略。 VS 不存在硬件 iprio 数组；selector 0x30–0x3F 不可访问，可由 hypervisor 模拟。有效 guest file 由 hstatus.VGEIN 选择。",
+  "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/CSRs.adoc#L1-L370",
+  "sourceRevision": "20318d1b03f0ac8253458b82f8244d0d0db074e9",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "DATA",
+      "summary": "访问 vsiselect 选择的 iprio 或 IMSIC eidelivery/eithreshold/eip/eie；访问属性由所选寄存器决定。",
+      "summaryEn": "Access iprio or IMSIC state selected by vsiselect; access semantics depend on that register.",
+      "access": "依 selector：WARL/WLRL/RW/RO0",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 0
+        }
+      ],
+      "condition": "",
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/IMSIC.adoc#L423-L577",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    }
+  ],
+  "regions": [],
+  "extensions": [
+    "Smaia",
+    "Ssaia"
+  ],
+  "sources": [
+    {
+      "namespace": "aia",
+      "title": "RISC-V Advanced Interrupt Architecture 20250312",
+      "revision": "20318d1b03f0ac8253458b82f8244d0d0db074e9",
+      "url": "https://github.com/riscv/riscv-aia/tree/20318d1b03f0ac8253458b82f8244d0d0db074e9",
+      "license": "CC-BY-4.0"
+    }
+  ]
+}

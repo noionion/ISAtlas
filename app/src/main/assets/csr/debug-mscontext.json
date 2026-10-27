@@ -1,0 +1,84 @@
+{
+  "id": "riscv/debug/csr/mscontext",
+  "name": "mscontext",
+  "namespace": "debug",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 1962
+  },
+  "title": "Machine Supervisor Context",
+  "summary": "提供旧版 SCONTEXT 兼容别名。",
+  "summaryEn": "Provide a legacy alias for SCONTEXT.",
+  "privilege": "S",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "Sdtrig；由 tselect 选择触发器，可选实现受规范限制",
+  "notes": "Debug 1.0；DM/DMI、JTAG 及调试器虚拟寄存器不属于 hart CSR。 触发器在 Debug Mode 中不触发；DMODE=1 时只有 Debug Mode 可修改配置。功能是否实现需通过规范探测。 兼容 0.13 的旧编码；尽管地址编码不遵循通常映射，规范允许 S/HS、M 和 Debug Mode 访问。新实现优先使用 SCONTEXT。",
+  "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L298-L310",
+  "sourceRevision": "5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "extensions": [
+    "Sdtrig"
+  ],
+  "fields": [
+    {
+      "name": "DATA",
+      "summary": "保存供触发器比较的监管态上下文编号，高位可按实现固定为零。",
+      "summaryEn": "Hold the supervisor context identifier for trigger comparison; high bits may read zero.",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 31,
+          "lsb": 0
+        }
+      ],
+      "condition": "",
+      "aliases": [
+        "data"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L251-L269",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "",
+      "view": ""
+    }
+  ],
+  "regions": [
+    {
+      "label": "0",
+      "access": "RO0",
+      "summary": "显式只读零位。",
+      "summaryEn": "Explicit read-only-zero bits.",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 32
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L251-L269",
+      "view": ""
+    }
+  ],
+  "sources": [
+    {
+      "namespace": "debug",
+      "title": "RISC-V Debug Specification 1.0",
+      "revision": "5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8",
+      "url": "https://github.com/riscv/riscv-debug-spec/tree/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8",
+      "license": "CC-BY-4.0"
+    }
+  ]
+}

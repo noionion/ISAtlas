@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import dev.isatlas.core.DataPack
+import dev.isatlas.core.Catalog
 
 @Composable
 fun DataSourcesScreen(pack: DataPack?) {
@@ -29,15 +30,12 @@ fun DataSourcesScreen(pack: DataPack?) {
             if (pack == null) {
                 Text("数据库尚未加载。", Modifier.padding(vertical = 24.dp))
             } else {
-                pack.registers.groupBy { (it.namespace.ifBlank { pack.namespace }) to it.sourceRevision.ifBlank { pack.source.revision } }
-                    .toSortedMap(compareBy<Pair<String, String>> { it.first }.thenBy { it.second })
-                    .forEach { (source, registers) ->
-                        val (namespace, revision) = source
+                Catalog.sourceAttributions(pack).forEach { source ->
+                        val namespace = source.namespace
+                        val revision = source.revision
                         key(namespace, revision) {
-                            val title = if (revision == pack.source.revision) pack.source.title
-                                else if (namespace == "thead") "T-head Extension Specification" else namespace
-                            AboutHeading(title)
-                            if (namespace == "manual") {
+                            AboutHeading(source.title)
+                            if (namespace in setOf("manual", "aia", "debug", "spmp")) {
                                 Text("RISC-V International 及贡献者；字段经结构化整理，并补充中英文摘要。",
                                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             } else if (namespace == "thead") {
@@ -50,11 +48,9 @@ fun DataSourcesScreen(pack: DataPack?) {
                                     fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
                             }
                             TextButton(onClick = {
-                                linkError = runCatching { uriHandler.openUri(registers.first().sourceUrl) }.isFailure
+                                linkError = runCatching { uriHandler.openUri(source.url) }.isFailure
                             }, contentPadding = PaddingValues(0.dp)) { Text("查看固定版本原文 ↗") }
-                            registers.map { it.license }.filter { it.isNotBlank() }.distinct().forEach { license ->
-                                SourceLicense(namespace, license)
-                            }
+                            if (source.license.isNotBlank()) SourceLicense(namespace, source.license)
                             HorizontalDivider(Modifier.padding(top = 12.dp), color = MaterialTheme.colorScheme.outlineVariant)
                         }
                     }

@@ -58,7 +58,7 @@ fun RegisterDiagram(fields: List<FieldDefinition>, xlen: Int, selected: String?,
     // Reserve the bold text extent too: selection must not clip a callout.
     val labelWidths = fields.associate { field ->
         namePaint.typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
-        field.name to with(density) { namePaint.measureText(field.name).toDp() }
+        field.name to with(density) { namePaint.measureText(field.displayName).toDp() }
     }
     val fontHeight = with(density) { (namePaint.fontMetrics.descent - namePaint.fontMetrics.ascent).toDp() }
     BoxWithConstraints(Modifier.fillMaxWidth().testTag("register-diagram")) {
@@ -169,11 +169,11 @@ fun RegisterDiagram(fields: List<FieldDefinition>, xlen: Int, selected: String?,
                                                 Offset(anchor, labelTop - 3.dp.toPx()), 0.8.dp.toPx())
                                             canvas.save()
                                             canvas.rotate(angle, anchor, labelTop)
-                                            canvas.drawText(field.name, anchor, labelTop - namePaint.fontMetrics.ascent, namePaint)
+                                            canvas.drawText(field.displayName, anchor, labelTop - namePaint.fontMetrics.ascent, namePaint)
                                             canvas.restore()
                                         } else {
                                             namePaint.textAlign = Paint.Align.CENTER
-                                            canvas.drawText(field.name, anchor,
+                                            canvas.drawText(field.displayName, anchor,
                                                 (top + bottom - namePaint.fontMetrics.ascent - namePaint.fontMetrics.descent) / 2, namePaint)
                                         }
                                         if (active) drawLine(colors.primary, Offset(x, bottom - 2.dp.toPx()),

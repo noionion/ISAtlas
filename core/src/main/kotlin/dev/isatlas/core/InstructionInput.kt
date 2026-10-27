@@ -55,7 +55,7 @@ object InstructionCsr {
     /** Execution privilege filters must not hide a CSR named by an instruction operand. */
     fun resolve(pack: DataPack, address: Int, xlen: Int, namespace: String? = null): List<RegisterDefinition> =
         pack.registers.filter { (it.locator as? RegisterLocator.Csr)?.address == address && xlen in it.xlens &&
-            (namespace == null || it.namespace.ifBlank { pack.namespace } == namespace) }
+            (namespace == null || it.namespace.ifBlank { pack.namespace } == namespace || it.sources.any { source -> source.namespace == namespace }) }
             .sortedWith(compareBy<RegisterDefinition> { it.namespace.ifBlank { pack.namespace } }.thenBy { it.name }.thenBy { it.id })
     fun address(encoding: InstructionEncoding, word: Long): Int? = encoding.operands(word)["csr"]?.toIntOrNull()
         ?: encoding.fields.firstOrNull { it.name == "csr" && it.value != null }?.value?.toInt()

@@ -15,7 +15,9 @@
     64
   ],
   "condition": "",
-  "extensions": [],
+  "extensions": [
+    "Smaia"
+  ],
   "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
   "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
   "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
@@ -85,8 +87,8 @@
     },
     {
       "name": "SEIP",
-      "summary": "S 外部中断待处理状态。",
-      "access": "RW / RO=0（依实现及委托）",
+      "summary": "S 外部中断待处理；mvien.SEIE=0 时含软件注入位，=1 时仅反映外部控制器信号。",
+      "access": "RW（mvien[9]=0）/RO（mvien[9]=1）",
       "layouts": [
         {
           "xlen": 32,
@@ -100,8 +102,8 @@
         }
       ],
       "aliases": [],
-      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
-      "summaryEn": "Report the pending supervisor external interrupt source.",
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L506-L616",
+      "summaryEn": "Supervisor external pending; mvien bit 9 separates the software-injected pending bit when set.",
       "values": {
         "0": "未挂起",
         "1": "已挂起"
@@ -112,7 +114,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "读取值为软件位与外部中断信号的逻辑或；CSR 读改写只修改软件位，不把外部信号写回。"
+      "typeRule": "无 AIA 或 mvien[9]=0：读取为软件位与外部信号 OR，CSR 读改写仅修改软件位；AIA 且 mvien[9]=1：mip.SEIP 只读，仅反映外部控制器信号，软件位改由 mvip[9] 保存。"
     },
     {
       "name": "MTIP",
@@ -234,6 +236,332 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {}
+    },
+    {
+      "name": "LOCAL16_23",
+      "summary": "标准本地中断的待处理位；标准本地中断置位后保持，直至软件清除。",
+      "summaryEn": "Pending bits for standard local interrupts; unsupported sources read as zero.",
+      "access": "RW（受实现、委托及虚拟注入条件约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 23,
+          "lsb": 16
+        },
+        {
+          "xlen": 64,
+          "msb": 23,
+          "lsb": 16
+        }
+      ],
+      "condition": "Smaia",
+      "aliases": [
+        "interrupts"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "CUSTOM24_31",
+      "summary": "自定义中断的待处理位；标准本地中断置位后保持，直至软件清除。",
+      "summaryEn": "Pending bits for custom interrupts; unsupported sources read as zero.",
+      "access": "RW（受实现、委托及虚拟注入条件约束）",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 24
+        },
+        {
+          "xlen": 64,
+          "msb": 31,
+          "lsb": 24
+        }
+      ],
+      "condition": "Smaia",
+      "aliases": [
+        "interrupts"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "LOCAL32_34",
+      "summary": "标准本地中断的待处理位；标准本地中断置位后保持，直至软件清除。",
+      "summaryEn": "Pending bits for standard local interrupts; unsupported sources read as zero.",
+      "access": "RW（受实现、委托及虚拟注入条件约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 34,
+          "lsb": 32
+        }
+      ],
+      "condition": "Smaia",
+      "aliases": [
+        "interrupts"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "RASLIP",
+      "summary": "低优先级 RAS 事件的待处理位；标准本地中断置位后保持，直至软件清除。",
+      "summaryEn": "Pending bits for low-priority RAS event; unsupported sources read as zero.",
+      "access": "RW（受实现、委托及虚拟注入条件约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 35,
+          "lsb": 35
+        }
+      ],
+      "condition": "Smaia",
+      "aliases": [
+        "interrupts"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+      "values": {
+        "0": "无待处理中断",
+        "1": "中断待处理"
+      },
+      "valuesEn": {
+        "0": "No interrupt pending",
+        "1": "Interrupt pending"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "LOCAL36_42",
+      "summary": "标准本地中断的待处理位；标准本地中断置位后保持，直至软件清除。",
+      "summaryEn": "Pending bits for standard local interrupts; unsupported sources read as zero.",
+      "access": "RW（受实现、委托及虚拟注入条件约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 42,
+          "lsb": 36
+        }
+      ],
+      "condition": "Smaia",
+      "aliases": [
+        "interrupts"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "RASHIP",
+      "summary": "高优先级 RAS 事件的待处理位；标准本地中断置位后保持，直至软件清除。",
+      "summaryEn": "Pending bits for high-priority RAS event; unsupported sources read as zero.",
+      "access": "RW（受实现、委托及虚拟注入条件约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 43,
+          "lsb": 43
+        }
+      ],
+      "condition": "Smaia",
+      "aliases": [
+        "interrupts"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+      "values": {
+        "0": "无待处理中断",
+        "1": "中断待处理"
+      },
+      "valuesEn": {
+        "0": "No interrupt pending",
+        "1": "Interrupt pending"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "LOCAL44_47",
+      "summary": "标准本地中断的待处理位；标准本地中断置位后保持，直至软件清除。",
+      "summaryEn": "Pending bits for standard local interrupts; unsupported sources read as zero.",
+      "access": "RW（受实现、委托及虚拟注入条件约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 47,
+          "lsb": 44
+        }
+      ],
+      "condition": "Smaia",
+      "aliases": [
+        "interrupts"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "CUSTOM48_63",
+      "summary": "自定义中断的待处理位；标准本地中断置位后保持，直至软件清除。",
+      "summaryEn": "Pending bits for custom interrupts; unsupported sources read as zero.",
+      "access": "RW（受实现、委托及虚拟注入条件约束）",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 48
+        }
+      ],
+      "condition": "Smaia",
+      "aliases": [
+        "interrupts"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "SGEIP",
+      "summary": "访客外部中断汇总中断待处理状态。",
+      "access": "RO",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 12,
+          "lsb": 12
+        },
+        {
+          "xlen": 64,
+          "msb": 12,
+          "lsb": 12
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+      "summaryEn": "Report the pending supervisor guest external interrupt source.",
+      "values": {
+        "0": "未挂起",
+        "1": "已挂起"
+      },
+      "valuesEn": {
+        "0": "Not pending",
+        "1": "Pending"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "当 hgeip 与 hgeie 按位与非零时置位。",
+      "condition": "H"
+    },
+    {
+      "name": "VSEIP",
+      "summary": "VS 外部中断待处理状态。",
+      "access": "RO",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 10,
+          "lsb": 10
+        },
+        {
+          "xlen": 64,
+          "msb": 10,
+          "lsb": 10
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+      "summaryEn": "Report the pending virtual supervisor external interrupt source.",
+      "values": {
+        "0": "未挂起",
+        "1": "已挂起"
+      },
+      "valuesEn": {
+        "0": "Not pending",
+        "1": "Pending"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "为 hvip.VSEIP、VGEIN 选中的 hgeip 位与其他平台 VS 外部中断源的逻辑或。",
+      "condition": "H"
+    },
+    {
+      "name": "VSTIP",
+      "summary": "VS 定时器中断待处理状态。",
+      "access": "RO",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 6,
+          "lsb": 6
+        },
+        {
+          "xlen": 64,
+          "msb": 6,
+          "lsb": 6
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+      "summaryEn": "Report the pending virtual supervisor timer interrupt source.",
+      "values": {
+        "0": "未挂起",
+        "1": "已挂起"
+      },
+      "valuesEn": {
+        "0": "Not pending",
+        "1": "Pending"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "为 hvip.VSTIP 与其他 VS 定时器中断源的逻辑或；Sstc 可加入 vstimecmp 比较结果。",
+      "condition": "H"
+    },
+    {
+      "name": "VSSIP",
+      "summary": "VS 软件中断待处理状态。",
+      "access": "RW",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 2,
+          "lsb": 2
+        },
+        {
+          "xlen": 64,
+          "msb": 2,
+          "lsb": 2
+        }
+      ],
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+      "summaryEn": "Report the pending virtual supervisor software interrupt source.",
+      "values": {
+        "0": "未挂起",
+        "1": "已挂起"
+      },
+      "valuesEn": {
+        "0": "Not pending",
+        "1": "Pending"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "hvip.VSSIP 的可写别名。",
+      "condition": "H"
     }
   ],
   "regions": [
@@ -263,44 +591,6 @@
       "layouts": [
         {
           "xlen": 32,
-          "msb": 12,
-          "lsb": 12
-        },
-        {
-          "xlen": 64,
-          "msb": 12,
-          "lsb": 12
-        }
-      ],
-      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/mipreg-standard.edn",
-      "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
-    },
-    {
-      "label": "0",
-      "access": "图示固定零；访问规则见原文",
-      "summary": "手册位图明确标注的区域。",
-      "layouts": [
-        {
-          "xlen": 32,
-          "msb": 10,
-          "lsb": 10
-        },
-        {
-          "xlen": 64,
-          "msb": 10,
-          "lsb": 10
-        }
-      ],
-      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/mipreg-standard.edn",
-      "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
-    },
-    {
-      "label": "0",
-      "access": "图示固定零；访问规则见原文",
-      "summary": "手册位图明确标注的区域。",
-      "layouts": [
-        {
-          "xlen": 32,
           "msb": 8,
           "lsb": 8
         },
@@ -320,25 +610,6 @@
       "layouts": [
         {
           "xlen": 32,
-          "msb": 6,
-          "lsb": 6
-        },
-        {
-          "xlen": 64,
-          "msb": 6,
-          "lsb": 6
-        }
-      ],
-      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/mipreg-standard.edn",
-      "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
-    },
-    {
-      "label": "0",
-      "access": "图示固定零；访问规则见原文",
-      "summary": "手册位图明确标注的区域。",
-      "layouts": [
-        {
-          "xlen": 32,
           "msb": 4,
           "lsb": 4
         },
@@ -346,25 +617,6 @@
           "xlen": 64,
           "msb": 4,
           "lsb": 4
-        }
-      ],
-      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/mipreg-standard.edn",
-      "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
-    },
-    {
-      "label": "0",
-      "access": "图示固定零；访问规则见原文",
-      "summary": "手册位图明确标注的区域。",
-      "layouts": [
-        {
-          "xlen": 32,
-          "msb": 2,
-          "lsb": 2
-        },
-        {
-          "xlen": 64,
-          "msb": 2,
-          "lsb": 2
         }
       ],
       "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/mipreg-standard.edn",
@@ -390,5 +642,14 @@
       "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
     }
   ],
-  "summaryEn": "Machine interrupt pending"
+  "summaryEn": "Machine interrupt pending",
+  "sources": [
+    {
+      "namespace": "aia",
+      "title": "RISC-V Advanced Interrupt Architecture 20250312",
+      "revision": "20318d1b03f0ac8253458b82f8244d0d0db074e9",
+      "url": "https://github.com/riscv/riscv-aia/tree/20318d1b03f0ac8253458b82f8244d0d0db074e9",
+      "license": "CC-BY-4.0"
+    }
+  ]
 }

@@ -3,7 +3,7 @@
   "namespace": "manual",
   "name": "tdata3",
   "title": "Third Debug/Trace trigger data register",
-  "summary": "调试触发器数据 3。",
+  "summary": "保存所选触发器的附加上下文过滤条件。",
   "locator": {
     "type": "riscv-csr",
     "address": 1955
@@ -14,14 +14,274 @@
     32,
     64
   ],
-  "condition": "",
-  "extensions": [],
-  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
+  "condition": "Sdtrig；由 tselect 选择触发器，可选实现受规范限制",
+  "extensions": [
+    "Sdtrig"
+  ],
+  "notes": "Debug 1.0；DM/DMI、JTAG 及调试器虚拟寄存器不属于 hart CSR。 触发器在 Debug Mode 中不触发；DMODE=1 时只有 Debug Mode 可修改配置。功能是否实现需通过规范探测。",
   "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
   "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
   "license": "CC-BY-4.0",
-  "coverage": "address-only",
-  "fields": [],
-  "regions": [],
-  "summaryEn": "Third Debug/Trace trigger data register"
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "DATA",
+      "summary": "访问所选触发器的类型相关数据，含义由 TYPE 决定。",
+      "summaryEn": "Access type-specific data for the selected trigger, interpreted by TYPE.",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 0
+        }
+      ],
+      "condition": "",
+      "aliases": [
+        "data"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L154-L166",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "XLEN<DXLEN 时写入按符号扩展；触发器禁用时可写入该触发器任一支持类型接受的值。",
+      "view": ""
+    },
+    {
+      "name": "textra.MHVALUE",
+      "summary": "保存 MHSELECT 所选机器/Hypervisor 上下文的比较值。",
+      "summaryEn": "Hold the machine/hypervisor context comparison selected by MHSELECT.",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 26
+        },
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 51
+        }
+      ],
+      "condition": "Sdtrig tdata1.TYPE=2/3/4/5/6",
+      "aliases": [
+        "mhvalue"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L1401-L1498",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "",
+      "view": "textra"
+    },
+    {
+      "name": "textra.MHSELECT",
+      "summary": "选择忽略、上下文编号或 VMID 比较；编码 1/2/5/6 还使用本字段 bit 2。",
+      "summaryEn": "Select no filtering, context or VMID comparison; encodings 1/2/5/6 also use bit 2.",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 25,
+          "lsb": 23
+        },
+        {
+          "xlen": 64,
+          "msb": 50,
+          "lsb": 48
+        }
+      ],
+      "condition": "Sdtrig tdata1.TYPE=2/3/4/5/6",
+      "aliases": [
+        "mhselect"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L1401-L1498",
+      "values": {
+        "0": "忽略 MHVALUE",
+        "1": "比较上下文与 {MHVALUE,0}（需要 H）",
+        "2": "比较 VMID 与 {MHVALUE,0}（需要 H）",
+        "3": "保留/本版未定义",
+        "4": "比较上下文与 MHVALUE",
+        "5": "比较上下文与 {MHVALUE,1}（需要 H）",
+        "6": "比较 VMID 与 {MHVALUE,1}（需要 H）",
+        "7": "保留/本版未定义"
+      },
+      "valuesEn": {
+        "0": "Ignore MHVALUE",
+        "1": "Compare context to {MHVALUE,0}; requires H",
+        "2": "Compare VMID to {MHVALUE,0}; requires H",
+        "3": "Reserved/not defined in this version",
+        "4": "Compare context to MHVALUE",
+        "5": "Compare context to {MHVALUE,1}; requires H",
+        "6": "Compare VMID to {MHVALUE,1}; requires H",
+        "7": "Reserved/not defined in this version"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "",
+      "view": "textra"
+    },
+    {
+      "name": "textra.SBYTEMASK",
+      "summary": "每位为 1 时忽略 SCONTEXT 比较中对应字节；仅 SSELECT=1 时生效。",
+      "summaryEn": "Each set bit ignores its SCONTEXT byte; effective only when SSELECT=1.",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 19,
+          "lsb": 18
+        },
+        {
+          "xlen": 64,
+          "msb": 39,
+          "lsb": 36
+        }
+      ],
+      "condition": "Sdtrig tdata1.TYPE=2/3/4/5/6",
+      "aliases": [
+        "sbytemask"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L1401-L1498",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "",
+      "view": "textra"
+    },
+    {
+      "name": "textra.SVALUE",
+      "summary": "保存 SSELECT 选择的 SCONTEXT 或 ASID 比较值。",
+      "summaryEn": "Hold the SCONTEXT or ASID comparison value selected by SSELECT.",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 17,
+          "lsb": 2
+        },
+        {
+          "xlen": 64,
+          "msb": 33,
+          "lsb": 2
+        }
+      ],
+      "condition": "Sdtrig tdata1.TYPE=2/3/4/5/6",
+      "aliases": [
+        "svalue"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L1401-L1498",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "",
+      "view": "textra"
+    },
+    {
+      "name": "textra.SSELECT",
+      "summary": "选择忽略、SCONTEXT 或当前 satp/vsatp 的 ASID 比较。",
+      "summaryEn": "Select no filtering, SCONTEXT or ASID comparison from satp/vsatp.",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 1,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 1,
+          "lsb": 0
+        }
+      ],
+      "condition": "Sdtrig tdata1.TYPE=2/3/4/5/6",
+      "aliases": [
+        "sselect"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L1401-L1498",
+      "values": {
+        "0": "不进行对应上下文比较",
+        "1": "比较 SCONTEXT",
+        "2": "比较当前 satp/vsatp 的 ASID",
+        "3": "保留/本版未定义"
+      },
+      "valuesEn": {
+        "0": "ignore",
+        "1": "scontext",
+        "2": "asid",
+        "3": "Reserved/not defined in this version"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "",
+      "view": "textra"
+    }
+  ],
+  "regions": [
+    {
+      "label": "0",
+      "access": "RO0",
+      "summary": "显式只读零位。",
+      "summaryEn": "Explicit read-only-zero bits.",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 22,
+          "lsb": 20
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L1401-L1498",
+      "view": "textra"
+    },
+    {
+      "label": "0",
+      "access": "RO0",
+      "summary": "显式只读零位。",
+      "summaryEn": "Explicit read-only-zero bits.",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 47,
+          "lsb": 40
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L1500-L1538",
+      "view": "textra"
+    },
+    {
+      "label": "0",
+      "access": "RO0",
+      "summary": "显式只读零位。",
+      "summaryEn": "Explicit read-only-zero bits.",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 35,
+          "lsb": 34
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L1500-L1538",
+      "view": "textra"
+    }
+  ],
+  "summaryEn": "Hold additional trigger context filters.",
+  "sources": [
+    {
+      "namespace": "debug",
+      "title": "RISC-V Debug Specification 1.0",
+      "revision": "5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8",
+      "url": "https://github.com/riscv/riscv-debug-spec/tree/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8",
+      "license": "CC-BY-4.0"
+    }
+  ]
 }

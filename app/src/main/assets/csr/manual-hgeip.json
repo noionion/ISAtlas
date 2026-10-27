@@ -16,7 +16,9 @@
   ],
   "condition": "",
   "extensions": [
-    "H"
+    "H",
+    "Smaia",
+    "Ssaia"
   ],
   "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
   "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
@@ -26,7 +28,7 @@
   "fields": [
     {
       "name": "GEIP",
-      "summary": "按 guest external interrupt 编号报告待处理中断。",
+      "summary": "按 guest external interrupt 编号报告待处理中断。 AIA：mstateen0.IMSIC=0 不强制此字段读零。",
       "access": "RO",
       "layouts": [
         {
@@ -41,8 +43,8 @@
         }
       ],
       "aliases": [],
-      "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
-      "summaryEn": "Report pending guest external interrupts by source number.",
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/CSRs.adoc#L382-L441",
+      "summaryEn": "Report pending guest external interrupts by source number. AIA: mstateen0.IMSIC=0 does not force this field to zero.",
       "values": {},
       "valuesEn": {},
       "valuesByXlen": {},
@@ -80,5 +82,14 @@
       "summaryEn": "This region reads as zero."
     }
   ],
-  "summaryEn": "Hypervisor guest external interrupt pending"
+  "summaryEn": "Hypervisor guest external interrupt pending",
+  "sources": [
+    {
+      "namespace": "aia",
+      "title": "RISC-V Advanced Interrupt Architecture 20250312",
+      "revision": "20318d1b03f0ac8253458b82f8244d0d0db074e9",
+      "url": "https://github.com/riscv/riscv-aia/tree/20318d1b03f0ac8253458b82f8244d0d0db074e9",
+      "license": "CC-BY-4.0"
+    }
+  ]
 }

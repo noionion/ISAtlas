@@ -544,19 +544,28 @@ def run():
     retained = [reg for reg in old["registers"] if reg["namespace"] not in ("standard", "andes", "manual")]
     manual_registers, semantic_audit = build_registers(include_audit=True)
     registers = manual_registers + retained
+    from import_aia import enrich as enrich_aia, verify_checkout as verify_aia, update_metadata as update_aia_metadata
+    verify_aia()
+    registers, aia_audit = enrich_aia(registers)
+    from import_debug import enrich as enrich_debug, verify_checkout as verify_debug, update_metadata as update_debug_metadata
+    verify_debug()
+    registers, debug_audit = enrich_debug(registers)
+    from import_spmp import enrich as enrich_spmp, verify_checkout as verify_spmp, update_metadata as update_spmp_metadata
+    verify_spmp()
+    registers, spmp_audit = enrich_spmp(registers)
     fields = sum(len(reg["fields"]) for reg in registers)
-    old.update(version="0.5.0", registers=registers,
-               coverage=f"{len(registers)} 个 CSR / {fields} 个字段；官方手册 20250508 转换，未解析布局明确标记；保留其他来源。",
+    old.update(version="0.5.3", registers=registers,
+               coverage=f"{len(registers)} 个 CSR / {fields} 个字段；ISA Manual 20250508 + AIA 20250312 + Debug 1.0 + SPMP 1.0；保留其他来源。",
                source={"title": "RISC-V ISA Manual 20250508", "revision": REVISION, "url": REPOSITORY})
     write_catalog(ASSETS, old)
     sample_names = ["mstatus", "mstatush", "misa", "mvendorid", "marchid", "mimpid", "mhartid", "mtvec", "mepc", "mcause", "mtval", "sstatus", "sscratch", "satp", "mie"]
     sample = dict(old, id="riscv-manual-sample", namespace="manual",
                   registers=[next(reg for reg in registers if reg["namespace"] == "manual" and reg["name"] == name) for name in sample_names])
-    (ROOT / "core/src/test/resources/riscv-manual-sample.json").write_text(json.dumps(sample, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (ROOT / "core/src/test/resources/riscv-manual-sample.json").write_text(json.dumps(sample, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
     (ROOT / "core/src/test/resources/riscv-standard-sample.json").unlink(missing_ok=True)
     report = {"source": old["source"], "tag": "20250508", "counts": dict(Counter(reg["namespace"] for reg in registers)),
               "fields": fields, "sha256": catalog_sha256(ASSETS),
-              "fieldSemantics": semantic_audit,
+              "fieldSemantics": semantic_audit, "aia": aia_audit, "debug": debug_audit, "spmp": spmp_audit,
               "addressOnly": [reg["id"] for reg in registers if reg["coverage"] == "address-only"],
               "limitations": ["Only explicitly supported address tables and figures are imported; extension chapters are not exhaustively parsed.",
                               "Bytefield visual spans are not bit widths; only explicit width labels are decoded.",
@@ -567,7 +576,10 @@ def run():
     if retained:
         notices += ["\nRetained T-head data: https://github.com/T-head-Semi/thead-extension-spec\nRevision: 5a75db2696881a812a04e6e00347d3920dae03f2\n",
                     (ROOT / "tools/licenses/thead-Apache-2.0.txt").read_text(encoding="utf-8")]
-    (ASSETS / "THIRD_PARTY_NOTICES.txt").write_text("\n".join(notices), encoding="utf-8")
+    (ASSETS / "THIRD_PARTY_NOTICES.txt").write_text("\n".join(notices), encoding="utf-8", newline="\n")
+    update_aia_metadata()
+    update_debug_metadata()
+    update_spmp_metadata()
     licenses = ASSETS / "licenses"
     licenses.mkdir(exist_ok=True)
     (licenses / "CC-BY-4.0.txt").write_text((UPSTREAM / "LICENSE").read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
@@ -581,10 +593,10 @@ def run():
     options["dependencyScope"] = "Explicitly adapted mandatory prerequisites only; not a complete ISA configuration solver."
     # Retain the existing JSON schema: the scope belongs in the local report.
     report["dependencyScope"] = options.pop("dependencyScope")
-    options_path.write_text(json.dumps(options, indent=2) + "\n", encoding="utf-8")
+    options_path.write_text(json.dumps(options, indent=2) + "\n", encoding="utf-8", newline="\n")
     report_path = ROOT / "docs/data/manual-import-report.json"
     report_path.parent.mkdir(parents=True, exist_ok=True)
-    report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
     compact = {key: value for key, value in report.items() if key not in ("addressOnly", "fieldSemantics")}
     compact["fieldSemantics"] = {key: value for key, value in semantic_audit.items() if key != "sources"}
     print(json.dumps(compact, ensure_ascii=False, indent=2))

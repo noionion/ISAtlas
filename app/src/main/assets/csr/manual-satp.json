@@ -93,7 +93,8 @@
           "15": "Reserved"
         }
       },
-      "typeRule": "RV32 MODE：0=Bare，1=Sv32（hgatp 为 Sv32x4）。RV64 MODE：0=Bare，8=Sv39，9=Sv48，10=Sv57；hgatp 对应 Sv39x4/Sv48x4/Sv57x4。并非所有编码都必须实现。"
+      "typeRule": "RV32 MODE：0=Bare，1=Sv32（hgatp 为 Sv32x4）。RV64 MODE：0=Bare，8=Sv39，9=Sv48，10=Sv57；hgatp 对应 Sv39x4/Sv48x4/Sv57x4。并非所有编码都必须实现。 Sspmp 仅在 MODE=Bare 时启用，与分页互斥。 Sspmp is active only with MODE=Bare, mutually exclusive with paging.",
+      "condition": "Sspmp"
     },
     {
       "name": "ASID",
@@ -145,5 +146,14 @@
     }
   ],
   "regions": [],
-  "summaryEn": "Supervisor address translation and protection"
+  "summaryEn": "Supervisor address translation and protection",
+  "sources": [
+    {
+      "namespace": "spmp",
+      "title": "RISC-V S-level Physical Memory Protection 1.0",
+      "revision": "4ce228207193c55247200110e3d5b6881a17c367",
+      "url": "https://github.com/riscv/riscv-spmp/tree/4ce228207193c55247200110e3d5b6881a17c367",
+      "license": "CC-BY-4.0"
+    }
+  ]
 }

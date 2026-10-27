@@ -16,7 +16,7 @@
   ],
   "condition": "",
   "extensions": [],
-  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
+  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。",
   "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
   "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
   "license": "CC-BY-4.0",
@@ -51,7 +51,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP8A",
@@ -86,7 +86,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP8X",
@@ -117,7 +117,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP8W",
@@ -148,7 +148,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP8R",
@@ -179,7 +179,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP9L",
@@ -210,7 +210,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP9A",
@@ -245,7 +245,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP9X",
@@ -276,7 +276,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP9W",
@@ -307,7 +307,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP9R",
@@ -338,7 +338,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP10L",
@@ -369,7 +369,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP10A",
@@ -404,7 +404,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP10X",
@@ -435,7 +435,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP10W",
@@ -466,7 +466,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP10R",
@@ -497,7 +497,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP11L",
@@ -528,7 +528,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP11A",
@@ -563,7 +563,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP11X",
@@ -594,7 +594,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP11W",
@@ -625,7 +625,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP11R",
@@ -656,7 +656,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP12L",
@@ -682,7 +682,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP12A",
@@ -712,7 +712,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP12X",
@@ -738,7 +738,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP12W",
@@ -764,7 +764,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP12R",
@@ -790,7 +790,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP13L",
@@ -816,7 +816,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP13A",
@@ -846,7 +846,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP13X",
@@ -872,7 +872,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP13W",
@@ -898,7 +898,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP13R",
@@ -924,7 +924,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP14L",
@@ -950,7 +950,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP14A",
@@ -980,7 +980,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP14X",
@@ -1006,7 +1006,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP14W",
@@ -1032,7 +1032,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP14R",
@@ -1058,7 +1058,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP15L",
@@ -1084,7 +1084,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP15A",
@@ -1114,7 +1114,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP15X",
@@ -1140,7 +1140,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP15W",
@@ -1166,7 +1166,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     },
     {
       "name": "PMP15R",
@@ -1192,7 +1192,7 @@
       },
       "valuesByXlen": {},
       "valuesEnByXlen": {},
-      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。"
+      "typeRule": "基础 PMP 中 R/W/X 共同组成 WARL 字段，R=0 且 W=1 的组合为保留编码；Smepmp.MML 启用时另有编码解释。L 锁定位及 TOR 的地址锁定联动需一并考虑。 Smpmpdeleg：索引 ≥ mpmpdeleg.PMPNUM 的物理条目委托给 SPMP；超出当前 PMP 范围读零、写忽略。spmpcfg 低 8 位别名到对应 PMP 配置；重新划分继承原值，须预初始化。锁定 PMP 条目限制边界，锁定 SPMP 不阻止 M 态重新划分。"
     }
   ],
   "regions": [
@@ -1329,5 +1329,14 @@
       "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
     }
   ],
-  "summaryEn": "Physical memory protection configuration"
+  "summaryEn": "Physical memory protection configuration",
+  "sources": [
+    {
+      "namespace": "spmp",
+      "title": "RISC-V S-level Physical Memory Protection 1.0",
+      "revision": "4ce228207193c55247200110e3d5b6881a17c367",
+      "url": "https://github.com/riscv/riscv-spmp/tree/4ce228207193c55247200110e3d5b6881a17c367",
+      "license": "CC-BY-4.0"
+    }
+  ]
 }

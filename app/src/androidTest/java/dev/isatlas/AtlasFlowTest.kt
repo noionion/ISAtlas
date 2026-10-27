@@ -241,7 +241,7 @@ class AtlasFlowTest {
         val appVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName!!
         compose.onNodeWithContentDescription("关于 ISAtlas").performClick()
         compose.onNodeWithTag("about-app-version").assertTextEquals(appVersion)
-        compose.onNodeWithTag("about-database-version").assertTextEquals("0.5.0")
+        compose.onNodeWithTag("about-database-version").assertTextEquals("0.5.3")
         compose.onNodeWithTag("about-csr-count").assertDoesNotExist()
         compose.onNodeWithTag("about-field-count").assertDoesNotExist()
         compose.onNodeWithText("存储方式").assertDoesNotExist()

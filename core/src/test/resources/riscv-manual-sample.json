@@ -3,9 +3,9 @@
   "id": "riscv-manual-sample",
   "architecture": "riscv",
   "namespace": "manual",
-  "version": "0.5.0",
+  "version": "0.5.3",
   "title": "RISC-V CSR 离线数据库",
-  "coverage": "382 个 CSR / 1571 个字段；官方手册 20250508 转换，未解析布局明确标记；保留其他来源。",
+  "coverage": "430 个 CSR / 2008 个字段；ISA Manual 20250508 + AIA 20250312 + Debug 1.0 + SPMP 1.0；保留其他来源。",
   "source": {
     "title": "RISC-V ISA Manual 20250508",
     "revision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
@@ -414,7 +414,9 @@
             "1": "Allow S-mode access to user-page data"
           },
           "valuesByXlen": {},
-          "valuesEnByXlen": {}
+          "valuesEnByXlen": {},
+          "typeRule": "Sspmp 中同样控制 S 访问 U 区域；不允许 S 执行 U 区域。 Also govern S data access to U regions under Sspmp; never grant S execution.",
+          "condition": "Sspmp"
         },
         {
           "name": "MXR",
@@ -444,7 +446,9 @@
             "1": "Executable pages also satisfy loads"
           },
           "valuesByXlen": {},
-          "valuesEnByXlen": {}
+          "valuesEnByXlen": {},
+          "typeRule": "Sspmp 要求 MXR 可写；权限细节以 SPMP 权限表为准。 Sspmp requires writable MXR; see its permission table.",
+          "condition": "Sspmp"
         },
         {
           "name": "TVM",
@@ -949,7 +953,16 @@
           "summaryEn": "Preserve this region when updating other fields and ignore its read value."
         }
       ],
-      "summaryEn": "Machine status register"
+      "summaryEn": "Machine status register",
+      "sources": [
+        {
+          "namespace": "spmp",
+          "title": "RISC-V S-level Physical Memory Protection 1.0",
+          "revision": "4ce228207193c55247200110e3d5b6881a17c367",
+          "url": "https://github.com/riscv/riscv-spmp/tree/4ce228207193c55247200110e3d5b6881a17c367",
+          "license": "CC-BY-4.0"
+        }
+      ]
     },
     {
       "id": "riscv/manual/csr/mstatush",
@@ -1686,7 +1699,9 @@
         64
       ],
       "condition": "",
-      "extensions": [],
+      "extensions": [
+        "Smaia"
+      ],
       "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
       "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
       "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
@@ -1727,7 +1742,7 @@
         },
         {
           "name": "CODE",
-          "summary": "陷阱原因编号；需要结合 Interrupt 位区分中断原因和异常原因，具体编号以对应 cause 表为准。",
+          "summary": "陷阱原因编号；需要结合 Interrupt 位区分中断原因和异常原因，具体编号以对应 cause 表为准。 AIA 在 INT=1 时定义 35/43 为低/高优先级 RAS 本地中断。",
           "access": "WLRL",
           "layouts": [
             {
@@ -1745,7 +1760,7 @@
             "ExceptionCode"
           ],
           "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/machine.adoc",
-          "summaryEn": "Identify the trap cause within its interrupt or exception class.",
+          "summaryEn": "Identify the trap cause within its interrupt or exception class. AIA defines interrupt causes 35/43 as low/high priority RAS events.",
           "values": {
             "0": "INT=0：指令地址未对齐；INT=1：保留",
             "1": "INT=0：指令访问故障；INT=1：S 软件中断",
@@ -1759,58 +1774,58 @@
             "9": "INT=0：S/HS 模式环境调用；INT=1：S 外部中断",
             "10": "INT=0：H：VS 模式环境调用；否则保留；INT=1：H：VS 外部中断；否则保留",
             "11": "INT=0：M 模式环境调用；INT=1：M 外部中断",
-            "12": "INT=0：指令页故障；INT=1：H：S 访客外部中断；否则保留",
-            "13": "INT=0：加载页故障；INT=1：Sscofpmf：计数器溢出中断",
+            "12": "INT=0：指令页故障；INT=1：H：S 访客外部中断；否则保留 Sspmp：INT=0 时也用于SPMP 失败。",
+            "13": "INT=0：加载页故障；INT=1：Sscofpmf：计数器溢出中断 Sspmp：INT=0 时也用于SPMP 失败。",
             "14": "INT=0：保留；INT=1：保留",
-            "15": "INT=0：存储/AMO 页故障；INT=1：保留",
-            "16": "INT=0：双重陷阱；INT=1：平台定义",
-            "17": "INT=0：保留；INT=1：平台定义",
-            "18": "INT=0：软件检查异常；INT=1：平台定义",
-            "19": "INT=0：硬件错误；INT=1：平台定义",
-            "20": "INT=0：H：指令 guest-page 故障；否则保留；INT=1：平台定义",
-            "21": "INT=0：H：加载 guest-page 故障；否则保留；INT=1：平台定义",
-            "22": "INT=0：H：虚拟指令异常；否则保留；INT=1：平台定义",
-            "23": "INT=0：H：存储/AMO guest-page 故障；否则保留；INT=1：平台定义",
-            "24": "INT=0：自定义用途；INT=1：平台定义",
-            "25": "INT=0：自定义用途；INT=1：平台定义",
-            "26": "INT=0：自定义用途；INT=1：平台定义",
-            "27": "INT=0：自定义用途；INT=1：平台定义",
-            "28": "INT=0：自定义用途；INT=1：平台定义",
-            "29": "INT=0：自定义用途；INT=1：平台定义",
-            "30": "INT=0：自定义用途；INT=1：平台定义",
-            "31": "INT=0：自定义用途；INT=1：平台定义",
-            "32": "INT=0：保留；INT=1：平台定义",
-            "33": "INT=0：保留；INT=1：平台定义",
-            "34": "INT=0：保留；INT=1：平台定义",
-            "35": "INT=0：保留；INT=1：平台定义",
-            "36": "INT=0：保留；INT=1：平台定义",
-            "37": "INT=0：保留；INT=1：平台定义",
-            "38": "INT=0：保留；INT=1：平台定义",
-            "39": "INT=0：保留；INT=1：平台定义",
-            "40": "INT=0：保留；INT=1：平台定义",
-            "41": "INT=0：保留；INT=1：平台定义",
-            "42": "INT=0：保留；INT=1：平台定义",
-            "43": "INT=0：保留；INT=1：平台定义",
-            "44": "INT=0：保留；INT=1：平台定义",
-            "45": "INT=0：保留；INT=1：平台定义",
-            "46": "INT=0：保留；INT=1：平台定义",
-            "47": "INT=0：保留；INT=1：平台定义",
-            "48": "INT=0：自定义用途；INT=1：平台定义",
-            "49": "INT=0：自定义用途；INT=1：平台定义",
-            "50": "INT=0：自定义用途；INT=1：平台定义",
-            "51": "INT=0：自定义用途；INT=1：平台定义",
-            "52": "INT=0：自定义用途；INT=1：平台定义",
-            "53": "INT=0：自定义用途；INT=1：平台定义",
-            "54": "INT=0：自定义用途；INT=1：平台定义",
-            "55": "INT=0：自定义用途；INT=1：平台定义",
-            "56": "INT=0：自定义用途；INT=1：平台定义",
-            "57": "INT=0：自定义用途；INT=1：平台定义",
-            "58": "INT=0：自定义用途；INT=1：平台定义",
-            "59": "INT=0：自定义用途；INT=1：平台定义",
-            "60": "INT=0：自定义用途；INT=1：平台定义",
-            "61": "INT=0：自定义用途；INT=1：平台定义",
-            "62": "INT=0：自定义用途；INT=1：平台定义",
-            "63": "INT=0：自定义用途；INT=1：平台定义"
+            "15": "INT=0：存储/AMO 页故障；INT=1：保留 Sspmp：INT=0 时也用于SPMP 失败。",
+            "16": "INT=0：双重陷阱；INT=1：AIA 为标准本地中断保留",
+            "17": "INT=0：保留；INT=1：AIA 为标准本地中断保留",
+            "18": "INT=0：软件检查异常；INT=1：AIA 为标准本地中断保留",
+            "19": "INT=0：硬件错误；INT=1：AIA 为标准本地中断保留",
+            "20": "INT=0：H：指令 guest-page 故障；否则保留；INT=1：AIA 为标准本地中断保留 Sspmp：INT=0 时也用于Shbare 下 VS/VU SPMP 失败。",
+            "21": "INT=0：H：加载 guest-page 故障；否则保留；INT=1：AIA 为标准本地中断保留 Sspmp：INT=0 时也用于Shbare 下 VS/VU SPMP 失败。",
+            "22": "INT=0：H：虚拟指令异常；否则保留；INT=1：AIA 为标准本地中断保留",
+            "23": "INT=0：H：存储/AMO guest-page 故障；否则保留；INT=1：AIA 为标准本地中断保留 Sspmp：INT=0 时也用于Shbare 下 VS/VU SPMP 失败。",
+            "24": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "25": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "26": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "27": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "28": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "29": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "30": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "31": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "32": "INT=0：保留；INT=1：AIA 为标准本地中断保留",
+            "33": "INT=0：保留；INT=1：AIA 为标准本地中断保留",
+            "34": "INT=0：保留；INT=1：AIA 为标准本地中断保留",
+            "35": "INT=0：保留；INT=1：AIA 低优先级 RAS 本地中断",
+            "36": "INT=0：保留；INT=1：AIA 为标准本地中断保留",
+            "37": "INT=0：保留；INT=1：AIA 为标准本地中断保留",
+            "38": "INT=0：保留；INT=1：AIA 为标准本地中断保留",
+            "39": "INT=0：保留；INT=1：AIA 为标准本地中断保留",
+            "40": "INT=0：保留；INT=1：AIA 为标准本地中断保留",
+            "41": "INT=0：保留；INT=1：AIA 为标准本地中断保留",
+            "42": "INT=0：保留；INT=1：AIA 为标准本地中断保留",
+            "43": "INT=0：保留；INT=1：AIA 高优先级 RAS 本地中断",
+            "44": "INT=0：保留；INT=1：AIA 为标准本地中断保留",
+            "45": "INT=0：保留；INT=1：AIA 为标准本地中断保留",
+            "46": "INT=0：保留；INT=1：AIA 为标准本地中断保留",
+            "47": "INT=0：保留；INT=1：AIA 为标准本地中断保留",
+            "48": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "49": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "50": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "51": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "52": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "53": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "54": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "55": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "56": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "57": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "58": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "59": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "60": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "61": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "62": "INT=0：自定义用途；INT=1：AIA 自定义中断",
+            "63": "INT=0：自定义用途；INT=1：AIA 自定义中断"
           },
           "valuesEn": {
             "0": "INT=0: Instruction address misaligned; INT=1: Reserved",
@@ -1825,66 +1840,82 @@
             "9": "INT=0: Environment call from S/HS-mode; INT=1: Supervisor external interrupt",
             "10": "INT=0: H: environment call from VS-mode; otherwise reserved; INT=1: H: virtual supervisor external interrupt; otherwise reserved",
             "11": "INT=0: Environment call from M-mode; INT=1: Machine external interrupt",
-            "12": "INT=0: Instruction page fault; INT=1: H: supervisor guest external interrupt; otherwise reserved",
-            "13": "INT=0: Load page fault; INT=1: Sscofpmf: counter-overflow interrupt",
+            "12": "INT=0: Instruction page fault; INT=1: H: supervisor guest external interrupt; otherwise reserved Sspmp: also an SPMP violation with INT=0.",
+            "13": "INT=0: Load page fault; INT=1: Sscofpmf: counter-overflow interrupt Sspmp: also an SPMP violation with INT=0.",
             "14": "INT=0: Reserved; INT=1: Reserved",
-            "15": "INT=0: Store/AMO page fault; INT=1: Reserved",
-            "16": "INT=0: Double trap; INT=1: Platform use",
-            "17": "INT=0: Reserved; INT=1: Platform use",
-            "18": "INT=0: Software check; INT=1: Platform use",
-            "19": "INT=0: Hardware error; INT=1: Platform use",
-            "20": "INT=0: H: instruction guest-page fault; otherwise reserved; INT=1: Platform use",
-            "21": "INT=0: H: load guest-page fault; otherwise reserved; INT=1: Platform use",
-            "22": "INT=0: H: virtual instruction; otherwise reserved; INT=1: Platform use",
-            "23": "INT=0: H: store/AMO guest-page fault; otherwise reserved; INT=1: Platform use",
-            "24": "INT=0: Custom use; INT=1: Platform use",
-            "25": "INT=0: Custom use; INT=1: Platform use",
-            "26": "INT=0: Custom use; INT=1: Platform use",
-            "27": "INT=0: Custom use; INT=1: Platform use",
-            "28": "INT=0: Custom use; INT=1: Platform use",
-            "29": "INT=0: Custom use; INT=1: Platform use",
-            "30": "INT=0: Custom use; INT=1: Platform use",
-            "31": "INT=0: Custom use; INT=1: Platform use",
-            "32": "INT=0: Reserved; INT=1: Platform use",
-            "33": "INT=0: Reserved; INT=1: Platform use",
-            "34": "INT=0: Reserved; INT=1: Platform use",
-            "35": "INT=0: Reserved; INT=1: Platform use",
-            "36": "INT=0: Reserved; INT=1: Platform use",
-            "37": "INT=0: Reserved; INT=1: Platform use",
-            "38": "INT=0: Reserved; INT=1: Platform use",
-            "39": "INT=0: Reserved; INT=1: Platform use",
-            "40": "INT=0: Reserved; INT=1: Platform use",
-            "41": "INT=0: Reserved; INT=1: Platform use",
-            "42": "INT=0: Reserved; INT=1: Platform use",
-            "43": "INT=0: Reserved; INT=1: Platform use",
-            "44": "INT=0: Reserved; INT=1: Platform use",
-            "45": "INT=0: Reserved; INT=1: Platform use",
-            "46": "INT=0: Reserved; INT=1: Platform use",
-            "47": "INT=0: Reserved; INT=1: Platform use",
-            "48": "INT=0: Custom use; INT=1: Platform use",
-            "49": "INT=0: Custom use; INT=1: Platform use",
-            "50": "INT=0: Custom use; INT=1: Platform use",
-            "51": "INT=0: Custom use; INT=1: Platform use",
-            "52": "INT=0: Custom use; INT=1: Platform use",
-            "53": "INT=0: Custom use; INT=1: Platform use",
-            "54": "INT=0: Custom use; INT=1: Platform use",
-            "55": "INT=0: Custom use; INT=1: Platform use",
-            "56": "INT=0: Custom use; INT=1: Platform use",
-            "57": "INT=0: Custom use; INT=1: Platform use",
-            "58": "INT=0: Custom use; INT=1: Platform use",
-            "59": "INT=0: Custom use; INT=1: Platform use",
-            "60": "INT=0: Custom use; INT=1: Platform use",
-            "61": "INT=0: Custom use; INT=1: Platform use",
-            "62": "INT=0: Custom use; INT=1: Platform use",
-            "63": "INT=0: Custom use; INT=1: Platform use"
+            "15": "INT=0: Store/AMO page fault; INT=1: Reserved Sspmp: also an SPMP violation with INT=0.",
+            "16": "INT=0: Double trap; INT=1: AIA Reserved for standard local interrupts",
+            "17": "INT=0: Reserved; INT=1: AIA Reserved for standard local interrupts",
+            "18": "INT=0: Software check; INT=1: AIA Reserved for standard local interrupts",
+            "19": "INT=0: Hardware error; INT=1: AIA Reserved for standard local interrupts",
+            "20": "INT=0: H: instruction guest-page fault; otherwise reserved; INT=1: AIA Reserved for standard local interrupts Sspmp: also an SPMP violation with INT=0 under Shbare for VS/VU.",
+            "21": "INT=0: H: load guest-page fault; otherwise reserved; INT=1: AIA Reserved for standard local interrupts Sspmp: also an SPMP violation with INT=0 under Shbare for VS/VU.",
+            "22": "INT=0: H: virtual instruction; otherwise reserved; INT=1: AIA Reserved for standard local interrupts",
+            "23": "INT=0: H: store/AMO guest-page fault; otherwise reserved; INT=1: AIA Reserved for standard local interrupts Sspmp: also an SPMP violation with INT=0 under Shbare for VS/VU.",
+            "24": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "25": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "26": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "27": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "28": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "29": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "30": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "31": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "32": "INT=0: Reserved; INT=1: AIA Reserved for standard local interrupts",
+            "33": "INT=0: Reserved; INT=1: AIA Reserved for standard local interrupts",
+            "34": "INT=0: Reserved; INT=1: AIA Reserved for standard local interrupts",
+            "35": "INT=0: Reserved; INT=1: AIA Low-priority RAS local interrupt",
+            "36": "INT=0: Reserved; INT=1: AIA Reserved for standard local interrupts",
+            "37": "INT=0: Reserved; INT=1: AIA Reserved for standard local interrupts",
+            "38": "INT=0: Reserved; INT=1: AIA Reserved for standard local interrupts",
+            "39": "INT=0: Reserved; INT=1: AIA Reserved for standard local interrupts",
+            "40": "INT=0: Reserved; INT=1: AIA Reserved for standard local interrupts",
+            "41": "INT=0: Reserved; INT=1: AIA Reserved for standard local interrupts",
+            "42": "INT=0: Reserved; INT=1: AIA Reserved for standard local interrupts",
+            "43": "INT=0: Reserved; INT=1: AIA High-priority RAS local interrupt",
+            "44": "INT=0: Reserved; INT=1: AIA Reserved for standard local interrupts",
+            "45": "INT=0: Reserved; INT=1: AIA Reserved for standard local interrupts",
+            "46": "INT=0: Reserved; INT=1: AIA Reserved for standard local interrupts",
+            "47": "INT=0: Reserved; INT=1: AIA Reserved for standard local interrupts",
+            "48": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "49": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "50": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "51": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "52": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "53": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "54": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "55": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "56": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "57": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "58": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "59": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "60": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "61": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "62": "INT=0: Custom use; INT=1: AIA Custom interrupt",
+            "63": "INT=0: Custom use; INT=1: AIA Custom interrupt"
           },
           "valuesByXlen": {},
           "valuesEnByXlen": {},
-          "typeRule": "CODE 枚举须结合 INT 解释；异常编号 ≥64 为保留，中断编号 ≥16 由平台定义。H 特有编号仅在实现 H 时适用；双重陷阱、软件检查、硬件错误和溢出中断还要求对应扩展。实际可到达的原因受陷阱委托和接收模式限制。VS 中断号按 2→1、6→5、10→9 转换。"
+          "typeRule": "CODE 枚举须结合 INT 解释；异常编号 ≥64 为保留，中断编号 ≥16 由平台定义。H 特有编号仅在实现 H 时适用；双重陷阱、软件检查、硬件错误和溢出中断还要求对应扩展。实际可到达的原因受陷阱委托和接收模式限制。VS 中断号按 2→1、6→5、10→9 转换。 Sspmp 复用异常码 12/13/15；Shbare 下 VS/VU 复用 20/21/23。只补充异常含义，INT=1 的同号中断保持原义。"
         }
       ],
       "regions": [],
-      "summaryEn": "Machine trap cause"
+      "summaryEn": "Machine trap cause",
+      "sources": [
+        {
+          "namespace": "aia",
+          "title": "RISC-V Advanced Interrupt Architecture 20250312",
+          "revision": "20318d1b03f0ac8253458b82f8244d0d0db074e9",
+          "url": "https://github.com/riscv/riscv-aia/tree/20318d1b03f0ac8253458b82f8244d0d0db074e9",
+          "license": "CC-BY-4.0"
+        },
+        {
+          "namespace": "spmp",
+          "title": "RISC-V S-level Physical Memory Protection 1.0",
+          "revision": "4ce228207193c55247200110e3d5b6881a17c367",
+          "url": "https://github.com/riscv/riscv-spmp/tree/4ce228207193c55247200110e3d5b6881a17c367",
+          "license": "CC-BY-4.0"
+        }
+      ]
     },
     {
       "id": "riscv/manual/csr/mtval",
@@ -2217,7 +2248,9 @@
             "1": "Allow S-mode access to user-page data"
           },
           "valuesByXlen": {},
-          "valuesEnByXlen": {}
+          "valuesEnByXlen": {},
+          "typeRule": "Sspmp 中同样控制 S 访问 U 区域；不允许 S 执行 U 区域。 Also govern S data access to U regions under Sspmp; never grant S execution.",
+          "condition": "Sspmp"
         },
         {
           "name": "MXR",
@@ -2247,7 +2280,9 @@
             "1": "Executable pages also satisfy loads"
           },
           "valuesByXlen": {},
-          "valuesEnByXlen": {}
+          "valuesEnByXlen": {},
+          "typeRule": "Sspmp 要求 MXR 可写；权限细节以 SPMP 权限表为准。 Sspmp requires writable MXR; see its permission table.",
+          "condition": "Sspmp"
         },
         {
           "name": "SPELP",
@@ -2521,7 +2556,16 @@
           "summaryEn": "Preserve this region when updating other fields and ignore its read value."
         }
       ],
-      "summaryEn": "Supervisor status register"
+      "summaryEn": "Supervisor status register",
+      "sources": [
+        {
+          "namespace": "spmp",
+          "title": "RISC-V S-level Physical Memory Protection 1.0",
+          "revision": "4ce228207193c55247200110e3d5b6881a17c367",
+          "url": "https://github.com/riscv/riscv-spmp/tree/4ce228207193c55247200110e3d5b6881a17c367",
+          "license": "CC-BY-4.0"
+        }
+      ]
     },
     {
       "id": "riscv/manual/csr/sscratch",
@@ -2675,7 +2719,8 @@
               "15": "Reserved"
             }
           },
-          "typeRule": "RV32 MODE：0=Bare，1=Sv32（hgatp 为 Sv32x4）。RV64 MODE：0=Bare，8=Sv39，9=Sv48，10=Sv57；hgatp 对应 Sv39x4/Sv48x4/Sv57x4。并非所有编码都必须实现。"
+          "typeRule": "RV32 MODE：0=Bare，1=Sv32（hgatp 为 Sv32x4）。RV64 MODE：0=Bare，8=Sv39，9=Sv48，10=Sv57；hgatp 对应 Sv39x4/Sv48x4/Sv57x4。并非所有编码都必须实现。 Sspmp 仅在 MODE=Bare 时启用，与分页互斥。 Sspmp is active only with MODE=Bare, mutually exclusive with paging.",
+          "condition": "Sspmp"
         },
         {
           "name": "ASID",
@@ -2727,7 +2772,16 @@
         }
       ],
       "regions": [],
-      "summaryEn": "Supervisor address translation and protection"
+      "summaryEn": "Supervisor address translation and protection",
+      "sources": [
+        {
+          "namespace": "spmp",
+          "title": "RISC-V S-level Physical Memory Protection 1.0",
+          "revision": "4ce228207193c55247200110e3d5b6881a17c367",
+          "url": "https://github.com/riscv/riscv-spmp/tree/4ce228207193c55247200110e3d5b6881a17c367",
+          "license": "CC-BY-4.0"
+        }
+      ]
     },
     {
       "id": "riscv/manual/csr/mie",
@@ -2746,7 +2800,9 @@
         64
       ],
       "condition": "",
-      "extensions": [],
+      "extensions": [
+        "Smaia"
+      ],
       "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
       "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
       "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
@@ -2962,6 +3018,328 @@
           },
           "valuesByXlen": {},
           "valuesEnByXlen": {}
+        },
+        {
+          "name": "LOCAL16_23",
+          "summary": "标准本地中断的使能位；未实现的中断位读零。",
+          "summaryEn": "Enable bits for standard local interrupts; unsupported sources read as zero.",
+          "access": "RW（受实现、委托及虚拟注入条件约束）",
+          "layouts": [
+            {
+              "xlen": 32,
+              "msb": 23,
+              "lsb": 16
+            },
+            {
+              "xlen": 64,
+              "msb": 23,
+              "lsb": 16
+            }
+          ],
+          "condition": "Smaia",
+          "aliases": [
+            "interrupts"
+          ],
+          "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+          "values": {},
+          "valuesEn": {},
+          "valuesByXlen": {},
+          "valuesEnByXlen": {}
+        },
+        {
+          "name": "CUSTOM24_31",
+          "summary": "自定义中断的使能位；未实现的中断位读零。",
+          "summaryEn": "Enable bits for custom interrupts; unsupported sources read as zero.",
+          "access": "RW（受实现、委托及虚拟注入条件约束）",
+          "layouts": [
+            {
+              "xlen": 32,
+              "msb": 31,
+              "lsb": 24
+            },
+            {
+              "xlen": 64,
+              "msb": 31,
+              "lsb": 24
+            }
+          ],
+          "condition": "Smaia",
+          "aliases": [
+            "interrupts"
+          ],
+          "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+          "values": {},
+          "valuesEn": {},
+          "valuesByXlen": {},
+          "valuesEnByXlen": {}
+        },
+        {
+          "name": "LOCAL32_34",
+          "summary": "标准本地中断的使能位；未实现的中断位读零。",
+          "summaryEn": "Enable bits for standard local interrupts; unsupported sources read as zero.",
+          "access": "RW（受实现、委托及虚拟注入条件约束）",
+          "layouts": [
+            {
+              "xlen": 64,
+              "msb": 34,
+              "lsb": 32
+            }
+          ],
+          "condition": "Smaia",
+          "aliases": [
+            "interrupts"
+          ],
+          "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+          "values": {},
+          "valuesEn": {},
+          "valuesByXlen": {},
+          "valuesEnByXlen": {}
+        },
+        {
+          "name": "RASLIE",
+          "summary": "低优先级 RAS 事件的使能位；未实现的中断位读零。",
+          "summaryEn": "Enable bits for low-priority RAS event; unsupported sources read as zero.",
+          "access": "RW（受实现、委托及虚拟注入条件约束）",
+          "layouts": [
+            {
+              "xlen": 64,
+              "msb": 35,
+              "lsb": 35
+            }
+          ],
+          "condition": "Smaia",
+          "aliases": [
+            "interrupts"
+          ],
+          "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+          "values": {
+            "0": "禁止或不委托",
+            "1": "允许或委托"
+          },
+          "valuesEn": {
+            "0": "Disable or do not delegate",
+            "1": "Enable or delegate"
+          },
+          "valuesByXlen": {},
+          "valuesEnByXlen": {}
+        },
+        {
+          "name": "LOCAL36_42",
+          "summary": "标准本地中断的使能位；未实现的中断位读零。",
+          "summaryEn": "Enable bits for standard local interrupts; unsupported sources read as zero.",
+          "access": "RW（受实现、委托及虚拟注入条件约束）",
+          "layouts": [
+            {
+              "xlen": 64,
+              "msb": 42,
+              "lsb": 36
+            }
+          ],
+          "condition": "Smaia",
+          "aliases": [
+            "interrupts"
+          ],
+          "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+          "values": {},
+          "valuesEn": {},
+          "valuesByXlen": {},
+          "valuesEnByXlen": {}
+        },
+        {
+          "name": "RASHIE",
+          "summary": "高优先级 RAS 事件的使能位；未实现的中断位读零。",
+          "summaryEn": "Enable bits for high-priority RAS event; unsupported sources read as zero.",
+          "access": "RW（受实现、委托及虚拟注入条件约束）",
+          "layouts": [
+            {
+              "xlen": 64,
+              "msb": 43,
+              "lsb": 43
+            }
+          ],
+          "condition": "Smaia",
+          "aliases": [
+            "interrupts"
+          ],
+          "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+          "values": {
+            "0": "禁止或不委托",
+            "1": "允许或委托"
+          },
+          "valuesEn": {
+            "0": "Disable or do not delegate",
+            "1": "Enable or delegate"
+          },
+          "valuesByXlen": {},
+          "valuesEnByXlen": {}
+        },
+        {
+          "name": "LOCAL44_47",
+          "summary": "标准本地中断的使能位；未实现的中断位读零。",
+          "summaryEn": "Enable bits for standard local interrupts; unsupported sources read as zero.",
+          "access": "RW（受实现、委托及虚拟注入条件约束）",
+          "layouts": [
+            {
+              "xlen": 64,
+              "msb": 47,
+              "lsb": 44
+            }
+          ],
+          "condition": "Smaia",
+          "aliases": [
+            "interrupts"
+          ],
+          "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+          "values": {},
+          "valuesEn": {},
+          "valuesByXlen": {},
+          "valuesEnByXlen": {}
+        },
+        {
+          "name": "CUSTOM48_63",
+          "summary": "自定义中断的使能位；未实现的中断位读零。",
+          "summaryEn": "Enable bits for custom interrupts; unsupported sources read as zero.",
+          "access": "RW（受实现、委托及虚拟注入条件约束）",
+          "layouts": [
+            {
+              "xlen": 64,
+              "msb": 63,
+              "lsb": 48
+            }
+          ],
+          "condition": "Smaia",
+          "aliases": [
+            "interrupts"
+          ],
+          "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/MSLevel.adoc#L27-L216",
+          "values": {},
+          "valuesEn": {},
+          "valuesByXlen": {},
+          "valuesEnByXlen": {}
+        },
+        {
+          "name": "SGEIE",
+          "summary": "访客外部中断汇总中断允许位，仍受全局使能和委托规则约束。",
+          "access": "WARL（未实现的中断源为只读零）",
+          "layouts": [
+            {
+              "xlen": 32,
+              "msb": 12,
+              "lsb": 12
+            },
+            {
+              "xlen": 64,
+              "msb": 12,
+              "lsb": 12
+            }
+          ],
+          "aliases": [],
+          "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+          "summaryEn": "Enable the supervisor guest external interrupt source.",
+          "values": {
+            "0": "禁止该中断源",
+            "1": "允许该中断源"
+          },
+          "valuesEn": {
+            "0": "Disable this interrupt source",
+            "1": "Enable this interrupt source"
+          },
+          "valuesByXlen": {},
+          "valuesEnByXlen": {},
+          "condition": "H"
+        },
+        {
+          "name": "VSEIE",
+          "summary": "VS 外部中断允许位，仍受全局使能和委托规则约束。",
+          "access": "WARL（未实现的中断源为只读零）",
+          "layouts": [
+            {
+              "xlen": 32,
+              "msb": 10,
+              "lsb": 10
+            },
+            {
+              "xlen": 64,
+              "msb": 10,
+              "lsb": 10
+            }
+          ],
+          "aliases": [],
+          "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+          "summaryEn": "Enable the virtual supervisor external interrupt source.",
+          "values": {
+            "0": "禁止该中断源",
+            "1": "允许该中断源"
+          },
+          "valuesEn": {
+            "0": "Disable this interrupt source",
+            "1": "Enable this interrupt source"
+          },
+          "valuesByXlen": {},
+          "valuesEnByXlen": {},
+          "condition": "H"
+        },
+        {
+          "name": "VSTIE",
+          "summary": "VS 定时器中断允许位，仍受全局使能和委托规则约束。",
+          "access": "WARL（未实现的中断源为只读零）",
+          "layouts": [
+            {
+              "xlen": 32,
+              "msb": 6,
+              "lsb": 6
+            },
+            {
+              "xlen": 64,
+              "msb": 6,
+              "lsb": 6
+            }
+          ],
+          "aliases": [],
+          "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+          "summaryEn": "Enable the virtual supervisor timer interrupt source.",
+          "values": {
+            "0": "禁止该中断源",
+            "1": "允许该中断源"
+          },
+          "valuesEn": {
+            "0": "Disable this interrupt source",
+            "1": "Enable this interrupt source"
+          },
+          "valuesByXlen": {},
+          "valuesEnByXlen": {},
+          "condition": "H"
+        },
+        {
+          "name": "VSSIE",
+          "summary": "VS 软件中断允许位，仍受全局使能和委托规则约束。",
+          "access": "WARL（未实现的中断源为只读零）",
+          "layouts": [
+            {
+              "xlen": 32,
+              "msb": 2,
+              "lsb": 2
+            },
+            {
+              "xlen": 64,
+              "msb": 2,
+              "lsb": 2
+            }
+          ],
+          "aliases": [],
+          "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/hypervisor.adoc",
+          "summaryEn": "Enable the virtual supervisor software interrupt source.",
+          "values": {
+            "0": "禁止该中断源",
+            "1": "允许该中断源"
+          },
+          "valuesEn": {
+            "0": "Disable this interrupt source",
+            "1": "Enable this interrupt source"
+          },
+          "valuesByXlen": {},
+          "valuesEnByXlen": {},
+          "condition": "H"
         }
       ],
       "regions": [
@@ -2991,44 +3369,6 @@
           "layouts": [
             {
               "xlen": 32,
-              "msb": 12,
-              "lsb": 12
-            },
-            {
-              "xlen": 64,
-              "msb": 12,
-              "lsb": 12
-            }
-          ],
-          "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/miereg-standard.edn",
-          "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
-        },
-        {
-          "label": "0",
-          "access": "图示固定零；访问规则见原文",
-          "summary": "手册位图明确标注的区域。",
-          "layouts": [
-            {
-              "xlen": 32,
-              "msb": 10,
-              "lsb": 10
-            },
-            {
-              "xlen": 64,
-              "msb": 10,
-              "lsb": 10
-            }
-          ],
-          "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/miereg-standard.edn",
-          "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
-        },
-        {
-          "label": "0",
-          "access": "图示固定零；访问规则见原文",
-          "summary": "手册位图明确标注的区域。",
-          "layouts": [
-            {
-              "xlen": 32,
               "msb": 8,
               "lsb": 8
             },
@@ -3048,25 +3388,6 @@
           "layouts": [
             {
               "xlen": 32,
-              "msb": 6,
-              "lsb": 6
-            },
-            {
-              "xlen": 64,
-              "msb": 6,
-              "lsb": 6
-            }
-          ],
-          "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/miereg-standard.edn",
-          "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
-        },
-        {
-          "label": "0",
-          "access": "图示固定零；访问规则见原文",
-          "summary": "手册位图明确标注的区域。",
-          "layouts": [
-            {
-              "xlen": 32,
               "msb": 4,
               "lsb": 4
             },
@@ -3074,25 +3395,6 @@
               "xlen": 64,
               "msb": 4,
               "lsb": 4
-            }
-          ],
-          "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/miereg-standard.edn",
-          "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
-        },
-        {
-          "label": "0",
-          "access": "图示固定零；访问规则见原文",
-          "summary": "手册位图明确标注的区域。",
-          "layouts": [
-            {
-              "xlen": 32,
-              "msb": 2,
-              "lsb": 2
-            },
-            {
-              "xlen": 64,
-              "msb": 2,
-              "lsb": 2
             }
           ],
           "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/images/bytefield/miereg-standard.edn",
@@ -3118,7 +3420,16 @@
           "summaryEn": "Follow the zero-value or write-zero rule specified for this region."
         }
       ],
-      "summaryEn": "Machine interrupt-enable register"
+      "summaryEn": "Machine interrupt-enable register",
+      "sources": [
+        {
+          "namespace": "aia",
+          "title": "RISC-V Advanced Interrupt Architecture 20250312",
+          "revision": "20318d1b03f0ac8253458b82f8244d0d0db074e9",
+          "url": "https://github.com/riscv/riscv-aia/tree/20318d1b03f0ac8253458b82f8244d0d0db074e9",
+          "license": "CC-BY-4.0"
+        }
+      ]
     }
   ]
 }

@@ -71,7 +71,7 @@ python -m unittest discover -s tools -p "test_*csr*.py"
 其中手册导入测试需要先初始化固定版本的上游子模块：
 
 ```powershell
-git submodule update --init upstream/riscv-isa-manual
+git submodule update --init upstream/riscv-isa-manual upstream/riscv-aia upstream/riscv-debug-spec upstream/riscv-spmp
 ```
 
 数据库再生成和复核步骤见[数据来源与转换](data-import.md)。

@@ -24,7 +24,10 @@ object Search {
         val extensionTags = extensions.map { it.lowercase(Locale.ROOT) }.toSet()
         return buildList {
             val filter = CatalogFilter(xlen, privilege, namespace, extensionTags)
-            pack.registers.filter { filter.accepts(it.xlens, it.privilege, it.namespace.ifBlank { pack.namespace }, IsaExtensionTags.associated(it)) }.forEach { reg ->
+            pack.registers.filter {
+                val sourceFilter = if (namespace != null && it.sources.any { source -> source.namespace == namespace }) filter.copy(namespace = null) else filter
+                sourceFilter.accepts(it.xlens, it.privilege, it.namespace.ifBlank { pack.namespace }, IsaExtensionTags.associated(it))
+            }.forEach { reg ->
                 val name = reg.name.lowercase(Locale.ROOT)
                 val namespaced = "${reg.namespace.ifBlank { pack.namespace }}.$name".lowercase(Locale.ROOT)
                 val identifiers = "$name $namespaced"

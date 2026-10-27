@@ -14,17 +14,28 @@ ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "app/src/main/assets"
 MANUAL = ROOT / "upstream/riscv-isa-manual"
 REVISION = "584390d9d872835b1bc45ab9ea946b56db3ad485"
-EXTERNAL_DEBUG = {"scontext", "hcontext", "tselect", "tdata1", "tdata2", "tdata3", "mcontext", "dcsr", "dpc", "dscratch0", "dscratch1"}
-PARTIAL_INTERRUPT = {"mie", "mip", "sie", "sip", "hie", "hip", "hvip", "vsie", "vsip"}
+EXTERNAL_DEBUG = set()  # All eleven former address-only entries are now supplemented from Debug 1.0.
+PARTIAL_INTERRUPT = {"hie", "hip"}
 
 
 def evidence(field, reg):
+    if "riscv-spmp/blob/" in field["sourceUrl"]:
+        from review_spmp import evidence as spmp_evidence
+        return spmp_evidence(field["sourceUrl"])
+    if "riscv-debug-spec/blob/" in field["sourceUrl"]:
+        from review_debug import evidence as debug_evidence
+        return debug_evidence(field["sourceUrl"])
+    if "riscv-aia/blob/" in field["sourceUrl"]:
+        from review_aia import evidence as aia_evidence
+        return aia_evidence(field["sourceUrl"])
     path = unquote(field["sourceUrl"].split(f"/blob/{REVISION}/", 1)[1]).split("#")[0]
     source = MANUAL / path
     assert source.is_file(), (reg["name"], field["name"], path)
     text = source.read_text(encoding="utf-8")
     name, csr = field["name"], reg["name"]
     terms = [name] + field.get("aliases", [])
+    if re.fullmatch(r"[ms]ireg[2-6]", csr) and name == "DATA":
+        terms.append(csr)
     if csr.endswith("h") and name == csr.upper():
         terms.append(csr[:-1])  # The chapter uses cycle[h]/time[h]/instret[h].
     if re.fullmatch(r"PMP\d+[LARWX]", name):
@@ -58,7 +69,7 @@ def evidence(field, reg):
 def review():
     pack = read_catalog(ASSETS)
     registers = [reg for reg in pack["registers"] if reg["namespace"] == "manual"]
-    assert len(registers) == 381
+    assert len(registers) == 391
     assert len({reg["id"] for reg in pack["registers"]}) == len(pack["registers"])
     assert {r["name"] for r in registers if r["coverage"] == "address-only"} == EXTERNAL_DEBUG
     rows, gaps, enumerated = [], [], 0
@@ -89,8 +100,11 @@ def review():
                          "evidence": evidence(field, reg), "layouts": field["layouts"],
                          "enumEntries": len(common) + sum(map(len, width_maps.values()))})
         for width in reg["xlens"]:
+          for view in {f.get("view", "") for f in reg["fields"]}:
             used = set()
             for item in reg["fields"] + reg["regions"]:
+                if item.get("view", "") != view:
+                    continue
                 for loc in item["layouts"]:
                     if loc["xlen"] != width:
                         continue
@@ -107,7 +121,7 @@ def review():
     sources = json.loads((ROOT / "tools/data-sources.lock.json").read_text(encoding="utf-8"))["sources"]
     vendor_source = next(source for source in sources if source["namespace"] == "thead")
     assert hashlib.sha256(vendor.read_bytes()).hexdigest() == vendor_source["sha256"]
-    assert len(rows) == 1570
+    assert len(rows) == 1766
     report = {"revision": REVISION, "catalogSha256": catalog_sha256(ASSETS), "manualCsrs": len(registers),
               "describedFields": len(rows), "enumeratedFields": enumerated, "missingDescriptions": [],
               "addressOnlyExternalDebug": sorted(EXTERNAL_DEBUG), "partialPlatformLayouts": gaps,

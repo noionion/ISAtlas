@@ -278,7 +278,13 @@ private fun ResultCard(hit: SearchHit, pack: DataPack, onOpen: (SearchHit) -> Un
 @Composable
 private fun RegisterDetail(state: AtlasState, reg: RegisterDefinition, onWidthChange: (Int) -> Unit) {
     val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-    val fields = reg.fields.filter { it.layout(state.xlen) != null }.sortedByDescending { it.layout(state.xlen)!!.msb }
+    val views = reg.fields.filter { it.layout(state.xlen) != null }.map { it.view }.distinct().ifEmpty { listOf("") }
+    var selectedView by rememberSaveable(reg.id, state.selectedField) {
+        mutableStateOf(reg.fields.firstOrNull { it.name == state.selectedField }?.view ?: "")
+    }
+    val view = selectedView.takeIf { it in views } ?: views.first()
+    val fields = reg.fields.filter { it.view == view && it.layout(state.xlen) != null }.sortedByDescending { it.layout(state.xlen)!!.msb }
+    val regions = reg.regions.filter { it.view == view }
     val available = state.xlen in reg.xlens
     var selectedField by rememberSaveable(reg.id, state.selectedField) { mutableStateOf(state.selectedField) }
     val list = rememberLazyListState()
@@ -293,8 +299,7 @@ private fun RegisterDetail(state: AtlasState, reg: RegisterDefinition, onWidthCh
         val index = fields.indexOfFirst { it.name == state.selectedField }
         if (available && index >= 0) list.scrollToItem(index + 2)
     }
-    val address = (reg.locator as RegisterLocator.Csr).address
-    val access = reg.privilege + if ((address shr 10) == 3) "RO" else "RW"
+    val access = reg.privilege + reg.access
     val description = reg.summary.ifBlank { reg.title }.removeSuffix("。")
     LazyColumn(state = list, modifier = Modifier.testTag("register-detail-list"), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         item {
@@ -319,7 +324,13 @@ private fun RegisterDetail(state: AtlasState, reg: RegisterDefinition, onWidthCh
                 if (available && reg.coverage == "address-only") {
                     Text("仅收录地址，字段布局待补充。", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.tertiary)
                 } else if (available) {
-                    RegisterDiagram(fields, state.xlen, selectedField, reg.regions) { selectedField = it }
+                    if (views.size > 1) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        views.forEach { option ->
+                            FilterChip(view == option, { selectedView = option; selectedField = null },
+                                label = { Text(option.ifEmpty { "通用格式" }) }, modifier = Modifier.testTag("csr-view-${option.ifEmpty { "generic" }}"))
+                        }
+                    }
+                    RegisterDiagram(fields, state.xlen, selectedField, regions) { selectedField = it }
                     fields.firstOrNull { it.name == selectedField }?.let { field ->
                         Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(10.dp)) {
                             Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -330,7 +341,7 @@ private fun RegisterDetail(state: AtlasState, reg: RegisterDefinition, onWidthCh
                         }
                     }
 
-                    reg.regions.filter { it.layout(state.xlen) != null }.distinctBy { it.label to it.access }.forEach { region ->
+                    regions.filter { it.layout(state.xlen) != null }.distinctBy { it.label to it.access }.forEach { region ->
                         Text("${region.label} · ${region.access}：${region.summary}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 } else Text("此 CSR 不适用于 RV${state.xlen}，请选择 ${reg.xlens.joinToString { "RV$it" }}。", color = MaterialTheme.colorScheme.error)
@@ -371,6 +382,11 @@ private fun RegisterDetail(state: AtlasState, reg: RegisterDefinition, onWidthCh
             Text("数据包 v${state.pack!!.version} · ${if (reg.coverage == "address-only") "仅地址索引" else "上游字段目录"}", style = MaterialTheme.typography.bodySmall)
             if (reg.condition.isNotBlank()) Text("适用条件：${reg.condition}", style = MaterialTheme.typography.bodySmall)
             TextButton(onClick = { runCatching { uriHandler.openUri(reg.sourceUrl) }.onFailure { sourceError = true } }) { Text("打开数据来源 ↗") }
+            reg.sources.filter { it.namespace != reg.namespace }.forEach { source ->
+                Text("补充：${source.title} · ${source.license} · ${source.revision.take(8)}", style = MaterialTheme.typography.bodySmall)
+                TextButton(onClick = { runCatching { uriHandler.openUri(source.url) }.onFailure { sourceError = true } },
+                    modifier = Modifier.testTag("csr-source-${source.namespace}")) { Text("打开 ${source.namespace.uppercase()} 补充来源 ↗") }
+            }
             if (sourceError) SelectionContainer { Text("无法打开浏览器：${reg.sourceUrl}", style = MaterialTheme.typography.bodySmall) }
         }
     }

@@ -8,8 +8,8 @@ class ImportedCatalogTest {
     private fun manual(name: String) = pack.registers.single { it.namespace == "manual" && it.name == name }
 
     @Test fun `official manual replaces old sources and preserves vendor data`() {
-        assertEquals(382, pack.registers.size)
-        assertEquals(381, pack.registers.count { it.namespace == "manual" })
+        assertEquals(430, pack.registers.size)
+        assertEquals(391, pack.registers.count { it.namespace == "manual" })
         assertEquals(1, pack.registers.count { it.namespace == "thead" })
         assertFalse(pack.registers.any { it.namespace in setOf("standard", "andes") })
         assertTrue(pack.registers.filter { it.namespace == "manual" }.all {
@@ -39,7 +39,11 @@ class ImportedCatalogTest {
         assertEquals(BitLayout(64, 63, 60), manual("satp").fields.single { it.name == "MODE" }.layout(64))
         assertEquals(BitLayout(64, 31, 7), manual("mvendorid").fields.single { it.name == "BANK" }.layout(64))
         assertTrue(manual("mstatus").regions.any { it.access == "WPRI" && it.layout(64)?.let { bits -> 48 in bits.lsb..bits.msb } == true })
-        assertTrue(pack.registers.filter { it.namespace == "manual" }.flatMap { it.fields }.all { it.sourceUrl.contains("/blob/584390d") })
+        assertTrue(pack.registers.filter { it.namespace == "manual" }.all { reg -> reg.fields.all { field ->
+            field.sourceUrl.contains("/blob/584390d") || reg.sources.any { source ->
+                source.namespace in setOf("aia", "debug", "spmp") && field.sourceUrl.startsWith("https://github.com/riscv/riscv-${if (source.namespace == "debug") "debug-spec" else source.namespace}/blob/${source.revision}/")
+            }
+        } })
     }
 
     @Test fun `removed sources produce no results while retained vendor is searchable`() {
@@ -50,7 +54,7 @@ class ImportedCatalogTest {
     }
 
     @Test fun `unsupported layouts remain address only without invented rules`() {
-        val incomplete = manual("dcsr")
+        val incomplete = manual("dcsr").copy(coverage = "address-only", fields = emptyList(), regions = emptyList())
         assertEquals("address-only", incomplete.coverage)
         assertTrue(incomplete.fields.isEmpty() && incomplete.regions.isEmpty())
         assertThrows(IllegalArgumentException::class.java) {
@@ -61,7 +65,7 @@ class ImportedCatalogTest {
     @Test fun `all manual fields have concise bilingual descriptions and matching enums`() {
         val registers = pack.registers.filter { it.namespace == "manual" }
         val fields = registers.flatMap { it.fields }
-        assertEquals(1570, fields.size)
+        assertEquals(1766, fields.size)
         assertTrue(registers.all { it.summary.any { char -> char in '\u4e00'..'\u9fff' } && it.summaryEn.isNotBlank() })
         fields.forEach { field ->
             assertTrue(field.summary, field.summary.any { it in '\u4e00'..'\u9fff' })

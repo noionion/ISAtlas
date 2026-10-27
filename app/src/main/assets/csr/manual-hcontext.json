@@ -3,7 +3,7 @@
   "namespace": "manual",
   "name": "hcontext",
   "title": "Hypervisor-mode context register",
-  "summary": "虚拟机调试上下文。",
+  "summary": "从 HS 态访问 MCONTEXT 的上下文编号。",
   "locator": {
     "type": "riscv-csr",
     "address": 1704
@@ -14,16 +14,77 @@
     32,
     64
   ],
-  "condition": "",
+  "condition": "Sdtrig；由 tselect 选择触发器，可选实现受规范限制 H；要求实现 MCONTEXT",
   "extensions": [
-    "H"
+    "H",
+    "Sdtrig"
   ],
-  "notes": "从官方手册地址表及明确位图提取；未解析的布局和访问规则保留缺失，不沿用旧数据库。",
+  "notes": "Debug 1.0；DM/DMI、JTAG 及调试器虚拟寄存器不属于 hart CSR。 触发器在 Debug Mode 中不触发；DMODE=1 时只有 Debug Mode 可修改配置。功能是否实现需通过规范探测。 HCONTEXT 别名到 MCONTEXT；需要 H 和已实现的 MCONTEXT，HS 访问受 mstateen0.CONTEXT 控制。",
   "sourceUrl": "https://github.com/riscv/riscv-isa-manual/blob/584390d9d872835b1bc45ab9ea946b56db3ad485/src/priv-csrs.adoc",
   "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485",
   "license": "CC-BY-4.0",
-  "coverage": "address-only",
-  "fields": [],
-  "regions": [],
-  "summaryEn": "Hypervisor-mode context register"
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "HCONTEXT",
+      "summary": "保存机器/Hypervisor 上下文编号，用于触发器上下文过滤。",
+      "summaryEn": "Hold the machine/hypervisor context identifier used for trigger filtering.",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 13,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 13,
+          "lsb": 0
+        }
+      ],
+      "condition": "",
+      "aliases": [
+        "hcontext"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L271-L296",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "",
+      "view": ""
+    }
+  ],
+  "regions": [
+    {
+      "label": "0",
+      "access": "RO0",
+      "summary": "显式只读零位。",
+      "summaryEn": "Explicit read-only-zero bits.",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 14
+        },
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 14
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L271-L296",
+      "view": ""
+    }
+  ],
+  "summaryEn": "Access the MCONTEXT identifier from HS-mode.",
+  "sources": [
+    {
+      "namespace": "debug",
+      "title": "RISC-V Debug Specification 1.0",
+      "revision": "5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8",
+      "url": "https://github.com/riscv/riscv-debug-spec/tree/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8",
+      "license": "CC-BY-4.0"
+    }
+  ]
 }

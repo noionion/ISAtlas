@@ -25,6 +25,9 @@ val RegisterLocator.label: String
 data class Source(val title: String, val revision: String, val url: String)
 
 @Serializable
+data class SourceAttribution(val namespace: String, val title: String, val revision: String, val url: String, val license: String)
+
+@Serializable
 data class BitLayout(val xlen: Int, val msb: Int, val lsb: Int) {
     val label: String get() = if (msb == lsb) "[$lsb]" else "[$msb:$lsb]"
 }
@@ -44,8 +47,10 @@ data class FieldDefinition(
     val valuesEn: Map<String, String> = emptyMap(),
     val valuesByXlen: Map<Int, Map<String, String>> = emptyMap(),
     val valuesEnByXlen: Map<Int, Map<String, String>> = emptyMap(),
+    val view: String = "",
 ) {
     fun layout(xlen: Int) = layouts.singleOrNull { it.xlen == xlen }
+    val displayName get() = name.removePrefix(if (view.isEmpty()) "" else "$view.")
 }
 
 @Serializable
@@ -56,6 +61,7 @@ data class BitRegion(
     val layouts: List<BitLayout>,
     val sourceUrl: String = "",
     val summaryEn: String = "",
+    val view: String = "",
 ) {
     fun layout(xlen: Int) = layouts.singleOrNull { it.xlen == xlen }
 }
@@ -81,6 +87,7 @@ data class RegisterDefinition(
     val coverage: String = "fields",
     val extensions: List<String> = emptyList(),
     val summaryEn: String = "",
+    val sources: List<SourceAttribution> = emptyList(),
 )
 
 @Serializable
@@ -97,6 +104,14 @@ data class DataPack(
 )
 
 object Catalog {
+    fun sourceAttributions(pack: DataPack): List<SourceAttribution> = pack.registers.flatMap { reg ->
+        val namespace = reg.namespace.ifBlank { pack.namespace }
+        val revision = reg.sourceRevision.ifBlank { pack.source.revision }
+        listOf(SourceAttribution(namespace,
+            if (revision == pack.source.revision) pack.source.title else if (namespace == "thead") "T-head Extension Specification" else namespace,
+            revision, reg.sourceUrl, reg.license)) + reg.sources
+    }.associateBy { it.namespace to it.revision }.values.sortedWith(compareBy({ it.namespace }, { it.revision }))
+
     fun decode(text: String): DataPack = Json.decodeFromString<DataPack>(text).also(::validate)
 
     fun decodeFiles(manifest: String, readCsr: (String) -> String): DataPack {
@@ -117,6 +132,10 @@ object Catalog {
         require(pack.source.revision.isNotBlank() && pack.source.url.startsWith("https://"))
         require(pack.registers.map { it.id }.distinct().size == pack.registers.size) { "寄存器身份重复" }
         pack.registers.forEach { reg ->
+            reg.sources.forEach { source ->
+                require(source.namespace.isNotBlank() && source.title.isNotBlank() && source.revision.isNotBlank() && source.license.isNotBlank())
+                require(source.url.startsWith("https://"))
+            }
             require(reg.id.startsWith("${pack.architecture}/${reg.namespace.ifBlank { pack.namespace }}/csr/"))
             require(reg.coverage in setOf("fields", "address-only"))
             require(reg.coverage != "address-only" || reg.fields.isEmpty())
@@ -143,11 +162,12 @@ object Catalog {
                 }
             }
             reg.xlens.forEach { xlen ->
+              (reg.fields.map { it.view } + reg.regions.map { it.view }).distinct().forEach { view ->
                 val used = mutableSetOf<Int>()
-                reg.fields.mapNotNull { it.layout(xlen) }.forEach { bits ->
+                reg.fields.filter { it.view == view }.mapNotNull { it.layout(xlen) }.forEach { bits ->
                     (bits.lsb..bits.msb).forEach { bit -> require(used.add(bit)) { "${reg.name}: 字段位重叠" } }
                 }
-                reg.regions.forEach { region ->
+                reg.regions.filter { it.view == view }.forEach { region ->
                     require(region.label.isNotBlank() && region.access.isNotBlank() && region.summary.isNotBlank())
                     require(region.layouts.isNotEmpty() && region.layouts.map { it.xlen }.distinct().size == region.layouts.size)
                     region.layouts.forEach { bits ->
@@ -157,6 +177,7 @@ object Catalog {
                         (bits.lsb..bits.msb).forEach { bit -> require(used.add(bit)) { "${reg.name}: 规范区域与字段重叠" } }
                     }
                 }
+              }
             }
         }
     }

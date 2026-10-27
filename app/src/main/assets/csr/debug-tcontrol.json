@@ -1,0 +1,170 @@
+{
+  "id": "riscv/debug/csr/tcontrol",
+  "name": "tcontrol",
+  "namespace": "debug",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 1957
+  },
+  "title": "Trigger Control",
+  "summary": "控制 M 态断点触发器及陷阱前使能状态。",
+  "summaryEn": "Control M-mode breakpoint triggers and saved enable state.",
+  "privilege": "M",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "Sdtrig；由 tselect 选择触发器，可选实现受规范限制",
+  "notes": "Debug 1.0；DM/DMI、JTAG 及调试器虚拟寄存器不属于 hart CSR。 触发器在 Debug Mode 中不触发；DMODE=1 时只有 Debug Mode 可修改配置。功能是否实现需通过规范探测。",
+  "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L207-L237",
+  "sourceRevision": "5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "extensions": [
+    "Sdtrig"
+  ],
+  "fields": [
+    {
+      "name": "MPTE",
+      "summary": "保存进入 M 态陷阱前的 MTE，供 MRET 恢复。",
+      "summaryEn": "Save MTE on an M-mode trap for restoration by MRET.",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 7,
+          "lsb": 7
+        },
+        {
+          "xlen": 64,
+          "msb": 7,
+          "lsb": 7
+        }
+      ],
+      "condition": "",
+      "aliases": [
+        "mpte"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L207-L237",
+      "values": {
+        "0": "未置位（状态为 0）",
+        "1": "已置位（状态为 1）"
+      },
+      "valuesEn": {
+        "0": "Clear; state is zero",
+        "1": "Set; state is one"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "",
+      "view": ""
+    },
+    {
+      "name": "MTE",
+      "summary": "控制 action=0 的触发器能否在 M 态匹配或触发。",
+      "summaryEn": "Control whether action=0 triggers match or fire in M-mode.",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 3,
+          "lsb": 3
+        },
+        {
+          "xlen": 64,
+          "msb": 3,
+          "lsb": 3
+        }
+      ],
+      "condition": "",
+      "aliases": [
+        "mte"
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L207-L237",
+      "values": {
+        "0": "禁止",
+        "1": "允许"
+      },
+      "valuesEn": {
+        "0": "disabled",
+        "1": "enabled"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {},
+      "typeRule": "",
+      "view": ""
+    }
+  ],
+  "regions": [
+    {
+      "label": "0",
+      "access": "RO0",
+      "summary": "显式只读零位。",
+      "summaryEn": "Explicit read-only-zero bits.",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 8
+        },
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 8
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L207-L237",
+      "view": ""
+    },
+    {
+      "label": "0",
+      "access": "RO0",
+      "summary": "显式只读零位。",
+      "summaryEn": "Explicit read-only-zero bits.",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 6,
+          "lsb": 4
+        },
+        {
+          "xlen": 64,
+          "msb": 6,
+          "lsb": 4
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L207-L237",
+      "view": ""
+    },
+    {
+      "label": "0",
+      "access": "RO0",
+      "summary": "显式只读零位。",
+      "summaryEn": "Explicit read-only-zero bits.",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 2,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 2,
+          "lsb": 0
+        }
+      ],
+      "sourceUrl": "https://github.com/riscv/riscv-debug-spec/blob/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8/xml/hwbp_registers.xml#L207-L237",
+      "view": ""
+    }
+  ],
+  "sources": [
+    {
+      "namespace": "debug",
+      "title": "RISC-V Debug Specification 1.0",
+      "revision": "5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8",
+      "url": "https://github.com/riscv/riscv-debug-spec/tree/5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8",
+      "license": "CC-BY-4.0"
+    }
+  ]
+}

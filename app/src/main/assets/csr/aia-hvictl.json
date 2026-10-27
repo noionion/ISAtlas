@@ -1,0 +1,268 @@
+{
+  "id": "riscv/aia/csr/hvictl",
+  "namespace": "aia",
+  "name": "hvictl",
+  "title": "Control VS virtual interrupt identity, priority and access interception",
+  "summary": "控制 VS 虚拟中断的身份、优先级及访问截获。",
+  "summaryEn": "Control VS virtual interrupt identity, priority and access interception.",
+  "locator": {
+    "type": "riscv-csr",
+    "address": 1545
+  },
+  "privilege": "H",
+  "access": "RW",
+  "xlens": [
+    32,
+    64
+  ],
+  "condition": "Smaia Ssaia H",
+  "notes": "AIA 20250312；可用性取决于特权模式、XLEN 与 IMSIC 实现。",
+  "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/CSRs.adoc#L1-L370",
+  "sourceRevision": "20318d1b03f0ac8253458b82f8244d0d0db074e9",
+  "license": "CC-BY-4.0",
+  "coverage": "fields",
+  "fields": [
+    {
+      "name": "VTI",
+      "summary": "截获 VS 对中断状态的访问与可能清除 pending 的写操作，并由 hvictl 指定候选。",
+      "summaryEn": "Intercept VS interrupt-state accesses and pending-clearing writes, and select the hvictl candidate.",
+      "access": "RW",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 30,
+          "lsb": 30
+        },
+        {
+          "xlen": 64,
+          "msb": 30,
+          "lsb": 30
+        }
+      ],
+      "condition": "",
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/VSLevel.adoc#L299-L436",
+      "values": {
+        "0": "使用 vsip/vsie 及 hviprio 候选",
+        "1": "启用截获与虚拟候选控制"
+      },
+      "valuesEn": {
+        "0": "Use vsip/vsie and hviprio candidates",
+        "1": "Enable interception and virtual candidate control"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "IID",
+      "summary": "虚拟中断主原因号；至少实现低 6 位，IID=9 可配合 IPRIO=0 表示无中断。",
+      "summaryEn": "Virtual major identity; at least six bits implemented; IID=9 with IPRIO=0 can represent no interrupt.",
+      "access": "WARL",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 27,
+          "lsb": 16
+        },
+        {
+          "xlen": 64,
+          "msb": 27,
+          "lsb": 16
+        }
+      ],
+      "condition": "",
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/VSLevel.adoc#L299-L436",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "DPR",
+      "summary": "VTI=1 且 IID≠9 时，指定相对 S 外部中断的默认优先次序。",
+      "summaryEn": "With VTI=1 and IID not 9, set default rank relative to supervisor external interrupts.",
+      "access": "RW",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 9,
+          "lsb": 9
+        },
+        {
+          "xlen": 64,
+          "msb": 9,
+          "lsb": 9
+        }
+      ],
+      "condition": "",
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/VSLevel.adoc#L299-L436",
+      "values": {
+        "0": "默认优先级高于 SEI",
+        "1": "默认优先级低于 SEI"
+      },
+      "valuesEn": {
+        "0": "Default rank above SEI",
+        "1": "Default rank below SEI"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "IPRIOM",
+      "summary": "选择 vstopi 返回固定优先级 1，或返回按实际候选计算的优先级。",
+      "summaryEn": "Choose fixed vstopi priority 1 or the priority computed from the selected candidate.",
+      "access": "RW",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 8,
+          "lsb": 8
+        },
+        {
+          "xlen": 64,
+          "msb": 8,
+          "lsb": 8
+        }
+      ],
+      "condition": "",
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/VSLevel.adoc#L299-L436",
+      "values": {
+        "0": "vstopi.IPRIO=1",
+        "1": "按候选优先级及饱和规则报告"
+      },
+      "valuesEn": {
+        "0": "vstopi.IPRIO=1",
+        "1": "Report candidate priority with saturation"
+      },
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    },
+    {
+      "name": "IPRIO",
+      "summary": "虚拟中断优先级，完整支持 8 位；用于 hvictl 指定的候选。",
+      "summaryEn": "Full eight-bit priority for the candidate specified by hvictl.",
+      "access": "RW",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 7,
+          "lsb": 0
+        },
+        {
+          "xlen": 64,
+          "msb": 7,
+          "lsb": 0
+        }
+      ],
+      "condition": "",
+      "aliases": [],
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/VSLevel.adoc#L299-L436",
+      "values": {},
+      "valuesEn": {},
+      "valuesByXlen": {},
+      "valuesEnByXlen": {}
+    }
+  ],
+  "regions": [
+    {
+      "label": "0",
+      "access": "RO0（保留）",
+      "summary": "保留位，读零。",
+      "summaryEn": "Reserved; reads as zero.",
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/VSLevel.adoc#L299-L436",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 15,
+          "lsb": 10
+        }
+      ]
+    },
+    {
+      "label": "0",
+      "access": "RO0（保留）",
+      "summary": "保留位，读零。",
+      "summaryEn": "Reserved; reads as zero.",
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/VSLevel.adoc#L299-L436",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 29,
+          "lsb": 28
+        }
+      ]
+    },
+    {
+      "label": "0",
+      "access": "RO0（保留）",
+      "summary": "保留位，读零。",
+      "summaryEn": "Reserved; reads as zero.",
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/VSLevel.adoc#L299-L436",
+      "layouts": [
+        {
+          "xlen": 32,
+          "msb": 31,
+          "lsb": 31
+        }
+      ]
+    },
+    {
+      "label": "0",
+      "access": "RO0（保留）",
+      "summary": "保留位，读零。",
+      "summaryEn": "Reserved; reads as zero.",
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/VSLevel.adoc#L299-L436",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 15,
+          "lsb": 10
+        }
+      ]
+    },
+    {
+      "label": "0",
+      "access": "RO0（保留）",
+      "summary": "保留位，读零。",
+      "summaryEn": "Reserved; reads as zero.",
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/VSLevel.adoc#L299-L436",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 29,
+          "lsb": 28
+        }
+      ]
+    },
+    {
+      "label": "0",
+      "access": "RO0（保留）",
+      "summary": "保留位，读零。",
+      "summaryEn": "Reserved; reads as zero.",
+      "sourceUrl": "https://github.com/riscv/riscv-aia/blob/20318d1b03f0ac8253458b82f8244d0d0db074e9/src/VSLevel.adoc#L299-L436",
+      "layouts": [
+        {
+          "xlen": 64,
+          "msb": 63,
+          "lsb": 31
+        }
+      ]
+    }
+  ],
+  "extensions": [
+    "Smaia",
+    "Ssaia"
+  ],
+  "sources": [
+    {
+      "namespace": "aia",
+      "title": "RISC-V Advanced Interrupt Architecture 20250312",
+      "revision": "20318d1b03f0ac8253458b82f8244d0d0db074e9",
+      "url": "https://github.com/riscv/riscv-aia/tree/20318d1b03f0ac8253458b82f8244d0d0db074e9",
+      "license": "CC-BY-4.0"
+    }
+  ]
+}

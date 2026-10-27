@@ -93,7 +93,8 @@
           "15": "Reserved"
         }
       },
-      "typeRule": "RV32 MODE：0=Bare，1=Sv32（hgatp 为 Sv32x4）。RV64 MODE：0=Bare，8=Sv39，9=Sv48，10=Sv57；hgatp 对应 Sv39x4/Sv48x4/Sv57x4。并非所有编码都必须实现。"
+      "typeRule": "RV32 MODE：0=Bare，1=Sv32（hgatp 为 Sv32x4）。RV64 MODE：0=Bare，8=Sv39，9=Sv48，10=Sv57；hgatp 对应 Sv39x4/Sv48x4/Sv57x4。并非所有编码都必须实现。 实现 Shbare 时，V=1 且 MODE=Bare 可对 VS/VU 应用 SPMP。 With Shbare, V=1 and MODE=Bare permit SPMP enforcement for VS/VU.",
+      "condition": "Sspmp Shbare"
     },
     {
       "name": "VMID",
@@ -165,5 +166,14 @@
       "summaryEn": "Writes may be constrained to architecturally legal values."
     }
   ],
-  "summaryEn": "Hypervisor guest address translation and protection"
+  "summaryEn": "Hypervisor guest address translation and protection",
+  "sources": [
+    {
+      "namespace": "spmp",
+      "title": "RISC-V S-level Physical Memory Protection 1.0",
+      "revision": "4ce228207193c55247200110e3d5b6881a17c367",
+      "url": "https://github.com/riscv/riscv-spmp/tree/4ce228207193c55247200110e3d5b6881a17c367",
+      "license": "CC-BY-4.0"
+    }
+  ]
 }
