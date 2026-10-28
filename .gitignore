@@ -2,6 +2,7 @@
 .tools/
 **/build/
 local.properties
+data.local.properties
 .idea/
 *.iml
 *.hprof
@@ -19,6 +20,7 @@ keystore.properties
 
 # Generated reports, screenshots and local design material.
 /docs/*
+!/docs/data-maintenance.md
 !/docs/data-import.md
 !/docs/data-format.md
 !/docs/field-review.md

@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/noionion/ISAtlas-data",
+  "revision": "7983ff1dee06e1e14fba28463cd9760d4f82dac4",
+  "workingTree": false,
+  "migrationOrigin": {
+    "repository": "https://github.com/noionion/ISAtlas",
+    "revision": "afdf1c9113f32fedfdde56f1a915424a4fcd6407"
+  },
+  "packages": [
+    {
+      "id": "manual",
+      "version": "20250508",
+      "sha256": "04937042a129a3ae33c05d47e0ca8b63c08f7dcf4b2abbd9e34c1d911b8f172c",
+      "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485"
+    },
+    {
+      "id": "aia",
+      "version": "20250312",
+      "sha256": "7e63d9dc163ee2116e04c86dad0c180a4240227a71bf14cd8c39dff890e6611e",
+      "sourceRevision": "20318d1b03f0ac8253458b82f8244d0d0db074e9"
+    },
+    {
+      "id": "debug",
+      "version": "1.0",
+      "sha256": "b10ddf6e90ecc2546d1673fa80f17c56a4f86bfab2fe377a90c601c5e9249cf7",
+      "sourceRevision": "5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8"
+    },
+    {
+      "id": "spmp",
+      "version": "1.0",
+      "sha256": "1affa34981cd798f24b68fc43af0c49e396f42931e7a377d3d05ad3cfd9516ec",
+      "sourceRevision": "4ce228207193c55247200110e3d5b6881a17c367"
+    }
+  ],
+  "files": [
+    {
+      "path": "app/src/androidTest/assets/demo-combined.zip",
+      "sha256": "424451302ea9cb0d70b0efa20d559373e056288dfbe8c56142079831062ee826"
+    },
+    {
+      "path": "app/src/androidTest/assets/thead-csr.zip",
+      "sha256": "14add4f4de5c8f1e36ecf52c5f823597c903df45042d7d1aa97deea9e6ee388a"
+    },
+    {
+      "path": "app/src/main/assets/licenses/Apache-2.0.txt",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    {
+      "path": "app/src/main/assets/licenses/CC-BY-4.0.txt",
+      "sha256": "380a72cc58f5771de8cd849b928ceef1c48c737bf51d71ddbe063db141d93ef5"
+    },
+    {
+      "path": "app/src/main/assets/march-extensions.json",
+      "sha256": "ce711d516947a14f6eb2eb310193b75d560a0227734bbb8c05c090a80cd9f4dd"
+    },
+    {
+      "path": "app/src/main/assets/packages/aia.zip",
+      "sha256": "7e63d9dc163ee2116e04c86dad0c180a4240227a71bf14cd8c39dff890e6611e"
+    },
+    {
+      "path": "app/src/main/assets/packages/debug.zip",
+      "sha256": "b10ddf6e90ecc2546d1673fa80f17c56a4f86bfab2fe377a90c601c5e9249cf7"
+    },
+    {
+      "path": "app/src/main/assets/packages/manual.zip",
+      "sha256": "04937042a129a3ae33c05d47e0ca8b63c08f7dcf4b2abbd9e34c1d911b8f172c"
+    },
+    {
+      "path": "app/src/main/assets/packages/spmp.zip",
+      "sha256": "1affa34981cd798f24b68fc43af0c49e396f42931e7a377d3d05ad3cfd9516ec"
+    },
+    {
+      "path": "app/src/main/assets/riscv-packages.json",
+      "sha256": "09723c9a9313eb7a8454581a501143d5cb47eb684c7b929905882cf0f2007392"
+    },
+    {
+      "path": "app/src/main/assets/THIRD_PARTY_NOTICES.txt",
+      "sha256": "e3f2d2e6c96f99672c488438782f1c1f1638092d1863be632cf819967a0dae57"
+    },
+    {
+      "path": "core/src/test/resources/riscv-manual-sample.json",
+      "sha256": "b9e7f1bf0e2db493835aaaf3bbecb0ea324b18b0af836b06298e0b047dad65d3"
+    }
+  ]
+}

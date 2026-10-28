@@ -1,7 +1,6 @@
 package dev.isatlas.core
 
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -12,7 +11,7 @@ import org.junit.Test
 class LocalPackagesTest {
     private val compiler = CompilerIsaOptions.decode(javaClass.getResource("/march-extensions.json")!!.readText())
     private val known = compiler.tokens.toSet()+setOf("s","u")
-    private fun fixture(name: String = "demo-combined.zip") = File("../examples/local-packages/$name").readBytes()
+    private fun fixture(name: String = "demo-combined.zip") = javaClass.getResource("/$name")!!.readBytes()
     private fun decode(bytes: ByteArray) = LocalPackages.decode(bytes,9,known,setOf("manual","aia","debug","spmp"))
     private fun entries(bytes: ByteArray) = linkedMapOf<String,ByteArray>().also { result ->
         ZipInputStream(bytes.inputStream()).use { z -> while (true) { val entry=z.nextEntry ?: break; result[entry.name]=z.readBytes() } }

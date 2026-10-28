@@ -15,9 +15,27 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
     testImplementation("junit:junit:4.13.2")
 }
+val dataAssets = providers.gradleProperty("isatlas.dataDir").map { rootProject.file(it) }
+    .getOrElse(rootProject.file("app/src/main/assets"))
+val prepareBuiltinDataTestResources by tasks.registering(Sync::class) {
+    from(zipTree(dataAssets.resolve("packages/manual.zip"))) {
+        include("inst/**", "riscv-instructions.json")
+    }
+    into(layout.buildDirectory.dir("generated/builtin-data-test-resources"))
+}
 sourceSets.test {
-    resources.srcDir("../app/src/main/assets")
-    resources.srcDir("../data/official-packages/manual")
+    resources.srcDir(dataAssets)
+    resources.srcDir(prepareBuiltinDataTestResources)
+    resources.srcDir("../app/src/androidTest/assets")
+}
+
+tasks.register<JavaExec>("validateOfficialPackages") {
+    group = "verification"
+    description = "Validate every official package combination (-PofficialDataDirectory=path)."
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("dev.isatlas.core.OfficialPackageTool")
+    args(providers.gradleProperty("officialDataDirectory").map { rootProject.file(it).absolutePath }
+        .getOrElse(dataAssets.absolutePath))
 }
 
 tasks.register<JavaExec>("validateLocalPackage") {

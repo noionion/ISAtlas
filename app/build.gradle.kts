@@ -36,7 +36,9 @@ android {
     }
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true }
-    sourceSets.getByName("androidTest").assets.srcDir("../examples/local-packages")
+    providers.gradleProperty("isatlas.dataDir").orNull?.let { directory ->
+        sourceSets.getByName("debug").assets.setSrcDirs(listOf(rootProject.file(directory)))
+    }
     packaging { resources.excludes += "/META-INF/{AL2.0,LGPL2.1}" }
 }
 dependencies {
