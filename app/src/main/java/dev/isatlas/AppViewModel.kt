@@ -41,7 +41,7 @@ data class AtlasState(
     val showLocalPackages: Boolean = false,
     val localPackages: List<ManagedLocalPackage> = emptyList(),
     val officialPackages: List<OfficialPackageInfo> = emptyList(),
-    val enabledOfficialPackages: Set<String> = setOf("aia", "debug", "spmp"),
+    val enabledOfficialPackages: Set<String> = emptySet(),
     val packageBusy: Boolean = false,
     val packageShowProgress: Boolean = false,
     val packageToggleTargets: Map<String, Boolean> = emptyMap(),
@@ -62,7 +62,7 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
     private val localStore = LocalPackageRepository(application, BuildConfigVersion.code(application))
     private lateinit var officialStore: OfficialPackages
     private lateinit var officialCompiler: CompilerIsaOptions
-    private var enabledOfficial = prefs.getStringSet("officialPackages", setOf("aia", "debug", "spmp"))!!.toSet()
+    private var enabledOfficial = prefs.getStringSet("officialPackages", emptySet())!!.toSet()
     private var pendingPackage: ByteArray? = null
     private val packageOperations = Mutex()
     private val mutable = MutableStateFlow(AtlasState(

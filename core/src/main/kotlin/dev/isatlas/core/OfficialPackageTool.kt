@@ -13,8 +13,9 @@ object OfficialPackageTool {
             file.readBytes()
         }
         val compiler = CompilerIsaOptions.decode(File(directory, "march-extensions.json").readText())
-        for (mask in 0..7) {
-            val enabled = listOf("aia", "debug", "spmp").filterIndexed { bit, _ -> mask and (1 shl bit) != 0 }.toSet()
+        val optional = packages.packages.filterNot { it.required }.map { it.id }
+        for (mask in 0 until (1 shl optional.size)) {
+            val enabled = optional.filterIndexed { bit, _ -> mask and (1 shl bit) != 0 }.toSet()
             val catalogs = packages.catalogs(enabled, compiler)
             println("Valid combination ${enabled.sorted()}: ${catalogs.csr.registers.size} CSR, ${catalogs.instructions.instructions.size} instructions")
         }

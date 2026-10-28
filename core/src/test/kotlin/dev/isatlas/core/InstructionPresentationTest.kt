@@ -8,7 +8,7 @@ class InstructionPresentationTest {
         private fun asset(name: String) = InstructionPresentationTest::class.java.classLoader!!.getResource(name)!!.readText()
         private val catalog = InstructionCatalog.decodeFiles(asset("riscv-instructions.json")) { asset("inst/$it") }
         private val compiler = CompilerIsaOptions.decode(asset("march-extensions.json"))
-        private val csrs = installedCatalog()
+        private val csrs = reviewedCatalog()
     }
     private fun search(query: String, filter: CatalogFilter = CatalogFilter(64)) = InstructionSearch.query(catalog, query, filter, compiler)
     private fun hit(name: String, word: Long) = search("0x${word.toString(16)}").hits.first { it.instruction.name == name }

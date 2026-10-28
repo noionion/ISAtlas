@@ -1,5 +1,6 @@
 package dev.isatlas.core
 
+import kotlinx.serialization.json.*
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -7,6 +8,35 @@ class OfficialPackagesTest {
     private val packages = officialPackages()
     private val compiler = CompilerIsaOptions.decode(javaClass.getResource("/march-extensions.json")!!.readText())
     private fun catalogs(vararg enabled: String) = packages.catalogs(enabled.toSet(), compiler)
+
+    @Test fun `Manual-only bundle loads without opening optional archives`() {
+        val reads = mutableListOf<String>()
+        val source = Json.parseToJsonElement(javaClass.getResource("/official-data/riscv-packages.json")!!.readText()).jsonObject
+        val index = JsonObject(source + ("packages" to JsonArray(source.getValue("packages").jsonArray.filter { it.jsonObject.getValue("id").jsonPrimitive.content == "manual" })))
+        val bundled = OfficialPackages(index.toString()) {
+            reads += it
+            javaClass.getResource("/$it")!!.readBytes()
+        }
+        assertEquals(listOf("manual"), bundled.packages.map { it.id })
+        assertEquals(listOf("packages/manual.zip"), reads)
+        val result = bundled.catalogs(emptySet(), compiler)
+        assertEquals(402, result.csr.registers.size)
+        assertEquals(1287, result.instructions.instructions.size)
+        assertEquals(17, result.instructions.pseudos.size)
+        assertTrue(result.csr.registers.all { it.namespace == "manual" && it.sources.isEmpty() })
+        assertTrue(result.csr.registers.single { it.name == "dcsr" }.fields.isEmpty())
+        assertThrows(IllegalArgumentException::class.java) { bundled.catalogs(setOf("aia"), compiler) }
+    }
+
+    @Test fun `official subsets reject missing Manual duplicate unknown and reversed dependencies`() {
+        val original = Json.parseToJsonElement(javaClass.getResource("/official-data/riscv-packages.json")!!.readText()).jsonObject
+        val all = original.getValue("packages").jsonArray
+        val unknown = JsonObject(all[1].jsonObject + ("id" to JsonPrimitive("unknown")))
+        for (entries in listOf(listOf(all[1]), listOf(all[0], all[0]), listOf(all[1], all[0]), listOf(all[0], unknown))) {
+            val index = JsonObject(original + ("packages" to JsonArray(entries)))
+            assertThrows(IllegalArgumentException::class.java) { OfficialPackages(index.toString()) { error("Invalid index must not read archives") } }
+        }
+    }
 
     @Test fun `all eight independent addon configurations validate and retain the instruction library`() {
         for (mask in 0..7) {

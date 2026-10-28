@@ -37,7 +37,7 @@ import dev.isatlas.core.*
                         modifier = Modifier.testTag("official-package-enabled-${item.id}"))
                 }
             }
-            Text("扩展包包含新增 CSR 和对基础定义的补充；关闭时撤回对应补充。来源与许可可在数据源页查看。",
+            if (state.officialPackages.any { !it.required }) Text("扩展包包含新增 CSR 和对基础定义的补充；关闭时撤回对应补充。来源与许可可在数据源页查看。",
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             AboutHeading("本地数据包")
             Text("导入企业或自定义 CSR、指令数据包，离线查询。", Modifier.padding(top = 16.dp), style = MaterialTheme.typography.bodyLarge)

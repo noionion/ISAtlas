@@ -4,7 +4,7 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class DebugCatalogTest {
-    private val pack = installedCatalog()
+    private val pack = reviewedCatalog()
     private fun reg(name: String) = pack.registers.single { it.name == name }
 
     @Test fun `debug mode CSRs and supplemental provenance load correctly`() {

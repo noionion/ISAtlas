@@ -8,6 +8,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import dev.isatlas.core.*
 import java.io.File
 import org.junit.Assert.*
+import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -16,14 +17,45 @@ class OfficialPackageFlowTest {
     private val context get() = InstrumentationRegistry.getInstrumentation().targetContext
     private fun packages(): OfficialPackages {
         val assets = context.assets
-        return OfficialPackages(assets.open("riscv-packages.json").bufferedReader().use { it.readText() }) { assets.open(it).use { stream -> stream.readBytes() } }
+        val fixtureAssets = InstrumentationRegistry.getInstrumentation().context.assets
+        return OfficialPackages(fixtureAssets.open("official-data/riscv-packages.json").bufferedReader().use { it.readText() }) { path ->
+            (if (path == "packages/manual.zip") assets.open(path) else fixtureAssets.open("official-data/$path")).use { it.readBytes() }
+        }
     }
     private fun compiler() = context.assets.open("march-extensions.json").bufferedReader().use { CompilerIsaOptions.decode(it.readText()) }
+
+    @Test fun manualOnlyBundleStartsWithOldAddonPreferencesAndShowsOnlyTheBasePackage() {
+        lateinit var model: AppViewModel
+        compose.runOnUiThread { model = ViewModelProvider(compose.activity)[AppViewModel::class.java] }
+        compose.waitUntil(30_000) { !model.state.value.loading }
+        assumeTrue(model.state.value.officialPackages.map { it.id } == listOf("manual"))
+        val prefs = context.getSharedPreferences("atlas", 0)
+        val hadPreference = prefs.contains("officialPackages")
+        val original = prefs.getStringSet("officialPackages", emptySet())!!.toSet()
+        try {
+            assertTrue(prefs.edit().putStringSet("officialPackages", setOf("aia", "debug", "spmp")).commit())
+            compose.runOnUiThread { model.close(); model.showAbout(true); model.showLocalPackages(true); model.load() }
+            compose.waitUntil(30_000) { !model.state.value.loading }
+            assertNull(model.state.value.error)
+            assertTrue(model.state.value.enabledOfficialPackages.isEmpty())
+            assertEquals(402, model.state.value.pack!!.registers.count { it.namespace == "manual" })
+            assertEquals(1287, model.state.value.instructions!!.instructions.count { it.namespace == "manual" })
+            compose.onNodeWithTag("official-package-manual").assertIsDisplayed()
+            for (id in listOf("aia", "debug", "spmp")) compose.onNodeWithTag("official-package-$id").assertDoesNotExist()
+        } finally {
+            val editor = prefs.edit()
+            if (hadPreference) editor.putStringSet("officialPackages", original) else editor.remove("officialPackages")
+            assertTrue(editor.commit())
+            compose.runOnUiThread { model.showLocalPackages(false); model.showAbout(false); model.load() }
+            compose.waitUntil(30_000) { !model.state.value.loading }
+        }
+    }
 
     @Test fun officialSwitchesWithdrawSupplementsPersistAndKeepOtherControlsEnabled() {
         lateinit var model: AppViewModel
         compose.runOnUiThread { model = ViewModelProvider(compose.activity)[AppViewModel::class.java] }
         compose.waitUntil(30_000) { !model.state.value.loading }
+        assumeTrue("Requires a full candidate APK", model.state.value.officialPackages.map { it.id }.containsAll(setOf("aia", "debug", "spmp")))
         val original = model.state.value.enabledOfficialPackages.toSet()
         val orientation = compose.activity.requestedOrientation
         fun toggle(id: String, enabled: Boolean) {
@@ -73,6 +105,7 @@ class OfficialPackageFlowTest {
         lateinit var model: AppViewModel
         compose.runOnUiThread { model = ViewModelProvider(compose.activity)[AppViewModel::class.java] }
         compose.waitUntil(30_000) { !model.state.value.loading }
+        assumeTrue("Requires an AIA candidate APK", model.state.value.officialPackages.any { it.id == "aia" })
         val original = "aia" in model.state.value.enabledOfficialPackages
         try {
             compose.runOnUiThread {

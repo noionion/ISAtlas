@@ -5,7 +5,7 @@ import org.junit.Test
 
 class IsaExtensionFilterTest {
     private val options = CompilerIsaOptions.decode(javaClass.getResource("/march-extensions.json")!!.readText())
-    private val pack = installedCatalog()
+    private val pack = reviewedCatalog()
 
     @Test fun `catalog options omit extensions without CSR associations but preserve dependency metadata`() {
         val visible = options.catalogOptions(pack)

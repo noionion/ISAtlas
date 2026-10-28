@@ -25,7 +25,9 @@ class LocalPackageFlowTest {
     private fun fixture(name: String) = testContext.assets.open(name).use { it.readBytes() }
     private fun base(): LocalCatalogs {
         val a=context.assets
-        val packages=OfficialPackages(a.open("riscv-packages.json").bufferedReader().use { it.readText() }) { a.open(it).use { input -> input.readBytes() } }
+        val packages=OfficialPackages(testContext.assets.open("official-data/riscv-packages.json").bufferedReader().use { it.readText() }) { path ->
+            (if (path == "packages/manual.zip") a.open(path) else testContext.assets.open("official-data/$path")).use { it.readBytes() }
+        }
         val compiler=a.open("march-extensions.json").bufferedReader().use { CompilerIsaOptions.decode(it.readText()) }
         return packages.catalogs(setOf("aia","debug","spmp"),compiler)
     }

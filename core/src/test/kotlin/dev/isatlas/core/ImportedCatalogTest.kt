@@ -4,7 +4,7 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class ImportedCatalogTest {
-    private val pack = installedCatalog()
+    private val pack = reviewedCatalog()
     private fun manual(name: String) = pack.registers.single { it.namespace == "manual" && it.name == name }
 
     @Test fun `official manual replaces old sources and vendor data is optional`() {

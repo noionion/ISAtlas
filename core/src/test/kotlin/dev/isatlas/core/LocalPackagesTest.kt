@@ -34,13 +34,13 @@ class LocalPackagesTest {
         if(location!=null) assertTrue(ex.message,ex.location.contains(location))
     }
     private fun base(): LocalCatalogs {
-        val csrs=installedCatalog()
+        val csrs=reviewedCatalog()
         val instructions=InstructionCatalog.decodeFiles(javaClass.getResource("/riscv-instructions.json")!!.readText()) { javaClass.getResource("/inst/$it")!!.readText() }
         return LocalCatalogs(csrs,instructions,compiler)
     }
 
     @Test fun `thead is optional with preserved source license and unknown lower bits`() {
-        assertTrue(installedCatalog().registers.none { it.namespace=="thead" })
+        assertTrue(reviewedCatalog().registers.none { it.namespace=="thead" })
         val data=decode(fixture("thead-csr.zip"))
         val csr=data.registers.single()
         assertEquals("th.sxstatus",csr.name)
@@ -77,7 +77,7 @@ class LocalPackagesTest {
     @Test fun `hash mismatch is localized and never changes the base`() {
         val files=entries(fixture()); files["csr/demo-control.json"]="{}".toByteArray()
         failure(zip(files),"csr/demo-control.json")
-        assertEquals(434,installedCatalog().registers.size)
+        assertEquals(434,reviewedCatalog().registers.size)
     }
     @Test fun `unknown files unsafe paths and duplicate JSON keys are rejected`() {
         for (name in listOf("../escape.json","/absolute.json","csr\\escape.json","extra.json")) failure(zip(entries(fixture())+(name to "{}".toByteArray())),"ZIP")

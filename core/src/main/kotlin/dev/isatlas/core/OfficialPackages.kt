@@ -22,7 +22,10 @@ class OfficialPackages(index: String, read: (String) -> ByteArray) {
     }
     init {
         val decoded = Json.decodeFromString<OfficialPackageIndex>(index)
-        require(decoded.schemaVersion == 1 && decoded.packages.map { it.id } == listOf("manual", "aia", "debug", "spmp"))
+        val order = listOf("manual", "aia", "debug", "spmp")
+        val ids = decoded.packages.map { it.id }
+        require(decoded.schemaVersion == 1 && ids.firstOrNull() == "manual" &&
+            ids == order.filter { it in ids }) { "官方包索引必须以 Manual 为基础，且不能重复或包含未知包" }
         packages = decoded.packages
         require(packages.filter { it.required }.map { it.id } == listOf("manual"))
         archives = packages.associate { info ->

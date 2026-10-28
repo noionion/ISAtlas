@@ -13,30 +13,28 @@
       "version": "20250508",
       "sha256": "04937042a129a3ae33c05d47e0ca8b63c08f7dcf4b2abbd9e34c1d911b8f172c",
       "sourceRevision": "584390d9d872835b1bc45ab9ea946b56db3ad485"
-    },
-    {
-      "id": "aia",
-      "version": "20250312",
-      "sha256": "7e63d9dc163ee2116e04c86dad0c180a4240227a71bf14cd8c39dff890e6611e",
-      "sourceRevision": "20318d1b03f0ac8253458b82f8244d0d0db074e9"
-    },
-    {
-      "id": "debug",
-      "version": "1.0",
-      "sha256": "b10ddf6e90ecc2546d1673fa80f17c56a4f86bfab2fe377a90c601c5e9249cf7",
-      "sourceRevision": "5695c0aaa7a3c228e14702e1268eb5a5e50e3cb8"
-    },
-    {
-      "id": "spmp",
-      "version": "1.0",
-      "sha256": "1affa34981cd798f24b68fc43af0c49e396f42931e7a377d3d05ad3cfd9516ec",
-      "sourceRevision": "4ce228207193c55247200110e3d5b6881a17c367"
     }
   ],
   "files": [
     {
       "path": "app/src/androidTest/assets/demo-combined.zip",
       "sha256": "424451302ea9cb0d70b0efa20d559373e056288dfbe8c56142079831062ee826"
+    },
+    {
+      "path": "app/src/androidTest/assets/official-data/packages/aia.zip",
+      "sha256": "7e63d9dc163ee2116e04c86dad0c180a4240227a71bf14cd8c39dff890e6611e"
+    },
+    {
+      "path": "app/src/androidTest/assets/official-data/packages/debug.zip",
+      "sha256": "b10ddf6e90ecc2546d1673fa80f17c56a4f86bfab2fe377a90c601c5e9249cf7"
+    },
+    {
+      "path": "app/src/androidTest/assets/official-data/packages/spmp.zip",
+      "sha256": "1affa34981cd798f24b68fc43af0c49e396f42931e7a377d3d05ad3cfd9516ec"
+    },
+    {
+      "path": "app/src/androidTest/assets/official-data/riscv-packages.json",
+      "sha256": "09723c9a9313eb7a8454581a501143d5cb47eb684c7b929905882cf0f2007392"
     },
     {
       "path": "app/src/androidTest/assets/thead-csr.zip",
@@ -55,24 +53,12 @@
       "sha256": "ce711d516947a14f6eb2eb310193b75d560a0227734bbb8c05c090a80cd9f4dd"
     },
     {
-      "path": "app/src/main/assets/packages/aia.zip",
-      "sha256": "7e63d9dc163ee2116e04c86dad0c180a4240227a71bf14cd8c39dff890e6611e"
-    },
-    {
-      "path": "app/src/main/assets/packages/debug.zip",
-      "sha256": "b10ddf6e90ecc2546d1673fa80f17c56a4f86bfab2fe377a90c601c5e9249cf7"
-    },
-    {
       "path": "app/src/main/assets/packages/manual.zip",
       "sha256": "04937042a129a3ae33c05d47e0ca8b63c08f7dcf4b2abbd9e34c1d911b8f172c"
     },
     {
-      "path": "app/src/main/assets/packages/spmp.zip",
-      "sha256": "1affa34981cd798f24b68fc43af0c49e396f42931e7a377d3d05ad3cfd9516ec"
-    },
-    {
       "path": "app/src/main/assets/riscv-packages.json",
-      "sha256": "09723c9a9313eb7a8454581a501143d5cb47eb684c7b929905882cf0f2007392"
+      "sha256": "4848867ec0f167771e9d3c708dc682444f7d6bb6edfba21429612ac00938c2ff"
     },
     {
       "path": "app/src/main/assets/THIRD_PARTY_NOTICES.txt",

@@ -1,6 +1,6 @@
 # 本地数据维护与内置基线
 
-可编辑 JSON、提取脚本、规范 submodule、来源锁定、公开模板及数据审核统一维护在 [ISAtlas-data](https://github.com/noionion/ISAtlas-data)。应用仓库保留运行时 Kotlin 模型/校验器、固定 ZIP、少量回归夹具和 `data/builtin-data.lock.json`。不在两个仓库分别修改同一份数据源。
+可编辑 JSON、提取脚本、规范 submodule、来源锁定、公开模板及数据审核统一维护在 [ISAtlas-data](https://github.com/noionion/ISAtlas-data)。应用仓库保留运行时 Kotlin 模型/校验器、Manual 固定 ZIP、少量回归夹具和 `data/builtin-data.lock.json`。不在两个仓库分别修改同一份数据源。
 
 ## 配置本机目录
 
@@ -45,7 +45,7 @@ Python 3.10+ 标准库即可运行。生成物在 `dist/riscv/`，测试样本�
 ./tools/Verify-BuiltinData.ps1
 ```
 
-同步前先校验候选官方包，再复制固定 ZIP、扩展依赖、声明/许可和回归夹具，生成锁文件；每个文件都核对 SHA-256。锁文件记录公开数据仓库地址、提交（如存在）、工作树状态、上游修订和逐文件指纹，不记录本机路径。
+同步前先校验完整候选官方包，再仅将 Manual ZIP 和筛选后的索引复制到正式资产；AIA/Debug/SPMP ZIP 与完整索引只复制到 Android/Core 共用测试夹具，绝不加入主 APK。同步扩展依赖、声明/许可和回归夹具，生成锁文件；每个文件都核对 SHA-256。锁文件记录公开数据仓库地址、提交（如存在）、工作树状态、上游修订和逐文件指纹，不记录本机路径。
 
 迁移初始状态尚无数据仓库提交，因此锁文件 `revision` 可为空、`workingTree=true`；此时 SHA-256 固定的是一个明确的本地候选快照，不表示已发布版本。首次数据提交或发布后，应重新同步并把实际数据提交写入应用锁文件。对外选定基线时优先使用已审核的干净数据提交。
 

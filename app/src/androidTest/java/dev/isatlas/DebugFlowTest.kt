@@ -4,12 +4,15 @@ import android.content.pm.ActivityInfo
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 class DebugFlowTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
+    private var officialSession: OfficialPackageTestSession? = null
+    @After fun restoreOfficialSelection() { officialSession?.close() }
     private fun closeFilters() {
         val panel = compose.onNodeWithTag("filter-panel").fetchSemanticsNode().boundsInRoot
         compose.onRoot().performTouchInput { click(Offset(panel.left / 2, centerY)) }
@@ -17,6 +20,7 @@ class DebugFlowTest {
     }
 
     @Before fun ready() {
+        officialSession = OfficialPackageTestSession(compose, setOf("debug"))
         compose.runOnUiThread { compose.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
         compose.waitUntil(20_000) { compose.onAllNodesWithTag("catalog-tab-CSR").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithContentDescription("筛选").performClick()

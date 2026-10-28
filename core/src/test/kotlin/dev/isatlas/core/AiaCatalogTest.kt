@@ -4,7 +4,7 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class AiaCatalogTest {
-    private val pack = installedCatalog()
+    private val pack = reviewedCatalog()
     private fun reg(name: String) = pack.registers.single { it.name == name }
 
     @Test fun `AIA entries load without duplicating existing register identities`() {
