@@ -97,7 +97,8 @@ Android 上的离线架构速查工具，支持 RISC-V 指令、CSR 与字段查
 | --- | --- |
 | [构建指南](docs/build.md) | 从源码构建、安装与开发验证 |
 | [看板维护规则](docs/project-maintenance.md) | 功能规划、任务清单、状态流转与 Issue 协作 |
-| [数据来源](docs/data-import.md) | 规范版本、数据维护与转换方式 |
+| [独立数据仓库](https://github.com/noionion/ISAtlas-data) | CSR、指令与字段数据、来源和审核 |
+| [数据维护](docs/data-maintenance.md) | 本地候选包联调与内置基线同步 |
 | [覆盖范围](docs/field-review.md) | CSR 与字段的收录范围及复核说明 |
 | [数据格式](docs/data-format.md) | CSR JSON 结构与字段约定 |
 | [指令数据](docs/instruction-data.md) | 指令编码、双语摘要、提取与审核方式 |

@@ -35,7 +35,7 @@ macOS / Linux 使用对应的 Wrapper：
 
 APK 输出到 `app/build/outputs/apk/debug/app-debug.apk`。这是供本地安装的调试包，正式发布需另行配置签名。
 
-构建所需的离线 CSR / 指令 JSON 和测试样本已纳入仓库，普通构建无需初始化上游子模块。首次构建需要下载 Gradle 与依赖；本机缓存齐全后可使用 `--offline`。
+构建所需的固定版本离线 ZIP 和测试样本已纳入仓库，普通构建无需数据仓库或上游子模块。核心指令测试所需 JSON 在构建目录中从 Manual ZIP 解出，不另维护可编辑副本。首次构建需要下载 Gradle 与依赖；本机缓存齐全后可使用 `--offline`。
 
 ## 安装到手机
 
@@ -62,19 +62,13 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 ./gradlew.bat :app:connectedDebugAndroidTest
 ```
 
-数据导入与存储测试使用 Python 3.10+ 标准库：
+内置基线完整性检查：
 
 ```powershell
-python -m unittest discover -s tools -p "test_*csr*.py"
+./tools/Verify-BuiltinData.ps1
 ```
 
-其中手册导入测试需要先初始化固定版本的上游子模块：
-
-```powershell
-git submodule update --init upstream/riscv-isa-manual upstream/riscv-aia upstream/riscv-debug-spec upstream/riscv-spmp
-```
-
-数据库再生成和复核步骤见[数据来源与转换](data-import.md)。
+数据生成与 Python 审核已迁入 [ISAtlas-data](https://github.com/noionion/ISAtlas-data)。候选包联调及显式更新内置基线见[数据维护](data-maintenance.md)。普通 APK 构建不会读取 `data.local.properties`，只有显式的数据联调/同步命令才使用它。
 
 ### 更新通道验证
 
@@ -90,8 +84,8 @@ git submodule update --init upstream/riscv-isa-manual upstream/riscv-aia upstrea
 | --- | --- |
 | `app/` | Android 界面、应用状态与离线资产 |
 | `core/` | 数据模型、校验、搜索与位布局逻辑 |
-| `tools/` | 数据存储、手册转换、字段说明与复核工具 |
-| `upstream/` | 固定提交的 ISA 手册子模块 |
+| `tools/` | 应用构建、签名发布、候选数据验证及基线同步 |
+| `data/` | 内置 ZIP 与测试夹具的版本锁定信息 |
 | `docs/` | 构建、数据维护与覆盖范围说明 |
 
 提交信息使用 Angular 风格的 `type(scope): summary`，例如 `docs(readme): simplify product introduction`。修改数据时同步保留来源、版本与许可，并参照[字段复核说明](field-review.md)检查覆盖边界。
