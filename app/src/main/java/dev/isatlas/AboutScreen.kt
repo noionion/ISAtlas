@@ -30,7 +30,8 @@ private const val PROJECT_URL = "https://github.com/noionion/ISAtlas"
 
 @Composable
 internal fun AboutScreen(pack: DataPack?, onShowSources: () -> Unit, update: UpdateState,
-    onSelectTrack: (UpdateTrack) -> Unit = {}, onShowLocalPackages: () -> Unit = {}, onCheckUpdate: () -> Unit) {
+    onSelectTrack: (UpdateTrack) -> Unit = {}, onShowLocalPackages: () -> Unit = {},
+    database: DatabaseUpdateState = DatabaseUpdateState(), onCheckDatabase: () -> Unit = {}, onCheckUpdate: () -> Unit) {
     val context = LocalContext.current
     val version = remember(context) {
         runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }
@@ -64,7 +65,9 @@ internal fun AboutScreen(pack: DataPack?, onShowSources: () -> Unit, update: Upd
             AboutRow("更新通道", subtitle = update.trackSummary, tag = "about-update-track", onClick = { showTrackPicker = true })
 
             AboutHeading("数据库")
-            AboutRow("数据库版本", pack?.version ?: "尚未加载", tag = "about-database-version")
+            AboutRow("数据库版本", database.version ?: "内置 Manual", tag = "about-database-version")
+            AboutRow("检查数据库更新", subtitle = database.summary, tag = "about-check-database-update",
+                showBadge = database.available, onClick = onCheckDatabase)
             AboutRow("数据源与许可", tag = "about-sources", onClick = onShowSources)
             AboutRow("数据包", subtitle = "管理内置规范与本地 CSR / 指令包", tag = "about-local-packages", onClick = onShowLocalPackages)
 

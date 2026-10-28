@@ -14,14 +14,18 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.isatlas.core.*
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable internal fun LocalPackagesScreen(state: AtlasState, model: AppViewModel) {
+    val database by model.databaseUpdates.state.collectAsStateWithLifecycle()
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let(model::previewPackage) }
     var removing by rememberSaveable { mutableStateOf<String?>(null) }
     Box(Modifier.fillMaxSize().testTag("local-packages-screen"), contentAlignment = Alignment.TopCenter) {
         Column(Modifier.widthIn(max = 760.dp).fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp).padding(bottom = 32.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            AboutHeading("内置规范包")
+            AboutHeading("官方数据库")
+            AboutRow("数据库更新", subtitle = database.summary, showBadge = database.available,
+                tag = "packages-check-database-update", onClick = { model.databaseUpdates.check() })
             state.officialPackages.forEach { item ->
                 Row(Modifier.fillMaxWidth().testTag("official-package-${item.id}"), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f).padding(vertical = 6.dp)) {

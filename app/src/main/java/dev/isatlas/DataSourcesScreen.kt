@@ -24,7 +24,7 @@ import dev.isatlas.core.SourceAttribution
 import dev.isatlas.core.OfficialPackageInfo
 
 @Composable
-fun DataSourcesScreen(pack: DataPack?, localPackages: List<ManagedLocalPackage> = emptyList(), officialPackages: List<OfficialPackageInfo> = emptyList()) {
+fun DataSourcesScreen(pack: DataPack?, localPackages: List<ManagedLocalPackage> = emptyList(), officialPackages: List<OfficialPackageInfo> = emptyList(), officialLicenses: Map<String, String> = emptyMap()) {
     val uriHandler = LocalUriHandler.current
     var linkError by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize().testTag("sources-screen"), contentAlignment = Alignment.TopCenter) {
@@ -65,7 +65,7 @@ fun DataSourcesScreen(pack: DataPack?, localPackages: List<ManagedLocalPackage> 
                                     TextButton(onClick = { expanded = !expanded }) { Text(if (expanded) "收起许可正文" else "查看许可正文") }
                                     if (expanded) Text(localManifest.licenseText, style = MaterialTheme.typography.bodySmall)
                                 }
-                            } else if (source.license.isNotBlank()) SourceLicense(namespace, source.license)
+                            } else if (source.license.isNotBlank()) SourceLicense(namespace, source.license, officialLicenses[source.license])
                             HorizontalDivider(Modifier.padding(top = 12.dp), color = MaterialTheme.colorScheme.outlineVariant)
                         }
                     }
@@ -77,11 +77,11 @@ fun DataSourcesScreen(pack: DataPack?, localPackages: List<ManagedLocalPackage> 
 }
 
 @Composable
-private fun SourceLicense(namespace: String, license: String) {
+private fun SourceLicense(namespace: String, license: String, databaseText: String? = null) {
     val context = LocalContext.current
     var expanded by rememberSaveable(namespace, license) { mutableStateOf(false) }
-    val text = remember(license) {
-        runCatching {
+    val text = remember(license, databaseText) {
+        databaseText ?: runCatching {
             require(license.matches(Regex("[A-Za-z0-9.+-]+")))
             context.assets.open("licenses/$license.txt").bufferedReader().use { it.readText() }
         }.getOrElse { "当前数据库未附带该许可正文。" }

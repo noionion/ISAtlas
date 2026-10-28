@@ -29,6 +29,7 @@ keystore.properties
 !/docs/instruction-data.md
 !/docs/pseudoinstruction-coverage.md
 !/docs/local-packages.md
+!/docs/database-updates.md
 !/docs/images/
 /docs/images/*
 !/docs/images/bit-layout.png

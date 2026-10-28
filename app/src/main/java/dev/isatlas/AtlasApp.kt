@@ -58,6 +58,7 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
     val context = LocalContext.current
     val updates = remember(context) { UpdateRepository.get(context) }
     val update by updates.state.collectAsStateWithLifecycle()
+    val database by model.databaseUpdates.state.collectAsStateWithLifecycle()
     // Keep covered search/detail content unchanged while packages are rebuilding.
     // Returning to the catalog publishes the latest state without recreating its grid.
     val catalogState = remember(state.takeUnless { it.showAbout }) { state }
@@ -125,7 +126,7 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
                         },
                         actions = {
                             IconButton(onClick = { keyboard?.hide(); model.showAbout(true) }) {
-                                BadgedBox(badge = { if (update.hasUpdate) UpdateBadge("home-update-badge") }) {
+                                BadgedBox(badge = { if (update.hasUpdate || database.available) UpdateBadge("home-update-badge") }) {
                                     Icon(Icons.Default.Info, "关于 ISAtlas")
                                 }
                             }
@@ -162,12 +163,13 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
             RaisedPage(state.showAbout, "关于 ISAtlas", "收起关于", { model.showAbout(false) },
                 modifier = if (state.showSources || state.showLocalPackages) Modifier.clearAndSetSemantics {} else Modifier) {
                 AboutScreen(state.pack, onShowSources = { model.showSources(true) }, update = update,
+                    database = database, onCheckDatabase = { model.databaseUpdates.check() },
                     onSelectTrack = updates::selectTrack,
                     onShowLocalPackages = { model.showLocalPackages(true) },
                     onCheckUpdate = { updates.check(manual = true) })
             }
             RaisedPage(state.showSources, "数据源与许可", "返回关于", { model.showSources(false) }) {
-                DataSourcesScreen(state.pack, state.localPackages, state.officialPackages)
+                DataSourcesScreen(state.pack, state.localPackages, state.officialPackages, state.officialLicenses)
             }
             RaisedPage(state.showLocalPackages, "数据包", "返回关于", { model.showLocalPackages(false) }) {
                 LocalPackagesScreen(state, model)
@@ -175,6 +177,7 @@ fun AtlasApp(model: AppViewModel = viewModel()) {
         }
     }
     UpdateDialogs(updates, update)
+    if (update.prompt == null) DatabaseUpdateDialog(database, model)
 }
 
 @Composable

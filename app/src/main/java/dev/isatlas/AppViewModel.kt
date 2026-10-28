@@ -7,9 +7,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dev.isatlas.core.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.sync.Mutex
@@ -42,6 +45,7 @@ data class AtlasState(
     val localPackages: List<ManagedLocalPackage> = emptyList(),
     val officialPackages: List<OfficialPackageInfo> = emptyList(),
     val enabledOfficialPackages: Set<String> = emptySet(),
+    val officialLicenses: Map<String, String> = emptyMap(),
     val packageBusy: Boolean = false,
     val packageShowProgress: Boolean = false,
     val packageToggleTargets: Map<String, Boolean> = emptyMap(),
@@ -60,8 +64,10 @@ data class AtlasState(
 class AppViewModel(application: Application, private val saved: SavedStateHandle) : AndroidViewModel(application) {
     private val prefs = application.getSharedPreferences("atlas", 0)
     private val localStore = LocalPackageRepository(application, BuildConfigVersion.code(application))
+    internal val databaseUpdates = DatabaseRepository.get(application)
     private lateinit var officialStore: OfficialPackages
     private lateinit var officialCompiler: CompilerIsaOptions
+    private var officialLicenses: Map<String, String> = emptyMap()
     private var enabledOfficial = prefs.getStringSet("officialPackages", emptySet())!!.toSet()
     private var pendingPackage: ByteArray? = null
     private val packageOperations = Mutex()
@@ -81,7 +87,14 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
         showLocalPackages = saved["showLocalPackages"] ?: false,
     ))
     val state = mutable.asStateFlow()
-    init { load() }
+    init {
+        load()
+        viewModelScope.launch {
+            combine(databaseUpdates.state, state) { update, app ->
+                update.stage == DatabaseStage.READY && !app.loading && !app.packageBusy && app.packageTogglingIds.isEmpty()
+            }.distinctUntilChanged().collect { ready -> if (ready) applyDatabaseUpdate() }
+        }
+    }
 
     fun load() {
         mutable.update { it.copy(loading = true, error = null) }
@@ -89,18 +102,60 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
             val result = withContext(Dispatchers.IO) {
                 runCatching {
                     val assets = getApplication<Application>().assets
-                    officialStore = OfficialPackages(assets.open("riscv-packages.json").bufferedReader().use { it.readText() }) { path ->
+                    val downloaded = databaseUpdates.load()
+                    officialLicenses = downloaded?.licenses.orEmpty()
+                    officialStore = downloaded?.packages ?: OfficialPackages(assets.open("riscv-packages.json").bufferedReader().use { it.readText() }) { path ->
                         assets.open(path).use { it.readBytes() }
                     }
-                    officialCompiler = assets.open("march-extensions.json").bufferedReader().use { CompilerIsaOptions.decode(it.readText()) }
+                    officialCompiler = downloaded?.compiler ?: assets.open("march-extensions.json").bufferedReader().use { CompilerIsaOptions.decode(it.readText()) }
                     enabledOfficial = enabledOfficial.intersect(officialStore.packages.map { it.id }.toSet())
                     localStore.load(officialStore.catalogs(enabledOfficial, officialCompiler))
                 }
             }
             result.fold(
-                onSuccess = { snapshot -> applyPackages(snapshot, initial = true) },
+                onSuccess = { snapshot -> applyPackages(snapshot, initial = true); databaseUpdates.check(manual = false) },
                 onFailure = { mutable.update { it.copy(loading = false, error = "内置数据包读取失败，请重试。") } },
             )
+        }
+    }
+
+    internal fun applyDatabaseUpdate() {
+        val (bytes, candidate) = databaseUpdates.candidate() ?: return
+        if (mutable.value.packageBusy || mutable.value.loading || mutable.value.packageTogglingIds.isNotEmpty() || databaseUpdates.state.value.stage != DatabaseStage.READY) return
+        databaseUpdates.applying()
+        mutable.update { it.copy(packageBusy = true) }
+        viewModelScope.launch {
+            // Finish the short atomic switch even if the Activity is closed during commit.
+            withContext(NonCancellable) {
+                packageOperations.withLock {
+                    val result = withContext(Dispatchers.IO) { runCatching {
+                        val old = officialStore.catalogs(enabledOfficial, officialCompiler)
+                        val enabled = enabledOfficial.intersect(candidate.packages.packages.map { it.id }.toSet())
+                        val snapshot = localStore.rebase(candidate.packages.catalogs(enabled, candidate.compiler))
+                        val hadSelection = prefs.contains("officialPackages")
+                        val previousSelection = prefs.getStringSet("officialPackages", emptySet())!!.toSet()
+                        try {
+                            // Remove obsolete saved IDs so newly downloaded optional packs stay disabled after restart.
+                            check(prefs.edit().putStringSet("officialPackages", enabled).commit()) { "无法保存数据包设置" }
+                            databaseUpdates.commit(bytes)
+                        } catch (error: Exception) {
+                            prefs.edit().apply { if (hadSelection) putStringSet("officialPackages", previousSelection) else remove("officialPackages") }.commit()
+                            localStore.rebase(old)
+                            throw error
+                        }
+                        officialStore = candidate.packages
+                        officialCompiler = candidate.compiler
+                        officialLicenses = candidate.licenses
+                        enabledOfficial = enabled
+                        snapshot
+                    } }
+                    result.fold(onSuccess = {
+                        applyPackages(it)
+                        databaseUpdates.applied(candidate.version)
+                    }, onFailure = { databaseUpdates.applyFailed() })
+                    mutable.update { it.copy(packageBusy = false) }
+                }
+            }
         }
     }
 
@@ -212,7 +267,7 @@ class AppViewModel(application: Application, private val saved: SavedStateHandle
             val roots = current.extensionRoots.intersect(catalogs.compiler.selectable.toSet())
             current.copy(loading = false, error = null, pack = catalogs.csr, instructions = catalogs.instructions,
             compilerIsa = catalogs.compiler, localPackages = snapshot.packages, packageMessage = snapshot.warning,
-            officialPackages = officialStore.packages, enabledOfficialPackages = enabledOfficial,
+            officialPackages = officialStore.packages, enabledOfficialPackages = enabledOfficial, officialLicenses = officialLicenses,
             namespace = current.namespace?.takeIf { ns -> catalogs.csr.registers.any { it.namespace == ns || it.sources.any { source -> source.namespace == ns } } || catalogs.instructions.instructions.any { it.namespace == ns } },
             extensions = catalogs.compiler.selectionClosure(roots),
             extensionRoots = roots,

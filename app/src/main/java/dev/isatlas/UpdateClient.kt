@@ -18,11 +18,13 @@ internal class UpdateClient(private val read: (String) -> String = ::readRelease
         AppUpdates.newest(results.flatMap { it.getOrDefault(emptyList()) })
     }
 
-    suspend fun downloadOrder(release: AppRelease): List<Int> = coroutineScope {
+    suspend fun downloadOrder(release: AppRelease): List<Int> = downloadOrder(release.apkUrl)
+
+    suspend fun downloadOrder(url: String): List<Int> = coroutineScope {
         val probes = UpdateChannels.all.mapIndexed { index, channel -> async(Dispatchers.IO) {
             val start = System.nanoTime()
             val available = runCatching {
-                val connection = openConnection(channel.url(release.apkUrl))
+                val connection = openConnection(channel.url(url))
                 try {
                     connection.setRequestProperty("Range", "bytes=0-3")
                     connection.setRequestProperty("Accept-Encoding", "identity")
