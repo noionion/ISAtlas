@@ -30,11 +30,14 @@ keystore.properties
 !/docs/pseudoinstruction-coverage.md
 !/docs/local-packages.md
 !/docs/database-updates.md
+!/docs/usage.md
 !/docs/images/
 /docs/images/*
 !/docs/images/bit-layout.png
 !/docs/images/field-details.png
 !/docs/images/filters.png
+!/docs/images/feature-overview-v2.png
+!/docs/images/quick-start.png
 !/docs/images/icon.svg
 
 # Retired local discovery material, unused by the official manual importer.
