@@ -14,10 +14,10 @@ try {
     $copies = [ordered]@{}
     foreach ($file in Get-ChildItem -LiteralPath $assets -File -Recurse) {
         $relative = [IO.Path]::GetRelativePath($assets, $file.FullName).Replace('\', '/')
-        if ($relative -notmatch '^(march-extensions\.json|riscv-packages\.json|THIRD_PARTY_NOTICES\.txt|licenses/[A-Za-z0-9.+-]+\.txt|packages/(manual|aia|debug|spmp|p)\.zip)$') {
+        if ($relative -notmatch '^(march-extensions\.json|riscv-packages\.json|THIRD_PARTY_NOTICES\.txt|licenses/[A-Za-z0-9.+-]+\.txt|packages/(manual|aia|debug|spmp|p|ime)\.zip)$') {
             throw "Unexpected generated asset: $relative"
         }
-        if ($relative -notmatch '^packages/(aia|debug|spmp|p)\.zip$') {
+        if ($relative -notmatch '^packages/(aia|debug|spmp|p|ime)\.zip$') {
             $copies["app/src/main/assets/$relative"] = if ($relative -eq 'riscv-packages.json') { $temporaryIndex } else { $file.FullName }
         }
     }
@@ -26,8 +26,10 @@ try {
     foreach ($name in @('aia', 'debug', 'spmp')) {
         $copies["app/src/androidTest/assets/official-data/packages/$name.zip"] = Join-Path $assets "packages/$name.zip"
     }
-    if ($index.packages.id -contains 'p') {
-        $copies['app/src/androidTest/assets/official-data/packages/p.zip'] = Join-Path $assets 'packages/p.zip'
+    foreach ($name in @('p', 'ime')) {
+        if ($index.packages.id -contains $name) {
+            $copies["app/src/androidTest/assets/official-data/packages/$name.zip"] = Join-Path $assets "packages/$name.zip"
+        }
     }
     $copies['core/src/test/resources/riscv-manual-sample.json'] = Join-Path $repository 'dist/test-fixtures/riscv-manual-sample.json'
     foreach ($name in @('demo-combined.zip', 'thead-csr.zip')) {
