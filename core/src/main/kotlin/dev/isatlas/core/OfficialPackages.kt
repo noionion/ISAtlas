@@ -12,7 +12,7 @@ import kotlinx.serialization.json.*
 )
 @Serializable private data class OfficialPackageIndex(val schemaVersion: Int, val packages: List<OfficialPackageInfo>)
 
-/** Only APK assets are allowed here; local ZIP imports use the separate untrusted validator. */
+/** Reads trusted official archives; local ZIP imports use a separate validator. */
 class OfficialPackages(index: String, read: (String) -> ByteArray) {
     val packages: List<OfficialPackageInfo>
     private val archives: Map<String, Map<String, String>>
@@ -20,9 +20,18 @@ class OfficialPackages(index: String, read: (String) -> ByteArray) {
         val manual = archives.getValue("manual")
         InstructionCatalog.decodeFiles(manual.getValue("riscv-instructions.json")) { manual.getValue("inst/$it") }
     }
+    private val packedInstructions by lazy {
+        archives["p"]?.let { files ->
+            InstructionCatalog.decodeFiles(files.getValue("riscv-instructions.json")) { files.getValue("inst/$it") }
+                .also { catalog ->
+                    require(catalog.instructions.all { it.namespace == "p" && it.id.startsWith("p-") })
+                    require(catalog.pseudos.all { it.namespace == "p" && it.id.startsWith("p-") })
+                }
+        }
+    }
     init {
         val decoded = Json.decodeFromString<OfficialPackageIndex>(index)
-        val order = listOf("manual", "aia", "debug", "spmp")
+        val order = listOf("manual", "aia", "debug", "spmp", "p")
         val ids = decoded.packages.map { it.id }
         require(decoded.schemaVersion == 1 && ids.firstOrNull() == "manual" &&
             ids == order.filter { it in ids }) { "官方包索引必须以 Manual 为基础，且不能重复或包含未知包" }
@@ -75,7 +84,15 @@ class OfficialPackages(index: String, read: (String) -> ByteArray) {
             }
         }
         val pack = Catalog.decode(JsonObject(metadata!! + ("registers" to JsonArray(registers.values.toList()))).toString())
-        return LocalCatalogs(pack.copy(coverage = "${pack.registers.size} 个 CSR · ${pack.registers.sumOf { it.fields.size }} 个字段"), instructions, compiler)
+        val usePacked = "p" in enabled
+        val catalog = if (usePacked) requireNotNull(packedInstructions).let { draft ->
+            instructions.copy(instructions = instructions.instructions + draft.instructions,
+                pseudos = instructions.pseudos + draft.pseudos)
+        } else instructions
+        require(catalog.instructions.map { it.id }.distinct().size == catalog.instructions.size)
+        val options = if (usePacked) compiler.copy(tokens = (compiler.tokens + "p").distinct(),
+            dependencies = compiler.dependencies + ("p" to listOf("i", "zmmul", "zba", "zbb"))) else compiler
+        return LocalCatalogs(pack.copy(coverage = "${pack.registers.size} 个 CSR · ${pack.registers.sumOf { it.fields.size }} 个字段"), catalog, options)
     }
 
     private fun key(value: JsonElement, kind: String): String {

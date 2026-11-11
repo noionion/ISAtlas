@@ -20,7 +20,7 @@ fun privilegeRank(mode: String) = listOf("M", "S", "H", "VS", "U", "D").indexOf(
 @Serializable data class InstructionField(val name: String, val msb: Int, val lsb: Int, val value: Long? = null,
     val operand: String? = null, val operandBits: List<Int>? = null, val operandSigned: Boolean = false,
     val registerOffset: Int = 0, val registerMap: List<Int>? = null, val registerClass: String? = null,
-    val values: Map<String, String> = emptyMap())
+    val values: Map<String, String> = emptyMap(), val operandBias: Int = 0)
 @Serializable data class EncodingConstraint(val mask: String, val operator: String, val values: List<Long>, val xlens: List<Int> = listOf(32, 64))
 @Serializable data class OperandRelation(val left: String, val right: String, val operator: String)
 @Serializable data class InstructionContext(val summary: String, val summaryEn: String)
@@ -56,7 +56,7 @@ fun privilegeRank(mode: String) = listOf("M", "S", "H", "VS", "U", "D").indexOf(
         if (field.registerClass != null) {
             val number = field.registerMap?.getOrNull(value.toInt()) ?: (value.toInt() + field.registerOffset)
             "${when (field.registerClass) { "float" -> "f"; "vector" -> "v"; else -> "x" }}$number"
-        } else value.toString()
+        } else (value + field.operandBias).toString()
     }
 }
 @Serializable data class InstructionDefinition(val schemaVersion: Int, val id: String, val namespace: String,

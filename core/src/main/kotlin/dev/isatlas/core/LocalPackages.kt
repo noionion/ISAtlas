@@ -133,7 +133,7 @@ object LocalPackages {
         check(m.schemaVersion == 1 && m.architecture == "riscv", p, "仅支持 schemaVersion=1、architecture=riscv")
         check(m.minAppVersionCode in 1..app, p, "需要更新版本的 ISAtlas")
         check(m.id.matches(Regex("[a-z0-9][a-z0-9.-]{2,79}")) && token.matches(m.namespace), p, "包 ID 或命名空间格式错误")
-        check(m.namespace !in reserved && m.namespace !in setOf("manual", "standard", "andes", "aia", "debug", "spmp", "catalog"), p, "命名空间与内置来源冲突")
+        check(m.namespace !in reserved && m.namespace !in setOf("manual", "standard", "andes", "aia", "debug", "spmp", "p", "catalog"), p, "命名空间与内置来源冲突")
         check(listOf(m.name, m.publisher, m.version, m.license).all { it.isNotBlank() && it.length <= 160 }, p, "名称、发布者、版本和许可必填且不超过 160 字符")
         check(m.description.length <= 4096 && m.licenseText.length <= 32768, p, "描述或许可正文过长")
         val paths = m.csr + m.instructions

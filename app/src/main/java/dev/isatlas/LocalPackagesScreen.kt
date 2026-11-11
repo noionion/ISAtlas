@@ -29,9 +29,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
             state.officialPackages.forEach { item ->
                 Row(Modifier.fillMaxWidth().testTag("official-package-${item.id}"), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f).padding(vertical = 6.dp)) {
-                        Text(when (item.id) { "manual" -> "ISA Manual"; "aia" -> "AIA"; "debug" -> "Debug / Trace"; else -> "SPMP" },
+                        Text(when (item.id) { "manual" -> "ISA Manual"; "aia" -> "AIA"; "debug" -> "Debug / Trace"; "spmp" -> "SPMP"; else -> item.name },
                             style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                        Text("${item.version} · ${item.csrCount} CSR" + if (item.supplementCount > 0) " · 补充 ${item.supplementCount} 项" else " · 含指令库",
+                        Text(if (item.id == "p") "${item.version} · 草案指令包" else "${item.version} · ${item.csrCount} CSR" + if (item.supplementCount > 0) " · 补充 ${item.supplementCount} 项" else " · 含指令库",
                             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     if (item.required) Text("基础包", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
