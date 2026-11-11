@@ -15,6 +15,7 @@ object InstructionExamples {
             val operand = field.operand!!
             val value = if (field.registerClass != null) {
                 val desired = when {
+                    field.registerClass in setOf("matrix", "accumulator", "accumulator-type") -> when (operand) { "ms", "ms1" -> 2; "ms2" -> 4; else -> 0 }
                     field.registerClass == "vector" -> when (operand) { "vd", "vs3" -> 8; "vs1" -> 24; else -> 16 }
                     operand == "r1s'" -> 8
                     operand == "r2s'" -> 9

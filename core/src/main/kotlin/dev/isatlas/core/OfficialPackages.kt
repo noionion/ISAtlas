@@ -21,17 +21,17 @@ class OfficialPackages(index: String, read: (String) -> ByteArray) {
         InstructionCatalog.decodeFiles(manual.getValue("riscv-instructions.json")) { manual.getValue("inst/$it") }
     }
     private val addonInstructions by lazy {
-        archives.filterKeys { it in setOf("p", "ime") }.mapValues { (namespace, files) ->
+        archives.filterKeys { it in setOf("p", "ime", "ame") }.mapValues { (namespace, files) -> lazy {
             InstructionCatalog.decodeFiles(files.getValue("riscv-instructions.json")) { files.getValue("inst/$it") }
                 .also { catalog ->
                     require(catalog.instructions.all { it.namespace == namespace && it.id.startsWith("$namespace-") })
                     require(catalog.pseudos.all { it.namespace == namespace && it.id.startsWith("$namespace-") })
                 }
-        }
+        } }
     }
     init {
         val decoded = Json.decodeFromString<OfficialPackageIndex>(index)
-        val order = listOf("manual", "aia", "debug", "spmp", "p", "ime")
+        val order = listOf("manual", "aia", "debug", "spmp", "p", "ime", "ame")
         val ids = decoded.packages.map { it.id }
         require(decoded.schemaVersion == 1 && ids.firstOrNull() == "manual" &&
             ids == order.filter { it in ids }) { "官方包索引必须以 Manual 为基础，且不能重复或包含未知包" }
@@ -85,19 +85,21 @@ class OfficialPackages(index: String, read: (String) -> ByteArray) {
         }
         val pack = Catalog.decode(JsonObject(metadata!! + ("registers" to JsonArray(registers.values.toList()))).toString())
         val usePacked = "p" in enabled
-        val addons = addonInstructions.filterKeys { it in enabled }.values
+        val addons = addonInstructions.filterKeys { it in enabled }.values.map { it.value }
         val catalog = instructions.copy(instructions = instructions.instructions + addons.flatMap { it.instructions },
             pseudos = instructions.pseudos + addons.flatMap { it.pseudos })
         require(catalog.instructions.map { it.id }.distinct().size == catalog.instructions.size)
         var options = if (usePacked) compiler.copy(tokens = (compiler.tokens + "p").distinct(),
             dependencies = compiler.dependencies + ("p" to listOf("i", "zmmul", "zba", "zbb"))) else compiler
-        if ("ime" in enabled) {
-            val extensions = Json.parseToJsonElement(archives.getValue("ime").getValue("isa-extensions.json")).jsonObject
+        for (namespace in listOf("ime", "ame").filter { it in enabled }) {
+            val extensions = Json.parseToJsonElement(archives.getValue(namespace).getValue("isa-extensions.json")).jsonObject
             val tokens = extensions.getValue("tokens").jsonArray.map { it.jsonPrimitive.content }
             val dependencies = extensions.getValue("dependencies").jsonObject.mapValues { (_, values) ->
                 values.jsonArray.map { it.jsonPrimitive.content }
             }
-            require(tokens.distinct().size == tokens.size && tokens.all { it.matches(Regex("zvv[a-z0-9]+")) })
+            require(tokens.distinct().size == tokens.size && tokens.all {
+                if (namespace == "ame") it == "ztt" else it.matches(Regex("zvv[a-z0-9]+"))
+            })
             require(dependencies.keys == tokens.toSet())
             require(dependencies.values.flatten().all { it in tokens || it in compiler.tokens })
             options = options.copy(tokens = (options.tokens + tokens).distinct(), dependencies = options.dependencies + dependencies)

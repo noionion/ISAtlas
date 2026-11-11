@@ -26,7 +26,9 @@ object InstructionAssembly {
         fun value(key: String) = operands.getValue(key)
         fun reg(number: Int) = register("x$number", abi)
         hit.instruction.assemblyOperands?.let { order ->
-            if (hit.instruction.namespace != "manual") return line(order.map(::value))
+            if (hit.instruction.namespace != "manual") return line(order.map { token ->
+                if (token.startsWith("(") && token.endsWith(")")) "(${value(token.trim('(', ')'))})" else value(token)
+            })
             val args = order.mapNotNull { token -> when {
                 token == "vm" -> if (number("vm") == 0L) "v0.t" else null
                 token == "csr" -> csrName ?: "0x${number("csr")!!.toString(16).padStart(3, '0')}"

@@ -55,7 +55,7 @@ fun privilegeRank(mode: String) = listOf("M", "S", "H", "VS", "U", "D").indexOf(
         if (pieces.any { it.operandSigned } && value and (1L shl highest) != 0L) value -= 1L shl (highest + 1)
         if (field.registerClass != null) {
             val number = field.registerMap?.getOrNull(value.toInt()) ?: (value.toInt() + field.registerOffset)
-            "${when (field.registerClass) { "float" -> "f"; "vector" -> "v"; else -> "x" }}$number"
+            "${when (field.registerClass) { "float" -> "f"; "vector" -> "v"; "matrix" -> "m"; "accumulator" -> "acc"; "accumulator-type" -> "ad"; else -> "x" }}$number"
         } else (value + field.operandBias).toString()
     }
 }
@@ -73,7 +73,7 @@ data class InstructionCatalog(val instructions: List<InstructionDefinition>, val
             val schema = root.getValue("schemaVersion").jsonPrimitive.int
             require(schema in setOf(1, 2))
             val features = root["requiredFeatures"]?.jsonArray?.map { it.jsonPrimitive.content }.orEmpty().toSet()
-            require(features.all { it in setOf("operand-relations-v1", "alias-assembly-v1", "pseudo-references-v1") })
+            require(features.all { it in setOf("operand-relations-v1", "alias-assembly-v1", "pseudo-references-v1", "ame-registers-v1") })
             if (schema == 2) require(features.isNotEmpty())
             val files = root.getValue("files").jsonArray.map { it.jsonPrimitive.content }
             require(files.isNotEmpty() && files.distinct().size == files.size)
@@ -91,6 +91,8 @@ data class InstructionCatalog(val instructions: List<InstructionDefinition>, val
             if (entries.any { it.encodings.any { encoding -> encoding.operandRelations.isNotEmpty() } })
                 require(schema == 2 && "operand-relations-v1" in features)
             if (entries.any { it.assemblyOperands != null }) require(schema == 2 && "alias-assembly-v1" in features)
+            if (entries.any { i -> i.encodings.any { e -> e.fields.any { it.registerClass in setOf("matrix", "accumulator", "accumulator-type") } } })
+                require(schema == 2 && "ame-registers-v1" in features)
             val pseudoFiles = root["pseudoFiles"]?.jsonArray?.map { it.jsonPrimitive.content }.orEmpty()
             require(pseudoFiles.distinct().size == pseudoFiles.size && pseudoFiles.none { it in files })
             val pseudos = pseudoFiles.map { file ->

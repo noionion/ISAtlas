@@ -106,7 +106,7 @@ fun FilterPanel(state: AtlasState, model: AppViewModel) {
                     state.instructions?.instructions.orEmpty().map { it.namespace } + state.instructions?.pseudos.orEmpty().map { it.namespace }).distinct().sorted()
                 (listOf<Pair<String?, String>>(null to "全部") + namespaces.map { value ->
                     value to (state.localPackages.firstOrNull { it.active && it.data?.manifest?.namespace == value }?.let { "${it.record.name} · 本地" }
-                        ?: when (value) { "manual" -> "ISA 手册"; "aia" -> "AIA 规范"; "debug" -> "Debug 规范"; "spmp" -> "SPMP 规范"; "p" -> "P 草案"; "ime" -> "集成矩阵草案"; "thead" -> "玄铁"; else -> value })
+                        ?: when (value) { "manual" -> "ISA 手册"; "aia" -> "AIA 规范"; "debug" -> "Debug 规范"; "spmp" -> "SPMP 规范"; "p" -> "P 草案"; "ime" -> "集成矩阵草案"; "ame" -> "附加矩阵草案"; "thead" -> "玄铁"; else -> value })
                 }).forEach { (value, label) ->
                     FilterChip(selected = state.namespace == value, onClick = { model.namespace(value) },
                         label = { Text(label, style = MaterialTheme.typography.labelMedium) },

@@ -31,7 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                     Column(Modifier.weight(1f).padding(vertical = 6.dp)) {
                         Text(when (item.id) { "manual" -> "ISA Manual"; "aia" -> "AIA"; "debug" -> "Debug / Trace"; "spmp" -> "SPMP"; else -> item.name },
                             style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                        Text(if (item.id in setOf("p", "ime")) "${item.version} · 草案指令包 · 补充 ${item.supplementCount} 项" else "${item.version} · ${item.csrCount} CSR" + if (item.supplementCount > 0) " · 补充 ${item.supplementCount} 项" else " · 含指令库",
+                        Text(if (item.id == "ame") "${item.version} · 草案 · ${item.csrCount} CSR · 含指令库" else if (item.id in setOf("p", "ime")) "${item.version} · 草案指令包 · 补充 ${item.supplementCount} 项" else "${item.version} · ${item.csrCount} CSR" + if (item.supplementCount > 0) " · 补充 ${item.supplementCount} 项" else " · 含指令库",
                             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     if (item.required) Text("基础包", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
