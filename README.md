@@ -23,7 +23,7 @@ Android 上的离线架构速查工具，支持 RISC-V 指令、CSR 与字段查
 ## 下载安装
 
 - **[稳定版 0.5.0](https://github.com/noionion/ISAtlas/releases/latest)**：支持指令查询、完整／部分编码反查与伪指令参考。
-- **[预览版 0.6.0-beta.1](https://github.com/noionion/ISAtlas/releases/tag/v0.6.0-beta.1)**：新增指令使用示例、本地数据包导入与数据库独立更新。
+- **[预览版 0.6.0-beta.2](https://github.com/noionion/ISAtlas/releases/tag/v0.6.0-beta.2)**：支持数据库 0.2.0，新增 P、IME 与 AME 草案数据包查询。
 - **[全部版本](https://github.com/noionion/ISAtlas/releases)**：查看历史版本、预览版与更新日志。
 
 在对应版本的 Assets 中下载 APK 安装，随包提供更新日志与 SHA-256 校验文件。现有用户可覆盖升级并保留应用数据；在「关于 → 更新通道」选择稳定版或预览版。
@@ -56,6 +56,8 @@ Android 上的离线架构速查工具，支持 RISC-V 指令、CSR 与字段查
 ## 数据包与数据库更新
 
 应用默认内置 **RISC-V ISA Manual**，安装后即可离线查询 CSR、字段与指令。在「关于 → 检查数据库更新」下载独立发布的官方数据库，可获得 AIA、Debug / Trace、SPMP 等规范数据，并在数据包页按需启用。
+
+`0.6.0-beta.2` 起支持数据库 `0.2.0` 中的 P、Integrated Matrix（IME）与 Attached Matrix（AME）草案包，可查询新增指令、编码与 CSR 补充；AME 的矩阵、累加器及类型寄存器分别以 `m`、`acc`、`ad` 显示。草案包默认关闭，临时地址与规范差异在数据中保留说明。
 
 数据库与软件分别维护版本，官方与镜像并行检查，支持更新日志、跳过版本和取消下载。下载期间可继续查询，校验通过后自动应用；更新保留本地包及官方包启停选择，新增加的可选包默认关闭。
 
